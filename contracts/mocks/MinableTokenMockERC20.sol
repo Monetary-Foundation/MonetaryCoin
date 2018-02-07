@@ -20,7 +20,6 @@ contract MinableTokenMockERC20 is MinableToken {
 
     //totalSupply_ = INITIAL_SUPPLY;
     //balances[msg.sender] = INITIAL_SUPPLY;
-    
   }
 
 }
