@@ -8,15 +8,15 @@ import "./MintableToken.sol";
  * @dev ERC20 Token with Pos mining
 */
 contract MinableToken is MintableToken { 
-  event Commit(address indexed from, uint256 value, uint indexed blockNumber,uint commitmentStake);
+  event Commit(address indexed from, uint256 value, uint indexed onBlockNumber,uint atStake);
 
   uint256 totalStake_ = 0;
   uint256 blockReward_;
 
   struct Commitment {
-    uint amount;          // amount commited to mining
-    uint blockNumber;     // commitment done on block
-    uint commitmentStake; // stake during commitment
+    uint value;          // value commited to mining
+    uint onBlockNumber;     // commitment done on block
+    uint atStake; // stake during commitment
   }
 
   mapping( address => Commitment ) miners;
@@ -29,7 +29,7 @@ contract MinableToken is MintableToken {
     require(0 < _value);
     require(_value <= balances[msg.sender]);
     //Prevent commiting more then once without withdrawing first:
-    require(miners[msg.sender].amount == 0); 
+    require(miners[msg.sender].value == 0); 
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
@@ -37,34 +37,54 @@ contract MinableToken is MintableToken {
     
     totalStake_ = totalStake_.add(_value);
 
-    Commit(msg.sender, _value, block.number, totalStake_); // solium-disable-line
+    Commit(msg.sender, _value, block.number, totalStake_.sub(_value)); // solium-disable-line
     return true;
   }
 
-   /**
-  * @dev withdraw from mining 
+  /**
+  * @dev withdraw commitment + reward
   */
   function withdraw() public returns (uint256) {
-    require(miners[msg.sender].amount > 0); 
+    require(miners[msg.sender].value > 0); 
+    return 0;
+  }
 
-    uint256 averageStake = average(miners[msg.sender].commitmentStake, totalStake_);
+  /**
+  * @dev Calculate the reward if withdraw() happans on this block
+  * @return An uint256 representing the reward amount
+  */
+  function getCurrentReward(address _miner) public view returns (uint256) {
+    if (miners[_miner].value == 0) {
+      return 0;
+    }
+
+    uint256 averageStake = average(miners[_miner].atStake, totalStake_);
     
-    uint256 numberOfBlocks = block.number - miners[msg.sender].blockNumber;
+    uint256 numberOfBlocks = block.number.sub(miners[_miner].onBlockNumber);
 
-    uint256 withdrawAmount = miners[msg.sender].amount * numberOfBlocks * blockReward_ / averageStake;
+    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value) / averageStake;   
 
     
+    // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / averageStake);   
+    return miningReward;
+  }
 
-    return withdrawAmount;
+  /**
+  * @dev Calculate the average of two integer numbers 
+  * 1.5 will be rounded down
+  * @return An uint256 representing integer average
+  */
+  function average(uint a, uint b) public pure returns (uint) {
+    return (a+b) / 2;
   }
 
   /**
   * @dev Gets the commitment of the specified address.
-  * @param _miner The address to query the the balance of.
+  * @param _miner The address to query the the commitment Of
   * @return An uint256 representing the amount commited by the passed address.
   */
-  function commitmentOf(address _miner) public view returns (uint256 balance) {
-    return miners[_miner].amount;
+  function commitmentOf(address _miner) public view returns (uint256) {
+    return miners[_miner].value;
   }
 
   /**
