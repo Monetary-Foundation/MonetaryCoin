@@ -46,6 +46,8 @@ contract MinableToken is MintableToken {
   */
   function withdraw() public returns (uint256) {
     require(miners[msg.sender].value > 0); 
+
+    
     return 0;
   }
 
@@ -62,8 +64,7 @@ contract MinableToken is MintableToken {
     
     uint256 numberOfBlocks = block.number.sub(miners[_miner].onBlockNumber);
 
-    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value) / averageStake;   
-
+    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value) / averageStake;
     
     // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / averageStake);   
     return miningReward;
