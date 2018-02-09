@@ -33,7 +33,7 @@ contract('MinableToken', function (accounts) {
 
     assert.equal(totalStake, 0);
   });
-
+  /*
   it('should return correct block reward after construction', async function () {
     const initialAccount = accounts[0];
     const initialBalance = 5;
@@ -94,11 +94,11 @@ contract('MinableToken', function (accounts) {
     let avg = await token.average(2, 4);
     assert.equal(avg, 3);
   });
-
   it('should return the correct average (round down)', async function () {
     let avg = await token.average(2, 1);
     assert.equal(avg, 1);
   });
+
   it('should return the correct reward if nothing was commited', async function () {
     let zeroReward = await token.getCurrentReward(accounts[0]);
     assert.equal(zeroReward, 0);
@@ -236,5 +236,24 @@ contract('MinableToken', function (accounts) {
       new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * setBlockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1, finalStake));
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
+  });
+  */
+
+  it('should withdraw the correct amount', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    // after one block
+    let reward = await token.withdraw.call();
+    console.log(reward);
+    
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 1 * 5) / 2 = 10;
+    let expectedReward = new BigNumber(commitValue * 1 * setBlockReward).dividedToIntegerBy(2);
+
+    reward.should.be.bignumber.equal(expectedReward);
   });
 });

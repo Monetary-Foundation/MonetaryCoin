@@ -47,8 +47,18 @@ contract MinableToken is MintableToken {
   function withdraw() public returns (uint256) {
     require(miners[msg.sender].value > 0); 
 
+    Commitment storage commitment = miners[msg.sender];
+
+    uint256 reward = getCurrentReward(msg.sender);
+    uint256 additionalSupply = reward.sub(commitment.value);
     
-    return 0;
+    commitment.value = 0;
+
+    totalStake_ = totalStake_.sub(commitment.value);
+    balances[msg.sender] = balances[msg.sender].add(reward);
+    totalSupply_ = totalSupply_.add(additionalSupply);
+    
+    return reward;
   }
 
   /**
@@ -60,11 +70,13 @@ contract MinableToken is MintableToken {
       return 0;
     }
 
-    uint256 averageStake = average(miners[_miner].atStake, totalStake_);
-    
-    uint256 numberOfBlocks = block.number.sub(miners[_miner].onBlockNumber);
+    Commitment commitment = miners[_miner];
 
-    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value) / averageStake;
+    uint256 averageStake = average(commitment.atStake, totalStake_);
+    
+    uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
+
+    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(commitment.value) / averageStake;
     
     // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / averageStake);   
     return miningReward;
