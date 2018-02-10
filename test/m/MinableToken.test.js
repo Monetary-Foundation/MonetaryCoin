@@ -86,10 +86,6 @@ contract('MinableToken', function (accounts) {
     await expectThrow(token.commit(4));
   });
 
-  it('should throw if nothing to withdraw', async function () {
-    await expectThrow(token.withdraw());
-  });
-
   it('should return the correct average', async function () {
     let avg = await token.average(2, 4);
     assert.equal(avg, 3);
@@ -239,6 +235,40 @@ contract('MinableToken', function (accounts) {
   });
   */
 
+  it('should emit the correct event during withdraw', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    // after one block
+    const txObj = await token.withdraw();
+    // console.log(txObj.logs[0]);
+    const { from, reward, onBlockNumber } = txObj.logs[0].args;
+
+    assert.equal(txObj.logs[0].event, 'Withdraw');
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 1 * 5) / 2 = 10;
+    let expectedReward = new BigNumber(commitValue * 1 * setBlockReward).dividedToIntegerBy(2);
+
+    assert.equal(from, accounts[0]);
+    reward.should.be.bignumber.equal(expectedReward);
+    assert.equal(onBlockNumber.toNumber(), web3.eth.blockNumber);
+  });
+
+  it('should throw if nothing to withdraw', async function () {
+    await expectThrow(token.withdraw());
+  });
+
+  it('should throw if trying to withdraw twice after commit', async function () {
+    const commitValue = 4;
+    await token.commit(commitValue);
+
+    await token.withdraw();
+    await expectThrow(token.withdraw());
+  });
+
   it('should withdraw the correct amount', async function () {
     const commitValue = 4;
     // onBlockNumber = commitBlockNumber
@@ -246,14 +276,153 @@ contract('MinableToken', function (accounts) {
     // atStake = 0
     await token.commit(commitValue);
     // after one block
-    let reward = await token.withdraw.call();
-    console.log(reward);
-    
+    // let reward = await token.withdraw.call();
+    await token.withdraw();
+    let newBalance = await token.balanceOf(accounts[0]);
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 2 = 10;
     let expectedReward = new BigNumber(commitValue * 1 * setBlockReward).dividedToIntegerBy(2);
+    let expectedBalance = expectedReward.plus(initialBalance - commitValue);
 
-    reward.should.be.bignumber.equal(expectedReward);
+    newBalance.should.be.bignumber.equal(expectedBalance);
+  });
+
+  it('should withdraw the correct amount (transfer after commit)', async function () {
+    const commitValue = 4;
+    const transferValue = 7;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    await token.transfer(accounts[1], transferValue);
+    // after two blocks
+    await token.withdraw();
+    let newBalance = await token.balanceOf(accounts[0]);
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 2 * 5) / 2 = 20;
+    let expectedReward = new BigNumber(commitValue * 2 * setBlockReward).dividedToIntegerBy(2);
+    let expectedBalance = expectedReward.plus(initialBalance - commitValue).minus(transferValue);
+
+    newBalance.should.be.bignumber.equal(expectedBalance);
+  });
+
+  it('should decrease stake after withdraw', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    let totalStake = await token.totalStake();
+    assert.equal(totalStake, 0);
+    totalStake.should.be.bignumber.equal(0);
+    
+    await token.commit(commitValue);
+    totalStake = await token.totalStake();
+    assert.equal(totalStake, 4);
+    totalStake.should.be.bignumber.equal(4);
+    
+    await token.withdraw();
+    totalStake = await token.totalStake();
+    assert.equal(totalStake, 0);  
+  });
+
+  it('should decrease stake after withdraw (with other commiters)', async function () {
+    const commitValue = 4;
+    await token.transfer(accounts[1], 4);
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    let totalStake = await token.totalStake();
+    assert.equal(totalStake, 0);
+    totalStake.should.be.bignumber.equal(0);
+    
+    await token.commit(commitValue);
+    totalStake = await token.totalStake();
+    assert.equal(totalStake, 4);
+    totalStake.should.be.bignumber.equal(4);
+
+    await token.commit(commitValue, { from: accounts[1] });
+    
+    await token.withdraw();
+    totalStake = await token.totalStake();
+    assert.equal(totalStake, 4);
+  });
+
+  it('should increase supply after withdraw', async function () {
+    const commitValue = 4;
+    await token.transfer(accounts[1], 4);
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+
+    await token.commit(commitValue, { from: accounts[1] });
+
+    let reward = await token.getCurrentReward(accounts[0]);
+
+    let supply = await token.totalSupply();
+
+    let expectedSupplyIncrease = reward.minus(commitValue);
+
+    await token.withdraw();
+
+    let newSupply = await token.totalSupply();
+
+    newSupply.should.be.bignumber.equal(supply.plus(expectedSupplyIncrease));
+  });
+
+  it('should increase supply after two withdraws', async function () {
+    const commitValue = 4;
+    await token.transfer(accounts[1], 4);
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+
+    await token.commit(commitValue, { from: accounts[1] });
+
+    await token.withdraw({ from: accounts[0] });
+
+    let reward0 = await token.getCurrentReward(accounts[0]);
+    reward0.should.be.bignumber.equal(0);
+
+    let reward = await token.getCurrentReward(accounts[1]);
+
+    let supply = await token.totalSupply();
+
+    let expectedSupplyIncrease = reward.minus(commitValue);
+
+    await token.withdraw({ from: accounts[1] });
+
+    let newSupply = await token.totalSupply();
+
+    newSupply.should.be.bignumber.equal(supply.plus(expectedSupplyIncrease));
+  });
+
+  it('should return 0 for reward after withdraw', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+
+    await token.withdraw();
+
+    let reward = await token.getCurrentReward(accounts[0]);
+    reward.should.be.bignumber.equal(0);
+  });
+
+  it('should return 0 for commitment after withdraw (set commitment value to zero)', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+
+    await token.withdraw();
+
+    let commitment = await token.commitmentOf(accounts[0]);
+    commitment.should.be.bignumber.equal(0);
   });
 });

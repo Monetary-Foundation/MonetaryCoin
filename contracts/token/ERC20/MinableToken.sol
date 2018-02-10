@@ -9,6 +9,7 @@ import "./MintableToken.sol";
 */
 contract MinableToken is MintableToken { 
   event Commit(address indexed from, uint256 value, uint indexed onBlockNumber,uint atStake);
+  event Withdraw(address indexed from, uint256 reward, uint indexed onBlockNumber);
 
   uint256 totalStake_ = 0;
   uint256 blockReward_;
@@ -42,7 +43,7 @@ contract MinableToken is MintableToken {
   }
 
   /**
-  * @dev withdraw commitment + reward
+  * @dev withdraw reward
   */
   function withdraw() public returns (uint256) {
     require(miners[msg.sender].value > 0); 
@@ -51,13 +52,15 @@ contract MinableToken is MintableToken {
 
     uint256 reward = getCurrentReward(msg.sender);
     uint256 additionalSupply = reward.sub(commitment.value);
-    
-    commitment.value = 0;
 
     totalStake_ = totalStake_.sub(commitment.value);
-    balances[msg.sender] = balances[msg.sender].add(reward);
     totalSupply_ = totalSupply_.add(additionalSupply);
     
+    balances[msg.sender] = balances[msg.sender].add(reward);
+
+    commitment.value = 0;
+    
+    Withdraw(msg.sender, reward, block.number);
     return reward;
   }
 

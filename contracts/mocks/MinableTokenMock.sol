@@ -20,7 +20,7 @@ contract MinableTokenMock is MinableToken {
     ) public 
     {
     require(initialBalance <= totalSupply);
-    require(blockReward > 0);
+    require(0 < blockReward);
 
     // SafeMath.sub will throw if there is not enough balance.
     totalSupply_ = totalSupply; // * (10 ** uint256(decimals));
