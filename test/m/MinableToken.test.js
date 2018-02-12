@@ -31,7 +31,7 @@ contract('MinableToken', function (accounts) {
 
     assert.equal(totalStake, 0);
   });
-  
+
   it('should return correct block reward after construction', async function () {
     const initialAccount = accounts[0];
     const initialSupply = 5;
@@ -97,6 +97,41 @@ contract('MinableToken', function (accounts) {
     let avg = await token.average(2, 1);
     assert.equal(avg, 1);
   });
+
+  it('should return the correct signed average', async function () {
+    let avg = await token.signedAverage(2, 4);
+    assert.equal(avg, 3);
+  });
+
+  it('should return the correct signed average (round down)', async function () {
+    let avg = await token.signedAverage(2, 1);
+    assert.equal(avg, 1);
+  });
+
+  it('should return the correct signed average', async function () {
+    let avg = await token.signedAverage(-2, 4);
+    assert.equal(avg, 1);
+  });
+
+  it('should return the correct signed average', async function () {
+    let avg = await token.signedAverage(-2, 5);
+    assert.equal(avg, 1);
+  });
+
+  it('should return the correct signed average', async function () {
+    let avg = await token.signedAverage(-2, -4);
+    assert.equal(avg, -3);
+  });
+
+  it('should return the correct signed average (round toward zero)', async function () {
+    let avg = await token.signedAverage(-3, -4);
+    assert.equal(avg, -3);
+  });
+
+  // it('should throw on possitive overflow ', async function () {
+  //   const big = new BigNumber(2).pow(252).minus(1);
+  //   await expectThrow(token.signedAverage(big, big));
+  // });
 
   it('should return the correct reward if nothing was commited', async function () {
     let zeroReward = await token.getCurrentReward(accounts[0]);
@@ -195,7 +230,7 @@ contract('MinableToken', function (accounts) {
   it('should calculate the reward correctly when 2 stake increaes and 4 more blocks (stake even)', async function () {
     // unlock accounts[0], accounts[1], accounts[2]
     let finalStake = 0;
-    
+
     const commitValueAcc0 = 4;
     const commitValueAcc1 = 3;
     const commitValueAcc2 = 5;
@@ -236,7 +271,7 @@ contract('MinableToken', function (accounts) {
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1, finalStake));
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
-  
+
 
   it('should emit the correct event during withdraw', async function () {
     const commitValue = 4;
@@ -319,15 +354,15 @@ contract('MinableToken', function (accounts) {
     let totalStake = await token.totalStake();
     assert.equal(totalStake, 0);
     totalStake.should.be.bignumber.equal(0);
-    
+
     await token.commit(commitValue);
     totalStake = await token.totalStake();
     assert.equal(totalStake, 4);
     totalStake.should.be.bignumber.equal(4);
-    
+
     await token.withdraw();
     totalStake = await token.totalStake();
-    assert.equal(totalStake, 0);  
+    assert.equal(totalStake, 0);
   });
 
   it('should decrease stake after withdraw (with other commiters)', async function () {
@@ -339,14 +374,14 @@ contract('MinableToken', function (accounts) {
     let totalStake = await token.totalStake();
     assert.equal(totalStake, 0);
     totalStake.should.be.bignumber.equal(0);
-    
+
     await token.commit(commitValue);
     totalStake = await token.totalStake();
     assert.equal(totalStake, 4);
     totalStake.should.be.bignumber.equal(4);
 
     await token.commit(commitValue, { from: accounts[1] });
-    
+
     await token.withdraw();
     totalStake = await token.totalStake();
     assert.equal(totalStake, 4);

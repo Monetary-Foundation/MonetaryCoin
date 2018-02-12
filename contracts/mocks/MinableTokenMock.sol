@@ -15,13 +15,12 @@ contract MinableTokenMock is MinableToken {
   function MinableTokenMock(
     address initialAccount,
     uint256 initialSupply,
-    uint256 blockReward
+    int256 blockReward
     ) public 
     {
     require(0 < initialSupply);
     require(0 < blockReward);
 
-    // SafeMath.sub will throw if there is not enough balance.
     totalSupply_ = initialSupply; // * (10 ** uint256(decimals));
 
     balances[initialAccount] = initialSupply;

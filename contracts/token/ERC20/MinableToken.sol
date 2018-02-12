@@ -8,16 +8,17 @@ import "./MintableToken.sol";
  * @dev ERC20 Token with Pos mining
 */
 contract MinableToken is MintableToken { 
-  event Commit(address indexed from, uint256 value, uint indexed onBlockNumber,uint atStake);
-  event Withdraw(address indexed from, uint256 reward, uint indexed onBlockNumber);
+  event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward );
+  event Withdraw(address indexed from, uint reward, uint indexed onBlockNumber);
 
   uint256 totalStake_ = 0;
-  uint256 blockReward_;
+  int256 blockReward_;
 
   struct Commitment {
-    uint value;          // value commited to mining
-    uint onBlockNumber;     // commitment done on block
-    uint atStake; // stake during commitment
+    uint256 value;          // value commited to mining
+    uint256 onBlockNumber;     // commitment done on block
+    uint256 atStake; // stake during commitment
+    int256 onBlockReward;
   }
 
   mapping( address => Commitment ) miners;
@@ -34,11 +35,12 @@ contract MinableToken is MintableToken {
 
     // SafeMath.sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
-    miners[msg.sender] = Commitment(_value, block.number, totalStake_);
+    miners[msg.sender] = Commitment(_value, block.number, totalStake_,blockReward_); // solium-disable-line
     
-    totalStake_ = totalStake_.add(_value);
+    Commit(msg.sender, _value, block.number, totalStake_,blockReward_); // solium-disable-line
 
-    Commit(msg.sender, _value, block.number, totalStake_.sub(_value)); // solium-disable-line
+    totalStake_ = totalStake_.add(_value);
+    
     return true;
   }
 
@@ -75,13 +77,18 @@ contract MinableToken is MintableToken {
 
     Commitment commitment = miners[_miner];
 
-    uint256 averageStake = average(commitment.atStake, totalStake_);
+    int averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
+    
+    require(0 <= averageBlockReward);
+    uint256 effectiveBlockReward = uint(averageBlockReward);
+    
+    uint256 effectiveStake = average(commitment.atStake, totalStake_);
     
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
-    uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(commitment.value) / averageStake;
+    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
     
-    // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / averageStake);   
+    // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / effective);   
     return miningReward;
   }
 
@@ -91,7 +98,23 @@ contract MinableToken is MintableToken {
   * @return An uint256 representing integer average
   */
   function average(uint a, uint b) public pure returns (uint) {
-    return (a+b) / 2;
+    return a.add(b) / 2;
+  }
+
+  /**
+  * @dev Calculate the average of two signed integers numbers 
+  * 1.5 will be rounded down
+  * @return An int256 representing integer average
+  */
+  function signedAverage(int256 a, int256 b) public pure returns (int256) {
+    int ans = a + b;
+
+    if (a > 0 && b > 0 && ans < 0)
+         assert(false);
+    if (a < 0 && b < 0 && ans > 0)
+         assert(false);
+
+    return ans / 2;
   }
 
   /**
@@ -104,7 +127,8 @@ contract MinableToken is MintableToken {
   }
 
   /**
-  * @dev total number of tokens in existence
+  * @dev total stake of tokens
+  * @return the total stake
   */
   function totalStake() public view returns (uint256) {
     return totalStake_;
@@ -112,8 +136,9 @@ contract MinableToken is MintableToken {
 
   /**
   * @dev the total block reward
+  * @return the current block reward
   */
-  function blockReward() public view returns (uint256) {
+  function blockReward() public view returns (int256) {
     return blockReward_;
   }
 }
