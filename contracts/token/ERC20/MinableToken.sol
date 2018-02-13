@@ -8,7 +8,7 @@ import "./MintableToken.sol";
  * @dev ERC20 Token with Pos mining
 */
 contract MinableToken is MintableToken { 
-  event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward );
+  event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward);
   event Withdraw(address indexed from, uint reward, uint indexed onBlockNumber);
 
   uint256 totalStake_ = 0;
@@ -33,11 +33,11 @@ contract MinableToken is MintableToken {
     //Prevent commiting more then once without withdrawing first:
     require(miners[msg.sender].value == 0); 
 
-    // SafeMath.sub will throw if there is not enough balance.
+    // sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     miners[msg.sender] = Commitment(_value, block.number, totalStake_,blockReward_); // solium-disable-line
     
-    Commit(msg.sender, _value, block.number, totalStake_,blockReward_); // solium-disable-line
+    Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
 
     totalStake_ = totalStake_.add(_value);
     
