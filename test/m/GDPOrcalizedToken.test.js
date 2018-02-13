@@ -9,7 +9,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var GDPOraclizedToken = artifacts.require('GDPOraclizedToken');
+var GDPOraclizedToken = artifacts.require('GDPOraclizedTokenMock');
 
 contract('GDPOraclizedToken', function (accounts) {
   let token;
@@ -24,9 +24,10 @@ contract('GDPOraclizedToken', function (accounts) {
     token = await GDPOraclizedToken.new(initialAccount, initialSupply, setBlockReward, initialAccount);
   });
 
-  it('should return 0 for totalStake after construction', async function () {
-    let totalStake = await token.totalStake();
-
-    assert.equal(totalStake, 0);
+  it('should the correct oracle address after init', async function () {
+    let oracleAddress = await token.GDPOracle();
+    
+    console.log(oracleAddress);
+    assert.equal(oracleAddress, accounts[0]);
   });
 });
