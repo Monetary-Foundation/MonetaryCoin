@@ -35,6 +35,8 @@ contract MinableToken is MintableToken {
 
     // sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
+    // Transfer(msg.sender, 0, _value);
+    
     miners[msg.sender] = Commitment(_value, block.number, totalStake_,blockReward_); // solium-disable-line
     
     Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
@@ -59,6 +61,7 @@ contract MinableToken is MintableToken {
     totalSupply_ = totalSupply_.add(additionalSupply);
     
     balances[msg.sender] = balances[msg.sender].add(reward);
+    // Transfer(0, msg.sender, reward);
 
     commitment.value = 0;
     
