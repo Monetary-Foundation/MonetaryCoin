@@ -7,21 +7,21 @@ contract GDPOraclizedToken is MinableToken {
   event GDPOracleTransferred(address indexed previousOracle, address indexed newOracle);
   event BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
 
-  address public GDPOracle;
+  address GDPOracle_;
 
   /**
    * @dev The GdpOraclizedToken constructor sets the oracle account
    */
   /* 
-  function GdpOraclizedToken() public {
-    owner = msg.sender;
+  function GdpOraclizedToken(address oracle) public {
+    GDPOracle = oracle;
   }*/
 
   /**
    * @dev Throws if called by any account other than the GDPOracle.
    */
   modifier onlyGDPOracle() {
-    require(msg.sender == GDPOracle);
+    require(msg.sender == GDPOracle_);
     _;
   }
 
@@ -32,7 +32,7 @@ contract GDPOraclizedToken is MinableToken {
   function transferGDPOracle(address newOracle) public onlyGDPOracle {
     require(newOracle != address(0));
     GDPOracleTransferred(owner, newOracle);
-    GDPOracle = newOracle;
+    GDPOracle_ = newOracle;
   }
 
   /**
@@ -56,6 +56,14 @@ contract GDPOraclizedToken is MinableToken {
 
     BlockRewardChanged(blockReward_, newBlockReward, block.number);
     blockReward_ = newBlockReward;
+  }
+
+  /**
+  * @dev get GDPOracle
+  * @return the address of the GDPOracle
+  */
+  function GDPOracle() public view returns (address) { // solium-disable-line mixedcase
+    return GDPOracle_;
   }
 
 }
