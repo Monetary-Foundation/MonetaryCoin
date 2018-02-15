@@ -36,7 +36,7 @@ contract MinableToken is MintableToken {
     // sub will throw if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(_value);
     // Transfer(msg.sender, 0, _value);
-    
+
     miners[msg.sender] = Commitment(_value, block.number, totalStake_,blockReward_); // solium-disable-line
     
     Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
@@ -83,6 +83,7 @@ contract MinableToken is MintableToken {
     int averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
     
     require(0 <= averageBlockReward);
+    
     uint256 effectiveBlockReward = uint(averageBlockReward);
     
     uint256 effectiveStake = average(commitment.atStake, totalStake_);

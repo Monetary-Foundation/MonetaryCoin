@@ -272,7 +272,6 @@ contract('MinableToken', function (accounts) {
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
 
-
   it('should emit the correct event during withdraw', async function () {
     const commitValue = 4;
     // onBlockNumber = commitBlockNumber

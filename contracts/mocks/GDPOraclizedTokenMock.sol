@@ -28,8 +28,10 @@ contract GDPOraclizedTokenMock is GDPOraclizedToken {
     Transfer(0x0, initialAccount, initialSupply);
     
     blockReward_ = blockReward;
+    BlockRewardChanged(0, blockReward_, block.number);
 
     GDPOracle_ = GDPOracle;
+    GDPOracleTransferred(0x0, GDPOracle_);
   }
 
 }
