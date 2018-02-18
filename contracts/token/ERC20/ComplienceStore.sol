@@ -1,5 +1,7 @@
 pragma solidity ^0.4.18;
 
+import "./MultihashStore.sol";
+
 
 /**
  * @title ComplienceStore
@@ -27,6 +29,7 @@ contract ComplienceStore is MultihashStore {
     returns (bool) 
   {
     store[msg.sender] = Multihash(_hashFunction, _size, _hash, block.timestamp); // solium-disable-line
+    SetHash(msg.sender, _hashFunction, _size, _hash, block.timestamp); // solium-disable-line
   }
   
   function getHash(address from) public view
