@@ -20,7 +20,13 @@ contract ComplienceStore is MultihashStore {
 
   mapping( address => Multihash ) store;
 
-
+  /**
+  * @dev add multihash to complience store
+  * @param _hashFunction
+  * @param _size
+  * @param _hash
+  * @return true on success
+  */
   function setHash(
     uint8 _hashFunction,
     uint8 _size,
@@ -32,6 +38,14 @@ contract ComplienceStore is MultihashStore {
     SetHash(msg.sender, _hashFunction, _size, _hash, block.timestamp); // solium-disable-line
   }
   
+  /**
+  * @dev get hash from store for specific address
+  * @param from
+  * @return hashFunction
+  * @return size
+  * @return hash
+  * @return timestamp      
+  */
   function getHash(address from) public view
     returns (
       uint8 hashFunction,

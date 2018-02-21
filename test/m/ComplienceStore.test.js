@@ -16,7 +16,7 @@ contract('ComplienceStore', function (accounts) {
     ComplienceStore = await ComplienceStoreMock.new();
   });
 
-  it('should return all zero for unset address', async function () {
+  it('should return zeros for unset address', async function () {
     let multiHash = await ComplienceStore.getHash(accounts[0]);
 
     const hashFunction = multiHash[0]; // bignumber
@@ -30,7 +30,7 @@ contract('ComplienceStore', function (accounts) {
     timestamp.should.be.bignumber.equal(0);
   });
 
-  it('should return all zero for unset address 2', async function () {
+  it('should return zeros for unset address 2', async function () {
     let multiHash = await ComplienceStore.getHash(accounts[1]);
 
     const hashFunction = multiHash[0]; // bignumber
@@ -44,7 +44,7 @@ contract('ComplienceStore', function (accounts) {
     timestamp.should.be.bignumber.equal(0);
   });
 
-  it('should set multihash correctly', async function () {
+  it('should set and get multihash correctly', async function () {
     await ComplienceStore.setHash(1, 2, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
     let multiHash = await ComplienceStore.getHash(accounts[0]);
     

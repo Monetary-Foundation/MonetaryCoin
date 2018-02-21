@@ -26,6 +26,7 @@ contract MinableToken is MintableToken {
   /**
   * @dev commit amount for minning
   * @param _value The amount to be commited.
+  * @return true on successfull commit
   */
   function commit(uint _value) public returns (bool) {
     require(0 < _value);
@@ -48,6 +49,7 @@ contract MinableToken is MintableToken {
 
   /**
   * @dev withdraw reward
+  * @return reward to withdraw
   */
   function withdraw() public returns (uint256) {
     require(miners[msg.sender].value > 0); 
