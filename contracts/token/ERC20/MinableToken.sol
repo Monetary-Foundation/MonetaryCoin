@@ -56,6 +56,7 @@ contract MinableToken is MintableToken {
 
     Commitment storage commitment = miners[msg.sender];
 
+    //will throw if reward is negative:
     uint256 reward = getCurrentReward(msg.sender);
     uint256 additionalSupply = reward.sub(commitment.value);
 
