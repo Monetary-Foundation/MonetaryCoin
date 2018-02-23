@@ -8,39 +8,52 @@ import "./MinableToken.sol";
  * @dev ERC20 Token for mining when GDP is negative
 */
 contract MinableM5Token is MinableToken { 
-  
-  event withdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
 
-  address M5Token;
+  address M5Token_;
   
-  address M5LogicContract;
+  address M5Logic_;
+
+  /**
+  * @dev get the M5 token address
+  * @return M5 token address
+  */
+  function M5Token() public view returns (address) {
+    return M5Token_;
+  }
+
+  /**
+  * @dev get the M5 logic contract address
+  * @return M5 logic contract address
+  */
+  function M5Logic() public view returns (address) {
+    return M5Logic_;
+  }
 
   /* Minable Token data structs:
-  uint256 totalStake_ = 0;
-  int256 blockReward_;
+    uint256 totalStake_ = 0;
+    int256 blockReward_;
 
-  struct Commitment {
-    uint256 value;          // value commited to mining
-    uint256 onBlockNumber;     // commitment done on block
-    uint256 atStake; // stake during commitment
-    int256 onBlockReward;
-  }
-  mapping( address => Commitment ) miners;
+    struct Commitment {
+      uint256 value;          // value commited to mining
+      uint256 onBlockNumber;     // commitment done on block
+      uint256 atStake; // stake during commitment
+      int256 onBlockReward;
+    }
+    mapping( address => Commitment ) miners;
   */
 
   event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
   
-  event M5LogicContractUpgrade(address indexed oldM5LogicContract, address indexed newM5LogicContract);
-
+  event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
 
   /**
    * @dev Allows the upgrade the M5 logic Contract 
-   * @param newM5LogicContract The address of the new contract
+   * @param newM5Logic The address of the new contract
    */
-  function upgradeM5LogicContract(address newM5LogicContract) public onlyOwner {
-    require(newM5LogicContract != address(0));
-    M5RewardContractUpgrade(M5LogicContract, newM5LogicContract);
-    M5LogicContract = newM5LogicContract;
+  function upgradeM5Logic(address newM5Logic) public onlyOwner { // solium-disable-line
+    require(newM5Logic != address(0));
+    M5LogicUpgrade(M5Logic_, newM5Logic);
+    M5Logic_ = newM5Logic;
   }
 
 
@@ -48,10 +61,10 @@ contract MinableM5Token is MinableToken {
    * @dev Allows the upgrade of the M5 token Contract 
    * @param newM5Token The address of the new contract
    */
-  function upgradeM5LogicContract(address newM5Token) public onlyOwner {
+  function upgradeM5Token(address newM5Token) public onlyOwner { // solium-disable-line
     require(newM5Token != address(0));
-    M5TokenUpgrade(M5Token, newM5Token);
-    M5Token = newM5Token;
+    M5TokenUpgrade(M5Token_, newM5Token);
+    M5Token_ = newM5Token;
   }
 
 
@@ -63,19 +76,27 @@ contract MinableM5Token is MinableToken {
     if (miners[_miner].value == 0) {
       return 0;
     }
+    require(M5Logic_ != address(0));
     
+    uint M5Reward;
     
-    return 2;
+    // bool delegatecallStatus = M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address _miner)")), _miner); 
+    
+    // require(delegatecallStatus);
+
+    return M5Reward;
   }
+
+  event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
 
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
   * @return reward to withdraw
   */
-  function withdrawM5() public returns (uint256) {
-    require(miners[msg.sender].value > 0); 
+  // function withdrawM5() public returns (uint256) {
+  //   require(miners[msg.sender].value > 0); 
 
-    
-    return 1;
-  }
+  //   //WithdrawM5();
+  //   return 1;
+  // }
 }

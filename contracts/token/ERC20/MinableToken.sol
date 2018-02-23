@@ -81,7 +81,7 @@ contract MinableToken is MintableToken {
       return 0;
     }
 
-    Commitment commitment = miners[_miner];
+    Commitment storage commitment = miners[_miner];
 
     int averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
     
