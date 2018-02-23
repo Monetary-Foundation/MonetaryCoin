@@ -67,24 +67,27 @@ contract MinableM5Token is MinableToken {
     M5Token_ = newM5Token;
   }
 
+  uint M5rewardResponse_ = 55;
+
+  function M5rewardResponse() public view returns (uint) {
+    return M5rewardResponse_;
+  }
 
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount
   */
-  function getM5Reward(address _miner) public view returns (uint256) {
+  function getM5Reward(address _miner) public returns (uint256) {
     if (miners[_miner].value == 0) {
       return 0;
     }
     require(M5Logic_ != address(0));
     
-    uint M5Reward;
-    
-    // bool delegatecallStatus = M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address _miner)")), _miner); 
-    
+    require(M5Logic_.delegatecall(bytes4(keccak256("getM5Reward()")))); 
+    // M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address _miner)")), _miner);
     // require(delegatecallStatus);
 
-    return M5Reward;
+    return M5rewardResponse_;
   }
 
   event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
