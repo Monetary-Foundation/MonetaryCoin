@@ -69,7 +69,7 @@ contract('MinableM5Token', function (accounts) {
   //   await assertRevert(token.getM5Reward(accounts[0]));
   // });
 
-  it('should return the correct value from getM5Reward', async function () {
+  it('should correctly call getM5Reward', async function () {
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock1.new();
@@ -78,16 +78,30 @@ contract('MinableM5Token', function (accounts) {
 
     // let logicAddress = await token.M5Logic();
     // assert.equal(logicAddress, M5LogicContract.address);
-    
-    let reward = await token.withdrawM5();
 
-    console.log(reward);
-
-    let M5WithdrawResponse = await token.M5WithdrawResponse();
-
-    console.log(M5WithdrawResponse);
-
+    let reward = await token.getM5Reward.call(accounts[0]);
+    reward.should.be.bignumber.equal(String(2 ** 128));
+    // console.log(reward.toString(2));
   });
+
+  // it('should correctly change storage on withdrawM5()', async function () {
+  //   await token.commit(5);
+
+  //   let M5LogicContract = await M5LogicMock1.new();
+
+  //   await token.upgradeM5Logic(M5LogicContract.address);
+
+  //   // let logicAddress = await token.M5Logic();
+  //   // assert.equal(logicAddress, M5LogicContract.address);
+
+  //   let reward = await token.withdrawM5();
+
+  //   console.log(reward);
+
+  //   let M5WithdrawResponse = await token.M5WithdrawResponse();
+
+  //   console.log(M5WithdrawResponse);
+  // });
 
   // it('', async function () {
 

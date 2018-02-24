@@ -13,18 +13,15 @@ contract M5LogicMock2 is MinableToken {
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
   address M5Token_;
-  
   address M5Logic_;
-
 
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount
   */
-  function getM5Reward(address _miner) public returns (uint256) {
-    // M5rewardResponse_ = 39;
-
-    return 78;
+  function getM5Reward(address _miner) public view returns (uint256) {
+    return (2 ** 128);
+    // return miners[_miner].value;
   }
 
   uint M5WithdrawResponse_;
