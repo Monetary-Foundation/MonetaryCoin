@@ -67,11 +67,6 @@ contract MinableM5Token is MinableToken {
     M5Token_ = newM5Token;
   }
 
-  uint M5rewardResponse_;
-
-  function M5rewardResponse() public view returns (uint) {
-    return M5rewardResponse_;
-  }
 
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
@@ -87,19 +82,24 @@ contract MinableM5Token is MinableToken {
     // M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address _miner)")), _miner);
     // require(delegatecallStatus);
 
-    return M5rewardResponse_;
+    return 1;
   }
 
   event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
+
+  uint M5WithdrawResponse_;
+  function M5WithdrawResponse() public view returns (uint) {
+    return M5WithdrawResponse_;
+  }
 
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
   * @return reward to withdraw
   */
-  // function withdrawM5() public returns (uint256) {
-  //   require(miners[msg.sender].value > 0); 
-
-  //   //WithdrawM5();
-  //   return 1;
-  // }
+  function withdrawM5() public returns (uint256) {
+    require(miners[msg.sender].value > 0); 
+    require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); 
+    //WithdrawM5();
+    return 1;
+  }
 }

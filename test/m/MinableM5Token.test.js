@@ -79,13 +79,13 @@ contract('MinableM5Token', function (accounts) {
     // let logicAddress = await token.M5Logic();
     // assert.equal(logicAddress, M5LogicContract.address);
     
-    let reward = await token.getM5Reward(accounts[0]);
+    let reward = await token.withdrawM5();
 
     console.log(reward);
 
-    let M5rewardResponse = await token.M5rewardResponse();
+    let M5WithdrawResponse = await token.M5WithdrawResponse();
 
-    console.log(M5rewardResponse);
+    console.log(M5WithdrawResponse);
 
   });
 

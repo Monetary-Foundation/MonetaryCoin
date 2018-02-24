@@ -14,16 +14,22 @@ contract MinableM5TokenLogic is MinableToken {
   address M5Logic_;
 
 
-  uint M5rewardResponse_;
-
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount
   */
   function getM5Reward(address _miner) public returns (uint256) {
-    M5rewardResponse_ = 39;
+    // M5rewardResponse_ = 39;
 
     return 78;
+  }
+
+  uint M5WithdrawResponse_;
+
+  function withdrawM5() public returns (uint256) {
+    M5WithdrawResponse_ = 33;
+    //WithdrawM5();
+    return 1;
   }
 
   
