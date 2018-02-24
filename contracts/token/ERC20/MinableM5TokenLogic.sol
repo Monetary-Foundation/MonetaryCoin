@@ -7,7 +7,7 @@ import "./MinableToken.sol";
  * @title M5 Minaable token 
  * @dev ERC20 Token for mining when GDP is negative
 */
-contract MinableM5Token is MinableToken { 
+contract MinableM5TokenLogic is MinableToken { 
 
   address M5Token_;
   
@@ -78,16 +78,9 @@ contract MinableM5Token is MinableToken {
   * @return An uint256 representing the reward amount
   */
   function getM5Reward(address _miner) public returns (uint256) {
-    if (miners[_miner].value == 0) {
-      return 0;
-    }
-    require(M5Logic_ != address(0));
-    
-    require(M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address)")))); 
-    // M5Logic_.delegatecall(bytes4(keccak256("getM5Reward(address _miner)")), _miner);
-    // require(delegatecallStatus);
+    M5rewardResponse_ = 44;
 
-    return M5rewardResponse_;
+    return 78;
   }
 
   event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
