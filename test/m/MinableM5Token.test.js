@@ -10,7 +10,7 @@ require('chai')
   .should();
 
 var MinableM5TokenMock = artifacts.require('MinableM5TokenMock');
-var M5LogicMock1 = artifacts.require('M5LogicMock1');
+var M5LogicMock1 = artifacts.require('M5LogicMock2');
 
 // const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
