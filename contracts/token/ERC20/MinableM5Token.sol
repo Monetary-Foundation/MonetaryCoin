@@ -67,7 +67,7 @@ contract MinableM5Token is MinableToken {
     M5Token_ = newM5Token;
   }
 
-  uint M5rewardResponse_ = 55;
+  uint M5rewardResponse_;
 
   function M5rewardResponse() public view returns (uint) {
     return M5rewardResponse_;

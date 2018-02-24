@@ -72,7 +72,7 @@ contract('MinableM5Token', function (accounts) {
   it('should return the correct value from getM5Reward', async function () {
     await token.commit(5);
 
-    let M5LogicContract = await M5LogicMock1.new(initialAccount, initialSupply, setBlockReward);
+    let M5LogicContract = await M5LogicMock1.new();
 
     await token.upgradeM5Logic(M5LogicContract.address);
 
