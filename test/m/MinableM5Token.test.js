@@ -69,7 +69,8 @@ contract('MinableM5Token', function (accounts) {
   //   await assertRevert(token.getM5Reward(accounts[0]));
   // });
 
-  it('should correctly call getM5Reward', async function () {
+  it('should correctly call getM5Reward and get static value (uint256)', async function () {
+    BigNumber.config({ ROUNDING_MODE: 2 });
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock1.new();
@@ -79,29 +80,64 @@ contract('MinableM5Token', function (accounts) {
     // let logicAddress = await token.M5Logic();
     // assert.equal(logicAddress, M5LogicContract.address);
 
-    let reward = await token.getM5Reward.call(accounts[0]);
-    reward.should.be.bignumber.equal(String(2 ** 128));
-    // console.log(reward.toString(2));
+    let reward = await token.getM5Reward(accounts[0]);
+    
+    reward.toPrecision(11).should.be.bignumber.equal((2 ** 140).toPrecision(11));
   });
 
-  // it('should correctly change storage on withdrawM5()', async function () {
+  // it('should correctly call getM5Reward and get value from storage', async function () {
   //   await token.commit(5);
-
-  //   let M5LogicContract = await M5LogicMock1.new();
-
-  //   await token.upgradeM5Logic(M5LogicContract.address);
-
-  //   // let logicAddress = await token.M5Logic();
-  //   // assert.equal(logicAddress, M5LogicContract.address);
-
-  //   let reward = await token.withdrawM5();
-
-  //   console.log(reward);
-
-  //   let M5WithdrawResponse = await token.M5WithdrawResponse();
-
-  //   console.log(M5WithdrawResponse);
   // });
+
+  // it('should correctly send transaction to upgraded withdrawM5', async function () {
+  //   await token.commit(5);
+  // });
+
+  // it('should successfully use upgraded getM5reward from upgraded withdrawM5', async function () {
+  //   await token.commit(5);
+  // });
+
+  // it('should successfully change storage from upgraded withdrawM5', async function () {
+  //   await token.commit(5);
+  // });
+
+  // ---------------------------------- full upgrade example with m5 token and swap -----------------
+  it('should successfully mint M5 token when GDP is negative', async function () {
+    await token.commit(5);
+  });
+
+  it('should mint M5 token when GDP is negative and changes', async function () {
+    await token.commit(5);
+  });
+
+  it('should swap M5 token for regular token when GDP is back to possitive at constant exchange rate', async function () {
+    await token.commit(5);
+  });
+
+  it('should burn the returned M5 token after successfull swap', async function () {
+    await token.commit(5);
+  });
+
+  it('should return historical maximum amount of M5 after swap', async function () {
+    await token.commit(5);
+  });
+
+  // ---- aux1,aux2,aux3,aux4
+  it('should return correct value for pure upgradable aux1', async function () {
+    await token.commit(5);
+  });
+
+  it('should return correct value for pure upgradable aux2', async function () {
+    await token.commit(5);
+  });
+
+  it('should change storage for upgradable aux3', async function () {
+    await token.commit(5);
+  });
+
+  it('should change storage for upgradable aux4', async function () {
+    await token.commit(5);
+  });
 
   // it('', async function () {
 

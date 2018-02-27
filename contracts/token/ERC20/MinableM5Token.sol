@@ -73,12 +73,12 @@ contract MinableM5Token is MinableToken {
   * @return An uint256 representing the reward amount
   */
   function getM5Reward(address _miner) public view returns (uint256) {
+    require(M5Logic_ != address(0));
     if (miners[_miner].value == 0) {
       return 0;
     }
-    require(M5Logic_ != address(0));
     
-    // https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
+    // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
     // bytes4 sig;
     // assembly { sig := calldataload(0) }
     
@@ -86,14 +86,22 @@ contract MinableM5Token is MinableToken {
     uint16 returnSize = 256;
     // target contract
     address target = M5Logic_;
-    // variable to store result
+    // variable to store result (success or failure)
     uint8 callResult;
     
-    assembly {
+    assembly { // solium-disable-line
         // return _dest.delegatecall(msg.data)
+        // calldatacopy(t, f, s)	-	copy s bytes from calldata at position f to mem at position t
         calldatacopy(0x0, 0x0, calldatasize)
+        // delegatecall(g, a, in, insize, out, outsize)	- call contract at address a with input mem[in..(in+insize))
+        // providing g gas and v wei and output area mem[out..(out+outsize)) returning 0 on error (eg. out of gas) and 1 on success
+        // keep caller and callvalue
         callResult := delegatecall(sub(gas, 10000), target, 0x0, calldatasize, 0, returnSize)
-        switch callResult case 0 { revert(0,0) } default { return(0, returnSize) }
+        switch callResult 
+        case 0 
+          { revert(0,0) } 
+        default 
+          { return(0, returnSize) }
     }
   }
 
@@ -109,9 +117,11 @@ contract MinableM5Token is MinableToken {
   * @return reward to withdraw
   */
   function withdrawM5() public returns (uint256) {
+    require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
+    
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); 
-    //WithdrawM5();
+    // WithdrawM5(msg.sender);
     return 1;
   }
 }
