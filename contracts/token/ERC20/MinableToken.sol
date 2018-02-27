@@ -75,7 +75,8 @@ contract MinableToken is MintableToken {
   /**
   * @dev Calculate the reward if withdraw() happans on this block
   * @return An uint256 representing the reward amount
-  */
+  */ 
+  //RENAME to getReward
   function getCurrentReward(address _miner) public view returns (uint256) {
     if (miners[_miner].value == 0) {
       return 0;

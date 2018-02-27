@@ -107,11 +107,6 @@ contract MinableM5Token is MinableToken {
 
   event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
 
-  uint M5WithdrawResponse_;
-  function M5WithdrawResponse() public view returns (uint) {
-    return M5WithdrawResponse_;
-  }
-
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
   * @return reward to withdraw
@@ -120,7 +115,7 @@ contract MinableM5Token is MinableToken {
     require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
     
-    require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); 
+    require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
     // WithdrawM5(msg.sender);
     return 1;
   }

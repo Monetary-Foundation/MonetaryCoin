@@ -10,7 +10,11 @@ require('chai')
   .should();
 
 var MinableM5TokenMock = artifacts.require('MinableM5TokenMock');
+
 var M5LogicMock1 = artifacts.require('M5LogicMock2');
+
+var M5TokenMock = artifacts.require('M5TokenMock');
+var M5LogicMock3 = artifacts.require('M5LogicMock3');
 
 // const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
@@ -60,14 +64,14 @@ contract('MinableM5Token', function (accounts) {
     // });
   */
   // it('should return 0 for getM5Reward in no commitment were made', async function () {
-  //   const reward = await token.getM5Reward.call(accounts[0]);
-  //   reward.should.be.bignumber.equal(0);
-  // });
+    //   const reward = await token.getM5Reward.call(accounts[0]);
+    //   reward.should.be.bignumber.equal(0);
+    // });
 
-  // it('should revert on getM5Reward if M5Logic is uninitiated (address = 0)', async function () {
-  //   await token.commit(5);
-  //   await assertRevert(token.getM5Reward(accounts[0]));
-  // });
+    // it('should revert on getM5Reward if M5Logic is uninitiated (address = 0)', async function () {
+    //   await token.commit(5);
+    //   await assertRevert(token.getM5Reward(accounts[0]));
+    // });
 
   it('should correctly call getM5Reward and get static value (uint256)', async function () {
     BigNumber.config({ ROUNDING_MODE: 2 });
@@ -86,24 +90,32 @@ contract('MinableM5Token', function (accounts) {
   });
 
   // it('should correctly call getM5Reward and get value from storage', async function () {
-  //   await token.commit(5);
-  // });
+    //   await token.commit(5);
+    // });
 
-  // it('should correctly send transaction to upgraded withdrawM5', async function () {
-  //   await token.commit(5);
-  // });
+    // it('should correctly send transaction to upgraded withdrawM5', async function () {
+    //   await token.commit(5);
+    // });
 
-  // it('should successfully use upgraded getM5reward from upgraded withdrawM5', async function () {
-  //   await token.commit(5);
-  // });
+    // it('should successfully use upgraded getM5reward from upgraded withdrawM5', async function () {
+    //   await token.commit(5);
+    // });
 
-  // it('should successfully change storage from upgraded withdrawM5', async function () {
-  //   await token.commit(5);
-  // });
+    // it('should successfully change storage from upgraded withdrawM5', async function () {
+    //   await token.commit(5);
+    // });
 
   // ---------------------------------- full upgrade example with m5 token and swap -----------------
   it('should successfully mint M5 token when GDP is negative', async function () {
     await token.commit(5);
+    
+    let M5TokenMock = await M5TokenMock.new(initialAccount, initialSupply, setBlockReward);
+    let M5LogicMock3 = await M5LogicMock3.new();
+    
+    await token.upgradeM5Logic(M5LogicMock3.address);
+    // transfer ownership of token
+
+    // mint
   });
 
   it('should mint M5 token when GDP is negative and changes', async function () {
