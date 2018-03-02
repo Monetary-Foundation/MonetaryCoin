@@ -64,7 +64,7 @@ contract MinableM5Token is GDPOraclizedToken {
     if (miners[_miner].value == 0) {
       return 0;
     }
-    
+
     // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
     // return length
     uint16 returnSize = 256;
@@ -128,9 +128,7 @@ contract MinableM5Token is GDPOraclizedToken {
   */
   function aux(uint256 _value) public returns (bool) {
     require(M5Logic_ != address(0));
-   
     require(M5Logic_.delegatecall(bytes4(keccak256("aux(uint)")),_value)); // solium-disable-line
-    
     return true;
   }
 

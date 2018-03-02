@@ -79,9 +79,14 @@ contract('MinableM5Token', function (accounts) {
     // assert.equal(logicAddress, M5LogicContract.address);
 
     let reward = await token.getM5Reward(accounts[0]);
-    
+
     reward.toPrecision(11).should.be.bignumber.equal((2 ** 140).toPrecision(11));
   });
+
+
+  // it('should revert withdrawM5 if GDP is possitive', async function () {
+  //   await token.commit(5);
+  // });
 
   // it('should correctly call getM5Reward and get value from storage', async function () {
   //   await token.commit(5);
@@ -99,24 +104,20 @@ contract('MinableM5Token', function (accounts) {
   //   await token.commit(5);
   // });
 
-  // // ---- aux1,aux2,aux3,aux4
-  // it('should return correct value for pure upgradable aux1', async function () {
+  // it('should successfully emmit event after withdrawM5 call', async function () {
   //   await token.commit(5);
   // });
 
-  // it('throw if trying to call non existant finction after upgrade', async function () {
+  // it('should return fail to call aux if no such function in upgraded contract', async function () {
   //   await token.commit(5);
   // });
 
-  // it('should return correct value for pure upgradable aux2', async function () {
+  // it('should return fail to call aux contract not upgraded', async function () {
   //   await token.commit(5);
   // });
 
-  // it('should change storage for upgradable aux3', async function () {
+  // it('throw if trying to call non existant function after upgrade', async function () {
   //   await token.commit(5);
   // });
 
-  // it('should change storage for upgradable aux4', async function () {
-  //   await token.commit(5);
-  // });
 });

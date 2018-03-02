@@ -32,12 +32,13 @@ contract M5LogicMock3 is GDPOraclizedToken {
     
     uint256 effectiveBlockReward = uint(0 - averageBlockReward);
     
-    uint256 effectiveStake = average(commitment.atStake, totalStake_);
+    uint256 effectiveStake = average(commitment.atStake, totalStake_); 
     
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
     uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
     
+    //original commitment will be paid in regular tokens:
     return miningReward;
   }
 
@@ -56,7 +57,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
 
     //uint256 reward = getCurrentReward(msg.sender);
     // will throw if averageBlockReward is possitive:
-    uint256 additionalSupply = getM5Reward(msg.sender).sub(commitment.value);
+    uint256 additionalSupply = getM5Reward(msg.sender);//.sub(commitment.value);
 
     totalStake_ = totalStake_.sub(commitment.value);
     //totalSupply_ = totalSupply_.add(additionalSupply);
