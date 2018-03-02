@@ -9,13 +9,13 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var MinableM5GDPOraclizedTokenMock = artifacts.require('MinableM5GDPOraclizedTokenMock');
+var MinableM5GDPOraclizedTokenMock = artifacts.require('MinableM5TokenIntegrationMock');
 var M5TokenMock = artifacts.require('M5TokenMock');
 var M5LogicMock3 = artifacts.require('M5LogicMock3');
 
 // const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
-contract('MinableM5GDPOraclizedToken', function (accounts) {
+contract('MinableM5TokenIntegrationMock', function (accounts) {
   let token;
 
   // address initialAccount,
