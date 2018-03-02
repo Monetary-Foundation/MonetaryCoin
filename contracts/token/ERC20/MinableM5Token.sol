@@ -4,7 +4,7 @@ import "./MinableToken.sol";
 
 
 /**
- * @title M5 Minaable token 
+ * @title M5 Minable token 
  * @dev ERC20 Token for mining when GDP is negative
 */
 contract MinableM5Token is MinableToken { 
@@ -28,19 +28,6 @@ contract MinableM5Token is MinableToken {
   function M5Logic() public view returns (address) {
     return M5Logic_;
   }
-
-  /* Minable Token data structs:
-    uint256 totalStake_ = 0;
-    int256 blockReward_;
-
-    struct Commitment {
-      uint256 value;          // value commited to mining
-      uint256 onBlockNumber;     // commitment done on block
-      uint256 atStake; // stake during commitment
-      int256 onBlockReward;
-    }
-    mapping( address => Commitment ) miners;
-  */
 
   event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
   
@@ -67,9 +54,9 @@ contract MinableM5Token is MinableToken {
     M5Token_ = newM5Token;
   }
 
-
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
+  * @param _miner The address of the _miner
   * @return An uint256 representing the reward amount
   */
   function getM5Reward(address _miner) public view returns (uint256) {
@@ -79,14 +66,11 @@ contract MinableM5Token is MinableToken {
     }
     
     // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
-    // bytes4 sig;
-    // assembly { sig := calldataload(0) }
-    
     // return length
     uint16 returnSize = 256;
     // target contract
     address target = M5Logic_;
-    // variable to store result (success or failure)
+    // variable to check delegatecall result (success or failure)
     uint8 callResult;
     
     assembly { // solium-disable-line
@@ -105,18 +89,49 @@ contract MinableM5Token is MinableToken {
     }
   }
 
-  event WithdrawM5(address indexed from, uint reward, uint indexed onBlockNumber);
+  event WithdrawM5(address indexed from,uint commitment, uint m5_reward, uint indexed onBlockNumber);
 
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
-  * @return reward to withdraw
+  * @return true
   */
-  function withdrawM5() public returns (uint256) {
+  function withdrawM5() public returns (bool) {
     require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
     
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
     // WithdrawM5(msg.sender);
-    return 1;
+    return true;
   }
+
+  //triggered when user swaps m5Value of M5 tokens for value of regular tokens.
+  event Swap(address indexed user, uint256 m5_value, uint256 value);
+
+  /**
+  * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
+  * @param value The amount of M5 tokens to swap for regular tokens
+  * @return true
+  */
+  function swap(uint256 _value) public returns (bool) {
+    require(M5Logic_ != address(0));
+    require(M5Token_ != address(0));
+
+    require(M5Logic_.delegatecall(bytes4(keccak256("swap(uint)")),_value)); // solium-disable-line
+    
+    return true;
+  }
+
+  /**
+  * @dev auxilery function for future use 
+  * @param _value parameter 1
+  * @return true
+  */
+  function aux(uint256 _value) public returns (bool) {
+    require(M5Logic_ != address(0));
+   
+    require(M5Logic_.delegatecall(bytes4(keccak256("aux(uint)")),_value)); // solium-disable-line
+    
+    return true;
+  }
+
 }
