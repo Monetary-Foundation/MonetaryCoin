@@ -15,7 +15,7 @@ var M5LogicMock3 = artifacts.require('M5LogicMock3');
 
 // const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
-contract('MinableM5Token', function (accounts) {
+contract('MinableM5GDPOraclizedToken', function (accounts) {
   let token;
 
   // address initialAccount,
@@ -47,7 +47,6 @@ contract('MinableM5Token', function (accounts) {
     console.log(M5Reward);
     // mint
     await token.withdrawM5();
-
   });
 
   // it('should mint M5 token when GDP is negative and changes', async function () {

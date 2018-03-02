@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
 
-import "../../token/ERC20/MinableToken.sol";
+import "../../token/ERC20/GDPOraclizedToken.sol";
 
 
 /**
  * @title M5 Mineable token 
  * @dev ERC20 Token for mining when GDP is negative
 */
-contract M5LogicMock3 is MinableToken { 
+contract M5LogicMock3 is GDPOraclizedToken { 
   string public constant name = "Token"; // solium-disable-line uppercase
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
@@ -41,6 +41,7 @@ contract M5LogicMock3 is MinableToken {
     return miningReward;
   }
 
+  event WithdrawM5(address indexed from,uint commitment, uint m5_reward, uint indexed onBlockNumber);
 
   /**
   * @dev withdraw reward when gdp is negative
@@ -72,9 +73,13 @@ contract M5LogicMock3 is MinableToken {
     return additionalSupply;
   }
 
+
+  // triggered when user swaps m5Value of M5 tokens for value of regular tokens.
+  event Swap(address indexed user, uint256 m5_value, uint256 value);
+
   /**
   * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
-  * @param value The amount of M5 tokens to swap for regular tokens
+  * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */
   function swap(uint256 _value) public returns (bool) {

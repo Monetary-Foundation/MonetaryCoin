@@ -1,13 +1,13 @@
 pragma solidity ^0.4.18;
 
-import "./MinableToken.sol";
+import "./GDPOraclizedToken.sol";
 
 
 /**
  * @title M5 Minable token 
  * @dev ERC20 Token for mining when GDP is negative
 */
-contract MinableM5Token is MinableToken { 
+contract MinableM5Token is GDPOraclizedToken { 
 
   address M5Token_;
   
@@ -109,7 +109,7 @@ contract MinableM5Token is MinableToken {
 
   /**
   * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
-  * @param value The amount of M5 tokens to swap for regular tokens
+  * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */
   function swap(uint256 _value) public returns (bool) {

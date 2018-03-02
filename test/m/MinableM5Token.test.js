@@ -62,10 +62,10 @@ contract('MinableM5Token', function (accounts) {
   //   reward.should.be.bignumber.equal(0);
   // });
 
-  // it('should revert on getM5Reward if M5Logic is uninitiated (address = 0)', async function () {
-  //   await token.commit(5);
-  //   await assertRevert(token.getM5Reward(accounts[0]));
-  // });
+  it('should revert on getM5Reward if M5Logic is uninitiated (address = 0)', async function () {
+    await token.commit(5);
+    await assertRevert(token.getM5Reward(accounts[0]));
+  });
 
   it('should correctly call getM5Reward and get static value (uint256)', async function () {
     BigNumber.config({ ROUNDING_MODE: 2 });
@@ -118,13 +118,5 @@ contract('MinableM5Token', function (accounts) {
 
   // it('should change storage for upgradable aux4', async function () {
   //   await token.commit(5);
-  // });
-
-  // it('', async function () {
-
-  // });
-
-  // it('', async function () {
-
   // });
 });
