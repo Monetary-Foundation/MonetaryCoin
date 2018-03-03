@@ -82,8 +82,6 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should prevent from non oracle to setPossitiveGrowth', async function () {
     await assertRevert(token.setPossitiveGrowth(50, { from: accounts[1] }));
-
-    // await expectThrow(token.setPossitiveGrowth(5));
   });
 
   it('should prevent setting negative value for setPossitiveGrowth', async function () {
@@ -141,8 +139,14 @@ contract('GDPOraclizedToken', function (accounts) {
   });
 
   // // ------Integration tests:
+  
+  it('should revert on withdray() and setNegativeGrowth', async function () {
+    await token.setNegativeGrowth(-60);
+    await token.commit(5);
+    await expectThrow(token.withdraw());
+  });
 
-  it('should getCurrentReward() correctly after changing block reward', async function () {
+  it('should getReward() correctly after changing block reward', async function () {
     const commitValue = 4;
     // onBlockNumber = commitBlockNumber
     // value = 4
@@ -151,7 +155,7 @@ contract('GDPOraclizedToken', function (accounts) {
     // next block:
     await token.setPossitiveGrowth(11);
 
-    let reward = await token.getCurrentReward(accounts[0]);
+    let reward = await token.getReward(accounts[0]);
     // effectiveBlockReward (5+11) / 2 = 8
     // (commitValue * #blocks * effectiveBlockReward) / effectiveStake [integer division]
     // (4 * 2 * 8) / 2 = 32;
@@ -183,7 +187,7 @@ contract('GDPOraclizedToken', function (accounts) {
     const commitValue = 4;
     await token.commit(commitValue);
     await token.setNegativeGrowth(-20);
-    await assertRevert(token.getCurrentReward(accounts[0]));
+    await assertRevert(token.getReward(accounts[0]));
   });
 
   it('should fail to withdraw negative reward', async function () {

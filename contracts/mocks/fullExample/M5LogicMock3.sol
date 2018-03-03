@@ -55,7 +55,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
 
     Commitment storage commitment = miners[msg.sender];
 
-    //uint256 reward = getCurrentReward(msg.sender);
+    //uint256 reward = getReward(msg.sender);
     // will throw if averageBlockReward is possitive:
     uint256 additionalSupply = getM5Reward(msg.sender);//.sub(commitment.value);
 

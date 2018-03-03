@@ -9,10 +9,10 @@ import "./MintableToken.sol";
 */
 contract MinableToken is MintableToken { 
   event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward);
-  event Withdraw(address indexed from, uint reward, uint indexed onBlockNumber);
+  event Withdraw(address indexed from, uint reward, uint commitment, uint indexed onBlockNumber);
 
   uint256 totalStake_ = 0;
-  int256 blockReward_;
+  int256 blockReward_; //could be possitive or negative according to GDP change
 
   struct Commitment {
     uint256 value;          // value commited to mining
@@ -38,12 +38,17 @@ contract MinableToken is MintableToken {
     balances[msg.sender] = balances[msg.sender].sub(_value);
     // Transfer(msg.sender, 0, _value);
 
-    miners[msg.sender] = Commitment(_value, block.number, totalStake_,blockReward_); // solium-disable-line
+    totalStake_ = totalStake_.add(_value);
+
+    miners[msg.sender] = Commitment(
+      _value, // Commitment.value
+      block.number, // onBlockNumber
+      totalStake_, //atStake = current stake + commitments value
+      blockReward_ // onBlockReward
+      );
     
     Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
 
-    totalStake_ = totalStake_.add(_value);
-    
     return true;
   }
 
@@ -51,33 +56,34 @@ contract MinableToken is MintableToken {
   * @dev withdraw reward
   * @return reward to withdraw
   */
-  function withdraw() public returns (uint256) {
+  function withdraw() public returns (uint256 reward, uint256 commitmentValue) {
     require(miners[msg.sender].value > 0); 
 
-    Commitment storage commitment = miners[msg.sender];
+    //will revert if reward is negative:
+    reward = getReward(msg.sender);
 
-    //will throw if reward is negative:
-    uint256 reward = getCurrentReward(msg.sender);
-    uint256 additionalSupply = reward.sub(commitment.value);
+    Commitment storage commitment = miners[msg.sender];
+    
 
     totalStake_ = totalStake_.sub(commitment.value);
-    totalSupply_ = totalSupply_.add(additionalSupply);
+    totalSupply_ = totalSupply_.add(reward);
     
-    balances[msg.sender] = balances[msg.sender].add(reward);
+    balances[msg.sender] = balances[msg.sender].add(commitment.value.add(reward));
     // Transfer(0, msg.sender, reward);
+
+    commitmentValue = commitment.value;
 
     commitment.value = 0;
     
-    Withdraw(msg.sender, reward, block.number);
-    return reward;
+    Withdraw(msg.sender, reward, commitmentValue, block.number);
+    return (reward, commitmentValue);
   }
 
   /**
   * @dev Calculate the reward if withdraw() happans on this block
   * @return An uint256 representing the reward amount
   */ 
-  //RENAME to getReward
-  function getCurrentReward(address _miner) public view returns (uint256) {
+  function getReward(address _miner) public view returns (uint256) {
     if (miners[_miner].value == 0) {
       return 0;
     }
@@ -95,8 +101,7 @@ contract MinableToken is MintableToken {
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
     uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
-    
-    // uint256 miningReward = numberOfBlocks.mul(blockReward_).mul(miners[_miner].value / effective);   
+       
     return miningReward;
   }
 
@@ -118,9 +123,9 @@ contract MinableToken is MintableToken {
     int ans = a + b;
 
     if (a > 0 && b > 0 && ans < 0)
-         assert(false);
+         require(false);
     if (a < 0 && b < 0 && ans > 0)
-         assert(false);
+         require(false);
 
     return ans / 2;
   }

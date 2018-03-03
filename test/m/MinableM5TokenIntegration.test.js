@@ -39,7 +39,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
 
   // ---------------------------------- full upgrade example with m5 token and swap -----------------
   // it('should return the correct reward if nothing was commited', async function () {
-  //   let zeroReward = await token.getCurrentReward(accounts[0]);
+  //   let zeroReward = await token.getReward(accounts[0]);
   //   assert.equal(zeroReward, 0);
   // });
 
