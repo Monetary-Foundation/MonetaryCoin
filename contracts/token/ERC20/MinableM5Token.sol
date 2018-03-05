@@ -34,24 +34,23 @@ contract MinableM5Token is GDPOraclizedToken {
   event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
 
   /**
-   * @dev Allows the upgrade the M5 logic Contract 
-   * @param newM5Logic The address of the new contract
-   */
-  function upgradeM5Logic(address newM5Logic) public onlyOwner { // solium-disable-line
-    require(newM5Logic != address(0));
-    M5LogicUpgrade(M5Logic_, newM5Logic);
-    M5Logic_ = newM5Logic;
-  }
-
-
-  /**
-   * @dev Allows the upgrade of the M5 token Contract 
+   * @dev Allows the upgrade of the M5 token contract 
    * @param newM5Token The address of the new contract
    */
   function upgradeM5Token(address newM5Token) public onlyOwner { // solium-disable-line
     require(newM5Token != address(0));
     M5TokenUpgrade(M5Token_, newM5Token);
     M5Token_ = newM5Token;
+  }
+
+  /**
+   * @dev Allows the upgrade the M5 logic contract 
+   * @param newM5Logic The address of the new contract
+   */
+  function upgradeM5Logic(address newM5Logic) public onlyOwner { // solium-disable-line
+    require(newM5Logic != address(0));
+    M5LogicUpgrade(M5Logic_, newM5Logic);
+    M5Logic_ = newM5Logic;
   }
 
   /**
@@ -89,23 +88,27 @@ contract MinableM5Token is GDPOraclizedToken {
     }
   }
 
-  event WithdrawM5(address indexed from,uint commitment, uint m5_reward, uint indexed onBlockNumber);
+  event WithdrawM5(address indexed from,uint commitment, uint M5Reward);
 
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
-  * @return true
+  * @return reward
+  * @return commitmentValue
   */
-  function withdrawM5() public returns (bool) {
+  function withdrawM5() public returns (uint256 reward, uint256 commitmentValue) {
     require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
     
+    reward = getM5Reward(msg.sender);
+    commitmentValue = miners[msg.sender].value;
+
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
     // WithdrawM5(msg.sender);
-    return true;
+    return (reward,commitmentValue);
   }
 
   //triggered when user swaps m5Value of M5 tokens for value of regular tokens.
-  event Swap(address indexed user, uint256 m5_value, uint256 value);
+  event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
   * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
@@ -116,7 +119,7 @@ contract MinableM5Token is GDPOraclizedToken {
     require(M5Logic_ != address(0));
     require(M5Token_ != address(0));
 
-    require(M5Logic_.delegatecall(bytes4(keccak256("swap(uint)")),_value)); // solium-disable-line
+    require(M5Logic_.delegatecall(bytes4(keccak256("swap(uint256)")),_value)); // solium-disable-line
     
     return true;
   }
@@ -128,7 +131,7 @@ contract MinableM5Token is GDPOraclizedToken {
   */
   function aux(uint256 _value) public returns (bool) {
     require(M5Logic_ != address(0));
-    require(M5Logic_.delegatecall(bytes4(keccak256("aux(uint)")),_value)); // solium-disable-line
+    require(M5Logic_.delegatecall(bytes4(keccak256("aux(uint256)")),_value)); // solium-disable-line
     return true;
   }
 

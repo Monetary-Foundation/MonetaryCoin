@@ -43,7 +43,7 @@ contract MinableToken is MintableToken {
     miners[msg.sender] = Commitment(
       _value, // Commitment.value
       block.number, // onBlockNumber
-      totalStake_, //atStake = current stake + commitments value
+      totalStake_, // atStake = current stake + commitments value
       blockReward_ // onBlockReward
       );
     
@@ -63,7 +63,6 @@ contract MinableToken is MintableToken {
     reward = getReward(msg.sender);
 
     Commitment storage commitment = miners[msg.sender];
-    
 
     totalStake_ = totalStake_.sub(commitment.value);
     totalSupply_ = totalSupply_.add(reward);
@@ -75,7 +74,7 @@ contract MinableToken is MintableToken {
 
     commitment.value = 0;
     
-    Withdraw(msg.sender, reward, commitmentValue, block.number);
+    Withdraw(msg.sender, reward, commitmentValue, block.number);  // solium-disable-line
     return (reward, commitmentValue);
   }
 

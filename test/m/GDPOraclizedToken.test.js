@@ -55,7 +55,7 @@ contract('GDPOraclizedToken', function (accounts) {
     await expectThrow(token.transferGDPOracle(0));
   });
 
-  it('should prevent original oracle to do actions after transffer', async function () {
+  it('should prevent old oracle to do actions after transffer', async function () {
     // token = await GDPOraclizedToken.new(initialAccount, initialSupply, setBlockReward, accounts[1]);
     await token.transferGDPOracle(accounts[2]);
     await expectThrow(token.transferGDPOracle(accounts[3]));
@@ -140,7 +140,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
   // // ------Integration tests:
   
-  it('should revert on withdray() and setNegativeGrowth', async function () {
+  it('should revert on withdraw() when block reward is negative', async function () {
     await token.setNegativeGrowth(-60);
     await token.commit(5);
     await expectThrow(token.withdraw());
@@ -158,8 +158,8 @@ contract('GDPOraclizedToken', function (accounts) {
     let reward = await token.getReward(accounts[0]);
     // effectiveBlockReward (5+11) / 2 = 8
     // (commitValue * #blocks * effectiveBlockReward) / effectiveStake [integer division]
-    // (4 * 2 * 8) / 2 = 32;
-    let expectedReward = new BigNumber(commitValue * 2 * 8).dividedToIntegerBy(2);
+    // (4 * 2 * 8) / 4 = 32;
+    let expectedReward = new BigNumber(commitValue * 2 * 8).dividedToIntegerBy(commitValue);
     reward.should.be.bignumber.equal(expectedReward);
   });
 
@@ -170,15 +170,14 @@ contract('GDPOraclizedToken', function (accounts) {
     // next block:
     await token.setPossitiveGrowth(11);
 
-    // effectiveBlockReward (5+11) / 2 = 8
+    // effectiveBlockReward = (5+11) / 2 = 8
     // (commitValue * #blocks * effectiveBlockReward) / effectiveStake [integer division]
-    // (4 * 2 * 8) / 2 = 32;
-
+    // (4 * 2 * 8) / 4 = 16;
     await token.withdraw();
     let newBalance = await token.balanceOf(accounts[0]);
 
-    let expectedReward = new BigNumber(commitValue * 2 * 8).dividedToIntegerBy(2);
-    let expectedBalance = expectedReward.plus(initialSupply).minus(commitValue);
+    let expectedReward = new BigNumber(commitValue * 2 * 8).dividedToIntegerBy(commitValue);
+    let expectedBalance = expectedReward.plus(initialSupply);
 
     newBalance.should.be.bignumber.equal(expectedBalance);
   });
@@ -198,6 +197,6 @@ contract('GDPOraclizedToken', function (accounts) {
   });
 
   // it('should return correct reward after changing block reward and stake', async function () {
-  //
+  
   // });
 });

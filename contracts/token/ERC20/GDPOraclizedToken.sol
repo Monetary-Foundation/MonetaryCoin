@@ -11,7 +11,7 @@ contract GDPOraclizedToken is MinableToken {
   address GDPOracle_;
 
   /**
-   * @dev The GdpOraclizedToken constructor sets the oracle account
+   * @dev The GDPOraclizedToken constructor sets the oracle account
    */
   /* 
   function GdpOraclizedToken(address oracle) public {

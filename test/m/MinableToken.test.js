@@ -85,6 +85,24 @@ contract('MinableToken', function (accounts) {
     assert.equal(amount, 0);
   });
 
+  it('should emit the correct event during commit', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    const txObj = await token.commit(commitValue);
+    // after one block
+    const { from, value, onBlockNumber, atStake, onBlockReward } = txObj.logs[0].args;
+
+    assert.equal(txObj.logs[0].event, 'Commit');
+
+    assert.equal(from, accounts[0]);
+    value.should.be.bignumber.equal(commitValue);
+    assert.equal(onBlockNumber.toNumber(), web3.eth.blockNumber);
+    atStake.should.be.bignumber.equal(commitValue);
+    onBlockReward.should.be.bignumber.equal(blockReward);
+  });
+
   it('should throw if trying to commit twice without withdraw', async function () {
     await token.commit(4);
     await expectThrow(token.commit(4));
@@ -129,13 +147,13 @@ contract('MinableToken', function (accounts) {
     assert.equal(avg, -3);
   });
 
-  // OVERVIEW:
-  it('should throw on possitive overflow ', async function () {
-    const big = new BigNumber(2).pow(256).minus(1);
-    // let ans = await token.signedAverage(big, big);
-    // console.log(ans.toString());
-    await expectThrow(token.signedAverage(big, big));
-  });
+  // // OVERVIEW:
+  // it('should throw on possitive overflow ', async function () {
+  //   const big = new BigNumber(2).pow(256).minus(1);
+  //   // let ans = await token.signedAverage(big, big);
+  //   // console.log(ans.toString());
+  //   await expectThrow(token.signedAverage(big, big));
+  // });
 
   it('should return the correct reward if nothing was commited', async function () {
     let zeroReward = await token.getReward(accounts[0]);
@@ -335,7 +353,6 @@ contract('MinableToken', function (accounts) {
     let expectedRewardAcc0 =
       new BigNumber(commitValueAcc0 * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValueAcc0, finalStake));
     rewardAcc0.should.be.bignumber.equal(expectedRewardAcc0);
-  
 
     let rewardAcc1 = await token.getReward(accounts[1]);
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
@@ -344,7 +361,6 @@ contract('MinableToken', function (accounts) {
       new BigNumber(commitValueAcc1 * (numOfBlocks - 1) * blockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1, finalStake));
     rewardAcc1.should.be.bignumber.equal(expectedRewardAcc1);
-   
 
     let rewardAcc2 = await token.getReward(accounts[2]);
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
@@ -353,7 +369,6 @@ contract('MinableToken', function (accounts) {
       new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * blockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1 + commitValueAcc2, finalStake));
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
-  
   });
 
   it('should emit the correct event during withdraw', async function () {

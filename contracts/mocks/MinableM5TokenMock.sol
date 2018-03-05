@@ -15,7 +15,8 @@ contract MinableM5TokenMock is MinableM5Token {
   function MinableM5TokenMock(
     address initialAccount,
     uint256 initialSupply,
-    int256 blockReward
+    int256 blockReward,
+    address GDPOracle // solium-disable-line mixedcase
     ) public 
     {
 
@@ -28,7 +29,10 @@ contract MinableM5TokenMock is MinableM5Token {
     Transfer(0x0, initialAccount, initialSupply);
     
     blockReward_ = blockReward;   
-    // BlockRewardChanged(0, blockReward_, block.number); only in oraclizedGDPtoken
+    BlockRewardChanged(0, blockReward_, block.number);
+
+    GDPOracle_ = GDPOracle;
+    GDPOracleTransferred(0x0, GDPOracle_);
 
     //M5 specific:
     M5Token_ = address(0);
