@@ -12,20 +12,20 @@ contract M5tokenMock is BurnableToken, MintableToken {
   // }
   function M5tokenMock() public {}
 
-  event Swap(address indexed user, uint256 _value);
+  event Swap(address indexed from, uint256 _value);
 
   /**
    * @dev Swap M5 Tokens for Mcoin after GDP is back to possitive
    * This function is triggered by the monetary coin contract
    * to swap M5 tokens trigger swap function in monetary coin contract
-   * @param user owner of M5 tokens
+   * @param from owner of M5 tokens
    * @param _value The amount of token to be swapped (burned).
    */
-  function swap(address user, uint256 _value) public onlyOwner {
-    require(_value <= balances[user]);
+  function swap(address from, uint256 _value) public onlyOwner {
+    require(_value <= balances[from]);
 
-    balances[user] = balances[user].sub(_value);
+    balances[from] = balances[from].sub(_value);
     totalSupply_ = totalSupply_.sub(_value);
-    Swap(user, _value);
+    Swap(from, _value);
   }
 }

@@ -30,7 +30,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     
     require(averageBlockReward < 0);
     
-    uint256 effectiveBlockReward = uint(0 - averageBlockReward);
+    uint256 effectiveBlockReward = uint256(0 - averageBlockReward);
     
     uint256 effectiveStake = average(commitment.atStake, totalStake_); 
     
@@ -38,29 +38,29 @@ contract M5LogicMock3 is GDPOraclizedToken {
 
     uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
     
-    //original commitment will be paid in regular tokens:
     return miningReward;
   }
 
-  event WithdrawM5(address indexed from,uint commitment, uint m5_reward, uint indexed onBlockNumber);
+  event WithdrawM5(address indexed from, uint commitment, uint M5Reward);
 
   /**
   * @dev withdraw reward when gdp is negative
   * msg.sender will recive original commitment back and reward will be paid in M5 tokens
   * @return reward to withdraw
+  * @return commitmentValue 
   */
-  function withdrawM5() public returns (uint256) {
+  function withdrawM5() public returns (uint256 reward, uint256 commitmentValue) {
     require(miners[msg.sender].value > 0); 
     require(M5Token_ != address(0));
 
     Commitment storage commitment = miners[msg.sender];
+    
+    commitmentValue = commitment.value;
 
-    //uint256 reward = getReward(msg.sender);
     // will throw if averageBlockReward is possitive:
-    uint256 additionalSupply = getM5Reward(msg.sender);//.sub(commitment.value);
+    reward = getM5Reward(msg.sender);
 
     totalStake_ = totalStake_.sub(commitment.value);
-    //totalSupply_ = totalSupply_.add(additionalSupply);
     
     balances[msg.sender] = balances[msg.sender].add(commitment.value);
     // Transfer(0, msg.sender, reward);
@@ -68,15 +68,15 @@ contract M5LogicMock3 is GDPOraclizedToken {
     commitment.value = 0;
     
     //mint M5 token for msg.sender:
-    require(M5Token_.call(bytes4(keccak256("mint(address,uint256)")),msg.sender,additionalSupply)); // solium-disable-line
+    require(M5Token_.call(bytes4(keccak256("mint(address,uint256)")), msg.sender, reward)); // solium-disable-line
 
-    WithdrawM5(msg.sender, commitment.value, additionalSupply, block.number); // solium-disable-line
-    return additionalSupply;
+    WithdrawM5(msg.sender, commitmentValue, reward);
+    return (reward, commitmentValue);
   }
 
 
   // triggered when user swaps m5Value of M5 tokens for value of regular tokens.
-  event Swap(address indexed user, uint256 m5_value, uint256 value);
+  event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
   * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
@@ -86,7 +86,8 @@ contract M5LogicMock3 is GDPOraclizedToken {
   function swap(uint256 _value) public returns (bool) {
     // already checked: require(M5Logic_ != address(0));
     // already checked: require(M5Token_ != address(0));
-    require(M5Token_.call(bytes4(keccak256("swap(address,uint)")),msg.sender,_value)); // solium-disable-line
+    require(0 < blockReward_);
+    require(M5Token_.call(bytes4(keccak256("swap(address,uint256)")), msg.sender, _value)); // solium-disable-line
     
     uint256 reward = _value / 10;
 
