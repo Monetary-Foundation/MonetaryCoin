@@ -1,4 +1,4 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.19;
 
 import "../../token/ERC20/GDPOraclizedToken.sol";
 
@@ -18,11 +18,11 @@ contract M5LogicMock2 is GDPOraclizedToken {
   * @dev return static value
   * @return An uint256 returns the static value
   */
-  function getM5Reward(address _miner) public view returns (uint256) {
+  function getM5Reward(address _miner) public pure returns (uint256) {
     return (2 ** 140);
   }
 
-  function withdrawM5() public returns (uint256) {
+  function withdrawM5() public pure returns (uint256) {
     
     //WithdrawM5();
     return 1;
