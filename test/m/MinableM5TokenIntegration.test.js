@@ -232,7 +232,85 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
   //   await assertRevert(token.swap(100));
   // });
 
-  it('should successfully swap M5 token for regular token when GDP is back to possitive', async function () {
+  // it('should successfully swap M5 token for regular token when GDP is back to possitive', async function () {
+  //   await token.setNegativeGrowth(-100);
+  //   const commitValue = 5;
+  //   const swapValue = 80;
+  //   await token.commit(commitValue);
+    
+  //   await token.withdrawM5();
+  //   // We have M5 tokens now
+  //   // let M5Balance = await M5Token.balanceOf(accounts[0]);
+  //   let balance = await token.balanceOf(accounts[0]);
+    
+  //   // GDP back to possitive:
+  //   await token.setPossitiveGrowth(10);
+    
+  //   await token.swap(swapValue);
+  //   let newBalance = await token.balanceOf(accounts[0]);
+  //   newBalance.should.be.bignumber.equal(balance.plus(swapValue / 10));
+  // });
+
+  // it('should increase token supply after swap', async function () {
+  //   await token.setNegativeGrowth(-100);
+  //   const commitValue = 5;
+  //   const swapValue = 80;
+  //   await token.commit(commitValue);
+    
+  //   await token.withdrawM5();
+  //   // We have M5 tokens now
+    
+  //   let supply = await token.totalSupply();
+    
+  //   // GDP back to possitive:
+  //   await token.setPossitiveGrowth(10);
+    
+  //   await token.swap(swapValue);
+  //   let newSupply = await token.totalSupply();
+  //   newSupply.should.be.bignumber.equal(supply.plus(swapValue / 10));
+  // });
+
+  // it('should decrease M5 token balance after swap (burn)', async function () {
+  //   await token.setNegativeGrowth(-100);
+  //   const commitValue = 5;
+  //   const swapValue = 80;
+  //   await token.commit(commitValue);
+    
+  //   await token.withdrawM5();
+  //   // We have M5 tokens now
+  //   let M5Balance = await M5Token.balanceOf(accounts[0]);
+  //   // let balance = await token.balanceOf(accounts[0]);
+    
+  //   // GDP back to possitive:
+  //   await token.setPossitiveGrowth(10);
+    
+  //   await token.swap(swapValue);
+
+  //   let newM5Balance = await M5Token.balanceOf(accounts[0]);
+  //   newM5Balance.should.be.bignumber.equal(M5Balance.minus(swapValue));
+  // });
+
+  // it('should decrease M5 token supply after swap (burn)', async function () {
+  //   await token.setNegativeGrowth(-100);
+  //   const commitValue = 5;
+  //   const swapValue = 80;
+  //   await token.commit(commitValue);
+    
+  //   await token.withdrawM5();
+  //   // We have M5 tokens now
+  //   let M5Supply = await M5Token.totalSupply();
+  //   // let balance = await token.balanceOf(accounts[0]);
+    
+  //   // GDP back to possitive:
+  //   await token.setPossitiveGrowth(10);
+    
+  //   await token.swap(swapValue);
+
+  //   let newM5Supply = await M5Token.totalSupply();
+  //   newM5Supply.should.be.bignumber.equal(M5Supply.minus(swapValue));
+  // });
+
+  it('should revert if user trying to swap directly from M5 token contract', async function () {
     await token.setNegativeGrowth(-100);
     const commitValue = 5;
     const swapValue = 80;
@@ -240,52 +318,12 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     
     await token.withdrawM5();
     // We have M5 tokens now
-    // let M5Balance = await M5Token.balanceOf(accounts[0]);
-    let balance = await token.balanceOf(accounts[0]);
     
     // GDP back to possitive:
     await token.setPossitiveGrowth(10);
     
-    await token.swap(swapValue);
-    let newBalance = await token.balanceOf(accounts[0]);
-    newBalance.should.be.bignumber.equal(balance.plus(swapValue / 10));
+    await assertRevert(M5Token.swap(accounts[0], swapValue));
   });
-
-  it('should remove M5 tokens from user balance on swap', async function () {
-    await token.setNegativeGrowth(-100);
-    const commitValue = 5;
-    const swapValue = 80;
-    await token.commit(commitValue);
-    
-    await token.withdrawM5();
-    // We have M5 tokens now
-    let M5Balance = await M5Token.balanceOf(accounts[0]);
-    // let balance = await token.balanceOf(accounts[0]);
-    
-    // GDP back to possitive:
-    await token.setPossitiveGrowth(10);
-    
-    await token.swap(swapValue);
-
-    let newM5Balance = await M5Token.balanceOf(accounts[0]);
-    newM5Balance.should.be.bignumber.equal(M5Balance.minus(swapValue));
-  });
-
-  // it('should burn the returned M5 tokens after successfull swap', async function () {
-  //   await token.commit(5);
-  // });
-
-  // it('should increase supply after swap', async function () {
-
-  // });
-
-  // it('should decrease M5 token supply after swap', async function () {
-
-  // });
-
-  // it('should revert if user trying to swap directly from M5 token contract', async function () {
-
-  // });
 
   // it('should emit event on swap for M5 token contract', async function () {
   //   await token.setNegativeGrowth(-100);
@@ -306,9 +344,5 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
   //   assert.equal(from, accounts[0]);
   //   assert.equal(M5Value, 80);
   //   assert.equal(value, 8);
-  // });
-
-  // it('should', async function () {
-
   // });
 });
