@@ -1,9 +1,11 @@
 
 import assertRevert from '../helpers/assertRevert';
-// import expectThrow from '../helpers/expectThrow';
+import { increaseTimeTo, duration } from '../helpers/increaseTime';
+import latestTime from '../helpers/latestTime';
+
 // import advanceToBlock from '../helpers/advanceToBlock';
 const BigNumber = web3.BigNumber;
-const assert = require('chai').assert;
+// const assert = require('chai').assert;
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(BigNumber))
@@ -12,9 +14,9 @@ require('chai')
 let MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 let MCoinMock = artifacts.require('MCoinMock');
 
-// var MinableM5GDPOraclizedTokenMock = artifacts.require('MinableM5TokenIntegrationMock');
 var M5TokenMock = artifacts.require('M5TokenMock');
 var M5LogicMock3 = artifacts.require('M5LogicMock3');
+
 
 contract('MCoinDistributionMock', function (accounts) {
   let token;
@@ -31,9 +33,20 @@ contract('MCoinDistributionMock', function (accounts) {
   const initialBalance = 50;
 
   // distrebution timers should start 60 sec after current block timestamp
-  const startTimestamp = web3.eth.getBlock('latest').timestamp + 60;
-  const firstPeriodDays = 3;
-  const secondPeriodDays = 7;
+  const startTime = latestTime() + 60;
+  const firstPeriodWindows = 3;
+  const secondPeriodWindows = 7;
+
+  const firstWindow = startTime + duration.seconds(1);
+  // const afterClosingTime = this.closingTime + duration.seconds(1);
+
+  /**
+ * Returns possible window timestamp for specific window
+ * @param {number} windowNumber - Number of window, range: [0-lastWindow-1]
+ * @returns {number} possible timestamp for window
+ */
+  const windowTimeStamp = (windowNumber) =>
+    startTime + duration.seconds(5) + windowNumber * duration.hours(23);
 
   const initialBlockReward = 5;
   beforeEach(async function () {
@@ -42,9 +55,9 @@ contract('MCoinDistributionMock', function (accounts) {
     distribution = await MCoinDistributionMock.new(
       initialAccount,
       initialBalance,
-      startTimestamp,
-      firstPeriodDays,
-      secondPeriodDays,
+      startTime,
+      firstPeriodWindows,
+      secondPeriodWindows,
       { from: accounts[2] }
     );
 
@@ -78,25 +91,50 @@ contract('MCoinDistributionMock', function (accounts) {
   //   web3.fromWei(supply, 'ether').should.be.bignumber.equal(3 * initialBalance);
   // });
 
-  // it('should return the correct allocation for firstPeriodDays', async function () {
-  //   for (let i = 0; i < firstPeriodDays; i++) {
+  // it('should return the correct allocation for firstPeriodWindows', async function () {
+  //   for (let i = 0; i < firstPeriodWindows; i++) {
   //     let allocation = await distribution.allocationFor(i);
   //     let initialBalanceWei = web3.toWei(new BigNumber(initialBalance), 'ether');
-  //     allocation.should.be.bignumber.equal(initialBalanceWei.dividedToIntegerBy(firstPeriodDays));
+  //     allocation.should.be.bignumber.equal(initialBalanceWei.dividedToIntegerBy(firstPeriodWindows));
   //   }
   // });
 
-  // it('should return the correct allocation for secondPeriodDays', async function () {
-  //   const totalDuration = firstPeriodDays + secondPeriodDays;
-  //   for (let i = firstPeriodDays; i < totalDuration; i++) {
+  // it('should return the correct allocation for secondPeriodWindows', async function () {
+  //   const totalDuration = firstPeriodWindows + secondPeriodWindows;
+  //   for (let i = firstPeriodWindows; i < totalDuration; i++) {
   //     let allocation = await distribution.allocationFor(i);
   //     let initialBalanceWei = web3.toWei(new BigNumber(initialBalance), 'ether');
-  //     allocation.should.be.bignumber.equal(initialBalanceWei.dividedToIntegerBy(secondPeriodDays));
+  //     allocation.should.be.bignumber.equal(initialBalanceWei.dividedToIntegerBy(secondPeriodWindows));
   //   }
   // });
 
-  it('should revert if asked for allocation on illegal day', async function () {
-    await assertRevert(distribution.allocationFor(firstPeriodDays + secondPeriodDays));
+  it('should revert if asked for allocation on illegal window', async function () {
+    await assertRevert(distribution.allocationFor(firstPeriodWindows + secondPeriodWindows));
+  });
+
+  it('should return zero for currentWindow before start', async function () {
+    let window = await distribution.currentWindow();
+    window.should.be.bignumber.equal(0);
+  });
+
+  it('should return 0 for currentWindow and first window (first window counts as 0)', async function () {
+    await increaseTimeTo(windowTimeStamp(0));
+    let window = await distribution.currentWindow();
+    window.should.be.bignumber.equal(0);
+  });
+  // windowTimeStamp
+  // it('should return 1 for currentWindow and second window', async function () {
+  //   await increaseTimeTo(windowTimeStamp(1));
+  //   let window = await distribution.currentWindow();
+  //   window.should.be.bignumber.equal(1);
+  // });
+
+  it('should return the correct window for a given timestamp', async function () {
+    const bothWindows = firstPeriodWindows + secondPeriodWindows;
+    for (let i = 0; i < bothWindows; i++) {
+      let window = await distribution.windowOf(windowTimeStamp(i));
+      window.should.be.bignumber.equal(i);
+    }
   });
 
   // ---------------------------------- full upgrade example with M5 token and swap -----------------

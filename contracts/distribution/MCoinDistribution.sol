@@ -14,10 +14,10 @@ contract MCoinDistribution is Ownable {
 
   MinableToken public MCoin;
   
-  uint16 public firstPeriodDays;
+  uint public firstPeriodWindows;
   uint public firstPeriodSupply;
  
-  uint16 public secondPeriodDays;
+  uint public secondPeriodWindows;
   uint public secondPeriodSupply;
 
   uint public foundationReserve;
@@ -26,18 +26,18 @@ contract MCoinDistribution is Ownable {
   uint startTimestamp;
   
   function MCoinDistribution (
-    uint16  _firstPeriodDays,
+    uint    _firstPeriodWindows,
     uint    _firstPeriodSupply,
-    uint16  _secondPeriodDays,
+    uint    _secondPeriodWindows,
     uint    _secondPeriodSupply,
     address _foundationMultiSig,
     uint    _foundationReserve,
     uint    _startTimestamp
   ) public 
   {
-    firstPeriodDays = _firstPeriodDays;
+    firstPeriodWindows = _firstPeriodWindows;
     firstPeriodSupply = _firstPeriodSupply;
-    secondPeriodDays = _secondPeriodDays;
+    secondPeriodWindows = _secondPeriodWindows;
     secondPeriodSupply = _secondPeriodSupply;
     foundationMultiSig = _foundationMultiSig;
     foundationReserve = _foundationReserve;
@@ -54,11 +54,11 @@ contract MCoinDistribution is Ownable {
     // secondPeriodPerDay = distributionSupply.sub(firstPeriodPerDay) / (numberOfDays / 2);
 
     require(foundationMultiSig != address(0));
-    require(0 < firstPeriodDays);
+    require(0 < firstPeriodWindows);
     require(0 < firstPeriodSupply);
-    require(0 < secondPeriodDays);
+    require(0 < secondPeriodWindows);
     require(0 < secondPeriodSupply);
-    require(0 < firstPeriodDays);
+    require(0 < firstPeriodWindows);
     require(0 < startTimestamp);
   }
 
@@ -75,18 +75,23 @@ contract MCoinDistribution is Ownable {
     return true;
   }
 
-  function allocationFor(uint16 day) view public returns (uint) {
-    require(day < firstPeriodDays + secondPeriodDays);
-    return (day < firstPeriodDays) ? firstPeriodSupply / firstPeriodDays : secondPeriodSupply / secondPeriodDays;
+  function allocationFor(uint256 day) view public returns (uint256) {
+    require(day < firstPeriodWindows.add(secondPeriodWindows));
+    
+    return (day < firstPeriodWindows) 
+      ? firstPeriodSupply.div(firstPeriodWindows) 
+      : secondPeriodSupply.div(secondPeriodWindows);
   }
 
-  function currentPeriod() view public returns (uint) {
-    return periodOf(block.timestamp);
+  function currentWindow() view public returns (uint256) {
+    return windowOf(block.timestamp);
   }
 
-  // Each period is 23 hours long
-  function periodOf(uint timestamp) view public returns (uint) {
-    return (startTimestamp < timestamp) ? timestamp.sub(startTimestamp) / 23 hours : 0;
+  // Each window is 23 hours long
+  function windowOf(uint256 timestamp) view public returns (uint256) {
+    return (startTimestamp < timestamp) 
+      ? timestamp.sub(startTimestamp).div(23 hours) 
+      : 0;
   }
 
 }

@@ -18,13 +18,13 @@ contract MCoinDistributionMock is MCoinDistribution {
     address initialAccount,
     uint256 initialBalance,
     uint256 startTime,
-    uint16 firstPeriodDays,
-    uint16 secondPeriodDays
+    uint256 firstPeriodWindows,
+    uint256 secondPeriodWindows
     )
     MCoinDistribution (
-      firstPeriodDays,             // uint16  _firstPeriodDays,
+      firstPeriodWindows,             // uint  _firstPeriodWindows
       toDecimals(initialBalance),  // uint    _firstPeriodSupply,
-      secondPeriodDays,            // uint16  _secondPeriodDays,
+      secondPeriodWindows,            // uint  _secondPeriodDays,
       toDecimals(initialBalance),  // uint    _secondPeriodSupply,
       initialAccount,              // address _foundationMultiSig,
       toDecimals(initialBalance),  // uint    _foundationReserve,
@@ -32,7 +32,7 @@ contract MCoinDistributionMock is MCoinDistribution {
     ) public 
   {}    
 
-  function toDecimals(uint256 _value) internal returns (uint256) {
+  function toDecimals(uint256 _value) view internal returns (uint256) {
     return _value.mul(10 ** uint256(decimals));
   }
 }
