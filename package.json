@@ -1,6 +1,6 @@
 {
   "name": "tokens",
-  "private":true,
+  "private": true,
   "version": "1.6.0",
   "description": "Secure Smart Contract library for Solidity",
   "scripts": {
@@ -59,6 +59,7 @@
   },
   "dependencies": {
     "dotenv": "^4.0.0",
-    "ethjs-abi": "^0.2.1"
+    "ethjs-abi": "^0.2.1",
+    "web3": "0.20.6"
   }
 }

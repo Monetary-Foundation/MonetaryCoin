@@ -32,7 +32,7 @@ contract MCoinDistributionMock is MCoinDistribution {
     ) public 
   {}    
 
-  function toDecimals(uint256 _value) view internal returns (uint256) {
+  function toDecimals(uint256 _value) pure internal returns (uint256) {
     return _value.mul(10 ** uint256(decimals));
   }
 }

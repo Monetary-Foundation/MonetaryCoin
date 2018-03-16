@@ -14,16 +14,18 @@ contract MCoinDistribution is Ownable {
 
   MinableToken public MCoin;
   
-  uint public firstPeriodWindows;
-  uint public firstPeriodSupply;
+  uint256 public firstPeriodWindows;
+  uint256 public firstPeriodSupply;
  
-  uint public secondPeriodWindows;
-  uint public secondPeriodSupply;
+  uint256 public secondPeriodWindows;
+  uint256 public secondPeriodSupply;
+  
+  uint256 public totalWindows;  // firstPeriodWindows + secondPeriodSupply
 
-  uint public foundationReserve;
+  uint256 public foundationReserve;
   address public foundationMultiSig;
 
-  uint startTimestamp;
+  uint256 startTimestamp;
   
   function MCoinDistribution (
     uint    _firstPeriodWindows,
@@ -42,7 +44,8 @@ contract MCoinDistribution is Ownable {
     foundationMultiSig = _foundationMultiSig;
     foundationReserve = _foundationReserve;
     startTimestamp = _startTimestamp;
-    
+    totalWindows = firstPeriodWindows.add(secondPeriodWindows);
+
     // createFirstDay = wmul(totalSupply, 0.2 ether);
     // createPerDay = div(
     //     sub(sub(totalSupply, foundersAllocation), createFirstDay),
@@ -62,6 +65,11 @@ contract MCoinDistribution is Ownable {
     require(0 < startTimestamp);
   }
 
+  // Commit as a fallback
+  function () public payable {
+    commit();
+  }
+
   function init(MinableToken _MCoin) public onlyOwner returns (bool) {
     require(address(MCoin) == address(0));
     require(_MCoin.owner() == address(this));
@@ -75,10 +83,10 @@ contract MCoinDistribution is Ownable {
     return true;
   }
 
-  function allocationFor(uint256 day) view public returns (uint256) {
-    require(day < firstPeriodWindows.add(secondPeriodWindows));
+  function allocationFor(uint256 window) view public returns (uint256) {
+    require(window < totalWindows);
     
-    return (day < firstPeriodWindows) 
+    return (window < firstPeriodWindows) 
       ? firstPeriodSupply.div(firstPeriodWindows) 
       : secondPeriodSupply.div(secondPeriodWindows);
   }
@@ -87,11 +95,59 @@ contract MCoinDistribution is Ownable {
     return windowOf(block.timestamp);
   }
 
-  // Each window is 23 hours long
+  /**
+   * @dev Return the window number for given timestamp
+   * Each window is 23 hours long
+   * @param timestamp 
+   * @return number of current window in [0,inf)
+   * 0 will be returned if distribution didn't started or during the first window.
+   */
   function windowOf(uint256 timestamp) view public returns (uint256) {
     return (startTimestamp < timestamp) 
       ? timestamp.sub(startTimestamp).div(23 hours) 
       : 0;
+  }
+
+  mapping (uint256 => uint256) public totals;
+  mapping (uint256 => mapping (address => uint256)) public commitment;
+  event Commit(address indexed from, uint256 value, uint256 window);
+
+  function commitOn(uint window) public payable {
+    // Distribution have started
+    require(startTimestamp < block.timestamp);
+    // Distribution didn't ended
+    require(currentWindow() < totalWindows);
+    // Commit only for present or future windows
+    require(currentWindow() <= window);
+    // Don't commit after distribution is finished
+    require(window < totalWindows);
+    // Minimum commitment
+    require(0.01 ether <= msg.value);
+
+    // Add commitment for user on given window
+    commitment[window][msg.sender] = commitment[window][msg.sender].add(msg.value);
+    // Add to window total
+    totals[window] = totals[window].add(msg.value);
+
+    Commit(msg.sender, msg.value, window);
+  }
+
+  function commit() public payable {
+    commitOn(currentWindow());
+  }
+  
+  event Withdraw(address indexed from, uint256 value, uint256 window);
+
+  function withdraw(uint256 window) public{
+    require(window < currentWindow());
+    // empty window
+    require(0 < totals[window]);
+    require(0 < commitment[window][msg.sender]);
+
+    uint256 price = allocationFor(window).div(totals[window]);
+    uint256 reward = price.mul(commitment[window][msg.sender]);
+
+    Withdraw(msg.sender, reward, window);
   }
 
 }
