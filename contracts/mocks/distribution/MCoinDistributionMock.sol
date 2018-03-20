@@ -15,20 +15,22 @@ contract MCoinDistributionMock is MCoinDistribution {
   uint8 public constant decimals = 18;
 
   function MCoinDistributionMock (
+    uint256 firstPeriodWindows,
+    uint256 firstPeriodSupply,
+    uint256 secondPeriodWindows,
+    uint256 secondPeriodSupply,
     address initialAccount,
     uint256 initialBalance,
-    uint256 startTime,
-    uint256 firstPeriodWindows,
-    uint256 secondPeriodWindows
+    uint256 startTime
     )
     MCoinDistribution (
-      firstPeriodWindows,             // uint  _firstPeriodWindows
-      toDecimals(initialBalance),  // uint    _firstPeriodSupply,
-      secondPeriodWindows,            // uint  _secondPeriodDays,
-      toDecimals(initialBalance),  // uint    _secondPeriodSupply,
-      initialAccount,              // address _foundationMultiSig,
-      toDecimals(initialBalance),  // uint    _foundationReserve,
-      startTime                    // uint    _startTime
+      firstPeriodWindows,              // uint  _firstPeriodWindows
+      toDecimals(firstPeriodSupply),   // uint    _firstPeriodSupply,
+      secondPeriodWindows,             // uint  _secondPeriodDays,
+      toDecimals(secondPeriodSupply),  // uint    _secondPeriodSupply,
+      initialAccount,                  // address _foundationMultiSig,
+      toDecimals(initialBalance),      // uint    _foundationReserve,
+      startTime                        // uint    _startTime
     ) public 
   {}    
 
