@@ -1,11 +1,11 @@
 pragma solidity ^0.4.19;
 
 import "../token/ERC20/MinableM5Token.sol";
-import "../token/ERC20/ComplienceStore.sol";
+import "../token/ERC20/ComplianceStore.sol";
 
 
 // mock class using StandardToken
-contract MinableM5TokenIntegrationMock is MinableM5Token, ComplienceStore {
+contract MinableM5TokenIntegrationMock is MinableM5Token, ComplianceStore {
 
   string public constant name = "Token"; // solium-disable-line uppercase
   string public constant symbol = "SIMb"; // solium-disable-line uppercase

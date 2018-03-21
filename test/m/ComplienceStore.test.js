@@ -7,17 +7,17 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var ComplienceStoreMock = artifacts.require('ComplienceStoreMock');
+var ComplianceStoreMock = artifacts.require('ComplianceStoreMock');
 
-contract('ComplienceStore', function (accounts) {
-  let ComplienceStore;
+contract('ComplianceStore', function (accounts) {
+  let ComplianceStore;
 
   beforeEach(async function () {
-    ComplienceStore = await ComplienceStoreMock.new();
+    ComplianceStore = await ComplianceStoreMock.new();
   });
 
   it('should return zeros for unset address', async function () {
-    let multiHash = await ComplienceStore.getHash(accounts[0]);
+    let multiHash = await ComplianceStore.getHash(accounts[0]);
 
     const hashFunction = multiHash[0]; // bignumber
     const size = multiHash[1]; // bignumber
@@ -31,7 +31,7 @@ contract('ComplienceStore', function (accounts) {
   });
 
   it('should return zeros for unset address 2', async function () {
-    let multiHash = await ComplienceStore.getHash(accounts[1]);
+    let multiHash = await ComplianceStore.getHash(accounts[1]);
 
     const hashFunction = multiHash[0]; // bignumber
     const size = multiHash[1]; // bignumber
@@ -45,8 +45,8 @@ contract('ComplienceStore', function (accounts) {
   });
 
   it('should set and get multihash correctly', async function () {
-    await ComplienceStore.setHash(1, 2, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
-    let multiHash = await ComplienceStore.getHash(accounts[0]);
+    await ComplianceStore.setHash(1, 2, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
+    let multiHash = await ComplianceStore.getHash(accounts[0]);
     
     // console.log(multiHash);
     const hashFunction = multiHash[0]; // bignumber
@@ -62,7 +62,7 @@ contract('ComplienceStore', function (accounts) {
 
   it('should correctly emmit event during set', async function () {
     const txObj =
-      await ComplienceStore.setHash(2, 3, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
+      await ComplianceStore.setHash(2, 3, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
     assert.equal(txObj.logs[0].event, 'SetHash');
     
     const { from, hashFunction, size, hash, timestamp } = txObj.logs[0].args;

@@ -1,13 +1,13 @@
 pragma solidity ^0.4.19;
 
 
-import "../token/ERC20/ComplienceStore.sol";
+import "../token/ERC20/ComplianceStore.sol";
 
 
-// mock class using ComplienceStore
-contract ComplienceStoreMock is ComplienceStore {
+// mock class using ComplianceStore
+contract ComplianceStoreMock is ComplianceStore {
 
-  function ComplienceStoreMock() public {
+  function ComplianceStoreMock() public {
     
   }
 }
