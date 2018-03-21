@@ -123,7 +123,11 @@ contract MCoinDistribution is Ownable {
     return windowOf(block.timestamp);
   }
 
-  function commitOn(uint window) public payable {
+  /**
+  * @dev commit funds for the given window
+  * @param window to commit 
+  */
+  function commitOn(uint256 window) public payable {
     // Distribution have started
     require(startTimestamp < block.timestamp);
     // Distribution didn't ended
@@ -143,10 +147,18 @@ contract MCoinDistribution is Ownable {
     Commit(msg.sender, msg.value, window);
   }
 
+  /**
+  * @dev commit funds for the current window
+  */
   function commit() public payable {
     commitOn(currentWindow());
   }
   
+  /**
+  * @dev Withdraw tokens after the window was closed
+  * @param window to withdraw 
+  * @returns the calculated number pf tokens
+  */
   function withdraw(uint256 window) public returns (uint256 reward) {
     // Requested window already been closed
     require(window < currentWindow());
@@ -173,12 +185,22 @@ contract MCoinDistribution is Ownable {
     return reward;
   }
 
+
+  /**
+  * @dev get the reward from all closed windows
+  */
   function withdrawAll() public {
     for (uint256 i = 0; i < currentWindow(); i++) {
       withdraw(i);
     }
   }
 
+  /**
+  * @dev returns a array filed with reward for every closed window
+  * a convinience function to be called for updating a GUI. 
+  * To actually recive the rewards use withdrawAll(), which consumes less gas.
+  * @returns the calculated number of tokens for every closed window
+  */
   function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
     for (uint256 i = 0; i < currentWindow(); i++) {
       rewards[i] = withdraw(i);
@@ -186,6 +208,10 @@ contract MCoinDistribution is Ownable {
     return rewards;
   }
 
+  /**
+  * @dev moves Eth to the foundation wallet.
+  * @returns the amount to be moved.
+  */
   function moveFunds() public onlyOwner returns (uint256 value) {
     value = this.balance;
     require(0 < value);
