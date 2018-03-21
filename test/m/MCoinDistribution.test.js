@@ -11,11 +11,13 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-let MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
-let MCoinMock = artifacts.require('MCoinMock');
+const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
+const MCoinMock = artifacts.require('MCoinMock');
 
 // var M5TokenMock = artifacts.require('M5TokenMock');
 // var M5LogicMock3 = artifacts.require('M5LogicMock3');
+
+const windowLength = duration.minutes(5);
 
 /**
    * Returns possible window timestamp for specific window
@@ -24,7 +26,7 @@ let MCoinMock = artifacts.require('MCoinMock');
    * @returns {number} possible timestamp for window
    */
 const windowTimeStamp = (startTime, windowNumber) =>
-  startTime + duration.seconds(5) + windowNumber * duration.hours(23);
+  startTime + duration.seconds(5) + windowNumber * windowLength;
 
 // for tests run: ganache-cli -u0 -u1 -u2 -u3
 contract('MCoinDistributionMock', function (accounts) {
@@ -48,8 +50,6 @@ contract('MCoinDistributionMock', function (accounts) {
   const firstPeriodSupply = 100;
   const secondPeriodSupply = 150;
   const initialBalance = 50;
-  // const firstWindow = startTime + duration.seconds(1);
-  // const afterClosingTime = this.closingTime + duration.seconds(1);
 
   beforeEach(async function () {
     // New startTime for each test:
@@ -64,6 +64,7 @@ contract('MCoinDistributionMock', function (accounts) {
     // address initialAccount,
     // uint256 initialBalance,
     // uint256 startTime,
+    // uint256 windowLength
     distribution = await MCoinDistributionMock.new(
       firstPeriodWindows,
       firstPeriodSupply,
@@ -72,6 +73,7 @@ contract('MCoinDistributionMock', function (accounts) {
       initialAccount,
       initialBalance,
       startTime,
+      windowLength,
       { from: contractCreator }
     );
 

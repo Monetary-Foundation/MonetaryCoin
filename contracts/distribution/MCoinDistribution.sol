@@ -32,18 +32,20 @@ contract MCoinDistribution is Ownable {
   address public foundationWallet;
 
   uint256 startTimestamp;
+  uint256 windowLength;         // in seconds
 
   mapping (uint256 => uint256) public totals;
   mapping (address => mapping (uint256 => uint256)) public commitment;
   
   function MCoinDistribution (
-    uint    _firstPeriodWindows,
-    uint    _firstPeriodSupply,
-    uint    _secondPeriodWindows,
-    uint    _secondPeriodSupply,
+    uint _firstPeriodWindows,
+    uint _firstPeriodSupply,
+    uint _secondPeriodWindows,
+    uint _secondPeriodSupply,
     address _foundationWallet,
-    uint    _foundationReserve,
-    uint    _startTimestamp
+    uint _foundationReserve,
+    uint _startTimestamp,
+    uint _windowLength
   ) public 
   {
     require(0 < _firstPeriodWindows);
@@ -52,6 +54,7 @@ contract MCoinDistribution is Ownable {
     require(0 < _secondPeriodSupply);
     require(0 < _foundationReserve);
     require(0 < _startTimestamp);
+    require(0 < _windowLength);
     require(_foundationWallet != address(0));
     
     firstPeriodWindows = _firstPeriodWindows;
@@ -61,6 +64,7 @@ contract MCoinDistribution is Ownable {
     foundationWallet = _foundationWallet;
     foundationReserve = _foundationReserve;
     startTimestamp = _startTimestamp;
+    windowLength = _windowLength;
 
     totalWindows = firstPeriodWindows.add(secondPeriodWindows);
     require(totalWindows <= MAX_WINDOWS);
@@ -111,7 +115,7 @@ contract MCoinDistribution is Ownable {
   */
   function windowOf(uint256 timestamp) view public returns (uint256) {
     return (startTimestamp < timestamp) 
-      ? timestamp.sub(startTimestamp).div(23 hours) 
+      ? timestamp.sub(startTimestamp).div(windowLength) 
       : 0;
   }
 
@@ -157,7 +161,7 @@ contract MCoinDistribution is Ownable {
   /**
   * @dev Withdraw tokens after the window was closed
   * @param window to withdraw 
-  * @returns the calculated number pf tokens
+  * @return the calculated number pf tokens
   */
   function withdraw(uint256 window) public returns (uint256 reward) {
     // Requested window already been closed
@@ -185,7 +189,6 @@ contract MCoinDistribution is Ownable {
     return reward;
   }
 
-
   /**
   * @dev get the reward from all closed windows
   */
@@ -199,7 +202,7 @@ contract MCoinDistribution is Ownable {
   * @dev returns a array filed with reward for every closed window
   * a convinience function to be called for updating a GUI. 
   * To actually recive the rewards use withdrawAll(), which consumes less gas.
-  * @returns the calculated number of tokens for every closed window
+  * @return the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
     for (uint256 i = 0; i < currentWindow(); i++) {
@@ -210,7 +213,7 @@ contract MCoinDistribution is Ownable {
 
   /**
   * @dev moves Eth to the foundation wallet.
-  * @returns the amount to be moved.
+  * @return the amount to be moved.
   */
   function moveFunds() public onlyOwner returns (uint256 value) {
     value = this.balance;
