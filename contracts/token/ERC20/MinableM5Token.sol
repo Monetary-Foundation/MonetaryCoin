@@ -4,15 +4,19 @@ import "./GDPOraclizedToken.sol";
 
 
 /**
- * @title M5 Minable token 
- * @dev ERC20 Token for mining when GDP is negative
+ * @title a token with M5 mining ability.
+ * @dev This contract adds the ability to mine for M5 tokens when growth is negative.
+ * M5 token is a distinct ERC20 token which could be obtained only when the GDP growth is negative.
+ * The logic for M5 mining will be determined after all economic considerations were addressed
+ * and a concensus was reached.
+ * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permenently seal the upgrade ability.
 */
 contract MinableM5Token is GDPOraclizedToken { 
-
+  // The M5 token contract
   address M5Token_;
-  
+  // The contract to manage M5 mining logic.
   address M5Logic_;
-
+  
   /**
   * @dev get the M5 token address
   * @return M5 token address
@@ -34,7 +38,7 @@ contract MinableM5Token is GDPOraclizedToken {
   event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
 
   /**
-   * @dev Allows the upgrade of the M5 token contract 
+   * @dev Allows to set the M5 token contract 
    * @param newM5Token The address of the new contract
    */
   function upgradeM5Token(address newM5Token) public onlyOwner { // solium-disable-line
