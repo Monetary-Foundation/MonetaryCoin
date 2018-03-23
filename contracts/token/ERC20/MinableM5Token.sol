@@ -4,14 +4,26 @@ import "./GDPOraclizedToken.sol";
 
 
 /**
- * @title M5 Minable token 
- * @dev ERC20 Token for mining when GDP is negative
+ * @title M5 mining ability.
+ * @dev This contract adds the ability to mine for M5 tokens when growth is negative.
+ * M5 token is a distinct ERC20 token which could be obtained only when the GDP growth is negative.
+ * The logic for M5 mining will be determined after all economic considerations were addressed.
+ * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permenently seal the upgrade ability.
 */
 contract MinableM5Token is GDPOraclizedToken { 
-
-  address M5Token_;
   
+  event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
+  event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
+  event FinishUpgrade();
+
+  // The M5 token contract
+  address M5Token_;
+  // The contract to manage M5 mining logic.
   address M5Logic_;
+  // The address which controls the upgrade process
+  address upgradeManager_;
+  // When isUpgradeFinished_ is true, no more upgrades is allowed
+  bool isUpgradeFinished_ = false;
 
   /**
   * @dev get the M5 token address
@@ -29,15 +41,36 @@ contract MinableM5Token is GDPOraclizedToken {
     return M5Logic_;
   }
 
-  event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
-  
-  event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);
+  /**
+  * @dev get the upgrade manager address
+  * @return the upgrade manager address
+  */
+  function upgradeManager() public view returns (address) {
+    return upgradeManager_;
+  }
 
   /**
-   * @dev Allows the upgrade of the M5 token contract 
+  * @dev get the upgrade status
+  * @return the upgrade status. if true, no more upgrades are possible.
+  */
+  function isUpgradeFinished() public view returns (bool) {
+    return isUpgradeFinished_;
+  }
+
+  /**
+  * @dev Throws if called by any account other than the GDPOracle.
+  */
+  modifier onlyUpgradeManager() {
+    require(msg.sender == upgradeManager_);
+    require(!isUpgradeFinished_);
+    _;
+  }
+
+  /**
+   * @dev Allows to set the M5 token contract 
    * @param newM5Token The address of the new contract
    */
-  function upgradeM5Token(address newM5Token) public onlyOwner { // solium-disable-line
+  function upgradeM5Token(address newM5Token) public onlyUpgradeManager { // solium-disable-line
     require(newM5Token != address(0));
     M5TokenUpgrade(M5Token_, newM5Token);
     M5Token_ = newM5Token;
@@ -47,10 +80,20 @@ contract MinableM5Token is GDPOraclizedToken {
    * @dev Allows the upgrade the M5 logic contract 
    * @param newM5Logic The address of the new contract
    */
-  function upgradeM5Logic(address newM5Logic) public onlyOwner { // solium-disable-line
+  function upgradeM5Logic(address newM5Logic) public onlyUpgradeManager { // solium-disable-line
     require(newM5Logic != address(0));
     M5LogicUpgrade(M5Logic_, newM5Logic);
     M5Logic_ = newM5Logic;
+  }
+
+  /**
+  * @dev Function to dismiss the upgrade capability
+  * @return True if the operation was successful.
+  */
+  function finishUpgrade() onlyUpgradeManager public returns (bool) {
+    isUpgradeFinished_ = true;
+    FinishUpgrade();
+    return true;
   }
 
   /**

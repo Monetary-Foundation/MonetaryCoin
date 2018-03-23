@@ -14,7 +14,8 @@ contract M5LogicMock3 is GDPOraclizedToken {
 
   address M5Token_;
   address M5Logic_;
-
+  address upgradeManager_;
+  bool isUpgradeFinished_ = false;  
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount
@@ -73,7 +74,6 @@ contract M5LogicMock3 is GDPOraclizedToken {
     WithdrawM5(msg.sender, commitmentValue, reward);
     return (reward, commitmentValue);
   }
-
 
   // triggered when user swaps m5Value of M5 tokens for value of regular tokens.
   event Swap(address indexed from, uint256 M5Value, uint256 value);

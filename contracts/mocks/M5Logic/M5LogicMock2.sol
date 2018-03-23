@@ -13,12 +13,14 @@ contract M5LogicMock2 is GDPOraclizedToken {
 
   address M5Token_;
   address M5Logic_;
-
+  address upgradeManager_;
+  bool isUpgradeFinished_ = false;  
   /**
   * @dev return static value
   * @return An uint256 returns the static value
   */
   function getM5Reward(address _miner) public pure returns (uint256) {
+    require(_miner != address(0));
     return (2 ** 140);
   }
 

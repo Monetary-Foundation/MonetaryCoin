@@ -4,11 +4,11 @@ import "./MultihashStore.sol";
 
 
 /**
- * @title ComplienceStore
- * @dev unables to store optional complience data
+ * @title ComplianceStore
+ * @dev enables to store optional Compliance data
  * @dev supports one multihash per address
  */
-contract ComplienceStore is MultihashStore {
+contract ComplianceStore is MultihashStore {
   event SetHash(address indexed from, uint8 hashFunction, uint8 size, bytes32 hash, uint256 timestamp);
 
   struct Multihash {

@@ -18,20 +18,19 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
   let M5Token;
   let M5Logic;
 
-  // address initialAccount,
-  // uint256 initialBalance,
-  // uint256 blockReward
   const initialAccount = accounts[0];
   const initialSupply = 50;
   const setBlockReward = 5;
+  const GDPOracle = accounts[0];
+  const upgradeManager = accounts[3];
   beforeEach(async function () {
-    token = await MinableM5GDPOraclizedTokenMock.new(initialAccount, initialSupply, setBlockReward, accounts[0]);
+    token = await MinableM5GDPOraclizedTokenMock.new(initialAccount, initialSupply, setBlockReward, GDPOracle, upgradeManager);
     M5Token = await M5TokenMock.new();
     M5Logic = await M5LogicMock3.new();
 
     // upgrade token to new logic
-    await token.upgradeM5Logic(M5Logic.address);
-    await token.upgradeM5Token(M5Token.address);
+    await token.upgradeM5Logic(M5Logic.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5Token.address, { from: upgradeManager });
 
     // transfer ownership of M5token to token:
     await M5Token.transferOwnership(token.address);

@@ -11,18 +11,19 @@ var M5LogicMock2 = artifacts.require('M5LogicMock2');
 var M5LogicMock4 = artifacts.require('M5LogicMock4');
 var M5LogicMock5 = artifacts.require('M5LogicMock5');
 var M5LogicMock6 = artifacts.require('M5LogicMock6');
+var M5LogicMock7 = artifacts.require('M5LogicMock7');
 
 contract('MinableM5Token', function (accounts) {
   let token;
 
-  // address initialAccount,
-  // uint256 initialBalance,
-  // uint256 blockReward
   const initialAccount = accounts[0];
   const initialSupply = 50;
   const setBlockReward = 5;
+  const GDPOracle = accounts[0];
+  const upgradeManager = accounts[3];
+
   beforeEach(async function () {
-    token = await MinableM5TokenMock.new(initialAccount, initialSupply, setBlockReward, accounts[0]);
+    token = await MinableM5TokenMock.new(initialAccount, initialSupply, setBlockReward, GDPOracle, upgradeManager);
   });
 
   it('should be created with M5Token contract address = 0', async function () {
@@ -35,14 +36,39 @@ contract('MinableM5Token', function (accounts) {
     assert.equal(address, '0x0000000000000000000000000000000000000000');
   });
 
+  it('should return the correct upgrade manager', async function () {
+    let address = await token.upgradeManager();
+    assert.equal(address, upgradeManager);
+  });
+
   it('should provide the ability to upgrade M5Token address', async function () {
-    await token.upgradeM5Token(accounts[1]);
+    await token.upgradeM5Token(accounts[1], { from: upgradeManager });
     let address = await token.M5Token();
     assert.equal(address, accounts[1]);
   });
 
+  it('should return the correct status for isUpgradeFinished()', async function () {
+    const isFinished = await token.isUpgradeFinished();
+    assert.equal(isFinished, false);
+  });
+
+  it('should return the correct status for isUpgradeFinished() after finishUpgrade()', async function () {
+    await token.finishUpgrade({ from: upgradeManager });
+    const isFinished = await token.isUpgradeFinished();
+    assert.equal(isFinished, true);
+  });
+
+  it('should prevent the ability to finishUpgrade() from non manager', async function () {
+    await assertRevert(token.finishUpgrade({ from: GDPOracle }));
+  });
+
+  it('should prevent upgrading the contract after finishUpgrade()', async function () {
+    await token.finishUpgrade({ from: upgradeManager });
+    await assertRevert(token.upgradeM5Token(accounts[1], { from: upgradeManager }));
+  });
+
   it('should emit event when upgrading M5Token address', async function () {
-    let txObj = await token.upgradeM5Token(accounts[1]);
+    let txObj = await token.upgradeM5Token(accounts[1], { from: upgradeManager });
 
     assert.equal(txObj.logs[0].event, 'M5TokenUpgrade');
     const { oldM5Token, newM5Token } = txObj.logs[0].args;
@@ -52,13 +78,13 @@ contract('MinableM5Token', function (accounts) {
   });
 
   it('should provide the ability to upgrade M5Logic address', async function () {
-    await token.upgradeM5Logic(accounts[1]);
+    await token.upgradeM5Logic(accounts[1], { from: upgradeManager });
     let address = await token.M5Logic();
     assert.equal(address, accounts[1]);
   });
 
   it('should emit event when upgrading M5Logic address', async function () {
-    let txObj = await token.upgradeM5Logic(accounts[1]);
+    let txObj = await token.upgradeM5Logic(accounts[1], { from: upgradeManager });
 
     assert.equal(txObj.logs[0].event, 'M5LogicUpgrade');
     const { oldM5Logic, newM5Logic } = txObj.logs[0].args;
@@ -67,11 +93,11 @@ contract('MinableM5Token', function (accounts) {
     assert.equal(newM5Logic, accounts[1]);
   });
 
-  it('prevent from non owner to upgrade M5Logic', async function () {
+  it('prevent from non manager account to upgrade M5Logic', async function () {
     await assertRevert(token.upgradeM5Logic(accounts[1], { from: accounts[1] }));
   });
 
-  it('prevent from non owner to upgrade M5Token', async function () {
+  it('prevent from non manager account to upgrade to upgrade M5Token', async function () {
     await assertRevert(token.upgradeM5Token(accounts[1], { from: accounts[1] }));
   });
 
@@ -81,7 +107,7 @@ contract('MinableM5Token', function (accounts) {
   });
 
   it('should return 0 for getM5Reward in no commitment were made (after logic init)', async function () {
-    await token.upgradeM5Logic(accounts[1]);
+    await token.upgradeM5Logic(accounts[1], { from: upgradeManager });
     const reward = await token.getM5Reward.call(accounts[0]);
     reward.should.be.bignumber.equal(0);
   });
@@ -94,16 +120,15 @@ contract('MinableM5Token', function (accounts) {
   //   let ans = await token.getM5Reward(accounts[0]);
   //   console.log(ans.toString());
   // });
-  
-  it('should revert if non existant function in logic contract', async function () {
-    await token.upgradeM5Logic(accounts[2]);
+
+  it('should revert if calling non existant function in logic contract', async function () {
+    await token.upgradeM5Logic(accounts[2], { from: upgradeManager });
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock4.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
-    // await assertRevert(token.getM5Reward(accounts[0]));
     await assertRevert(token.getM5Reward(accounts[0]));
   });
 
@@ -113,7 +138,7 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock2.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     let reward = await token.getM5Reward(accounts[0]);
 
@@ -122,10 +147,10 @@ contract('MinableM5Token', function (accounts) {
 
   it('should revert upgraded M5reward if block reward is possitive', async function () {
     await token.commit(5);
-    
+
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     await assertRevert(token.getM5Reward(accounts[0]));
   });
@@ -139,7 +164,7 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     let reward = await token.getM5Reward(accounts[0]);
 
@@ -155,7 +180,7 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     await token.withdrawM5();
   });
@@ -169,13 +194,31 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     await token.withdrawM5();
 
     let newCommitment = await token.commitmentOf(accounts[0]);
-    
+
     newCommitment.should.be.bignumber.equal(0);
+  });
+
+  it('should successfully change storage (referenced by M5LogicContract) from upgraded withdrawM5', async function () {
+    const commitValue = 5;
+
+    await token.commit(commitValue);
+
+    await token.setNegativeGrowth(-51);
+
+    let M5LogicContract = await M5LogicMock7.new();
+
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+
+    await token.withdrawM5();
+
+    let changedAddress = await token.M5Logic();
+    
+    assert.equal(changedAddress, '0x0000000000000000000000000000000000000000');
   });
 
   it('should successfully call withdrawM5 to get reward and commitmet', async function () {
@@ -187,14 +230,14 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5.call();
 
     let reward = txObj[0];
 
     let commitmentValue = txObj[1];
-    
+
     reward.should.be.bignumber.equal(commitValue + 1);
     commitmentValue.should.be.bignumber.equal(commitValue);
   });
@@ -209,19 +252,19 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5.call({ from: accounts[1] });
 
     let reward = txObj[0];
 
     let commitmentValue = txObj[1];
-    
+
     reward.should.be.bignumber.equal(9);
     commitmentValue.should.be.bignumber.equal(8);
   });
 
-  it('should successfully revert when calling withdrawM5 from different address with commitment = 0', async function () {
+  it('should revert when calling withdrawM5 from different address with commitment = 0', async function () {
     await token.transfer(accounts[1], 10);
     const commitValue = 4;
     await token.commit(commitValue, { from: accounts[0] });
@@ -231,13 +274,13 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     // no commitmet for accounts[3]
     await assertRevert(token.withdrawM5.call({ from: accounts[3] }));
   });
 
-  it('should successfully emmit event after withdrawM5 call', async function () {
+  it('should successfully emit event after withdrawM5 call', async function () {
     const commitValue = 5;
 
     await token.commit(commitValue);
@@ -246,13 +289,13 @@ contract('MinableM5Token', function (accounts) {
 
     let M5LogicContract = await M5LogicMock5.new();
 
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5();
 
     assert.equal(txObj.logs[0].event, 'WithdrawM5');
     const { from, commitment, M5Reward } = txObj.logs[0].args;
-    
+
     assert.equal(from, accounts[0]);
     assert.equal(commitment, 5);
     assert.equal(M5Reward, 6);
@@ -265,21 +308,21 @@ contract('MinableM5Token', function (accounts) {
 
   it('should fail on swap() on non upgraded M5 token', async function () {
     let M5LogicContract = await M5LogicMock5.new();
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
     await assertRevert(token.swap(3));
   });
 
   it('should fail on swap() when no such function in upgraded contract', async function () {
     let M5LogicContract = await M5LogicMock5.new();
-    await token.upgradeM5Logic(M5LogicContract.address);
-    await token.upgradeM5Token(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
     await assertRevert(token.swap(3));
   });
 
   it('should successfully changed storage on swap() after upgrade', async function () {
     let M5LogicContract = await M5LogicMock6.new();
-    await token.upgradeM5Logic(M5LogicContract.address);
-    await token.upgradeM5Token(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
     await token.swap(3);
     let blockReward = await token.blockReward();
 
@@ -292,26 +335,26 @@ contract('MinableM5Token', function (accounts) {
 
   it('should fail on aux() when no such function in upgraded contract', async function () {
     let M5LogicContract = await M5LogicMock5.new();
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
     await assertRevert(token.aux(3));
   });
 
   it('should successfully changed storage on aux() after upgrade', async function () {
     let M5LogicContract = await M5LogicMock6.new();
-    await token.upgradeM5Logic(M5LogicContract.address);
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
     await token.aux(3);
     let blockReward = await token.blockReward();
 
     blockReward.should.be.bignumber.equal(3);
   });
-  
+
   // TODO: REVISE:
   // it('should emmit NewEvent on aux() after upgrade (event defined in logic contract)', async function () {
   //   let M5LogicContract = await M5LogicMock6.new();
   //   await token.upgradeM5Logic(M5LogicContract.address);
   //   let txObj = await token.aux(3);
   //   console.log(txObj.logs);
-    
+
   //   assert.equal(txObj.logs[0].event, 'NewEvent');
   //   const { value } = txObj.logs[0].args;
 

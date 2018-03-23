@@ -38,8 +38,10 @@ contract('MCoinDistributionMock', function (accounts) {
   const initialAccount = accounts[0];
   const GDPOracle = accounts[1];
   const contractCreator = accounts[2];
-  const buyer = accounts[3];
-  const buyer2 = accounts[4];
+  const upgradeManager = accounts[3];
+
+  const buyer = accounts[4];
+  const buyer2 = accounts[5];
 
   const initialBlockReward = 5;
 
@@ -55,7 +57,7 @@ contract('MCoinDistributionMock', function (accounts) {
     // New startTime for each test:
     startTime = latestTime() + 60;
 
-    token = await MCoinMock.new(initialBlockReward, GDPOracle, { from: contractCreator });
+    token = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
 
     // uint256 firstPeriodWindows,
     // uint256 firstPeriodSupply,
@@ -683,7 +685,7 @@ contract('MCoinDistributionMock', function (accounts) {
     assert.exists(event);
 
     const { value } = event.args;
-    
+
     value.should.be.bignumber.equal(web3.toWei(new BigNumber(0.2), 'ether'));
   });
 });
