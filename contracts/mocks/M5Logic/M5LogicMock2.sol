@@ -20,6 +20,7 @@ contract M5LogicMock2 is GDPOraclizedToken {
   * @return An uint256 returns the static value
   */
   function getM5Reward(address _miner) public pure returns (uint256) {
+    require(_miner != address(0));
     return (2 ** 140);
   }
 
