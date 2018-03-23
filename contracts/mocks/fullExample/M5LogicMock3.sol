@@ -75,7 +75,6 @@ contract M5LogicMock3 is GDPOraclizedToken {
     return (reward, commitmentValue);
   }
 
-
   // triggered when user swaps m5Value of M5 tokens for value of regular tokens.
   event Swap(address indexed from, uint256 M5Value, uint256 value);
 

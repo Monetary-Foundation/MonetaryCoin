@@ -217,7 +217,6 @@ contract('MinableM5Token', function (accounts) {
     await token.withdrawM5();
 
     let changedAddress = await token.M5Logic();
-    console.log(changedAddress);
     
     assert.equal(changedAddress, '0x0000000000000000000000000000000000000000');
   });
