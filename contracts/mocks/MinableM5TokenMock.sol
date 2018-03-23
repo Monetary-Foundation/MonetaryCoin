@@ -16,7 +16,8 @@ contract MinableM5TokenMock is MinableM5Token {
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward,
-    address GDPOracle // solium-disable-line mixedcase
+    address GDPOracle, // solium-disable-line mixedcase
+    address upgradeManager
     ) public 
     {
 
@@ -36,9 +37,8 @@ contract MinableM5TokenMock is MinableM5Token {
 
     //M5 specific:
     M5Token_ = address(0);
-  
     M5Logic_ = address(0);
-
+    upgradeManager_ = upgradeManager;
   }
 
 }

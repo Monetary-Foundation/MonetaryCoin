@@ -17,13 +17,14 @@ contract MinableM5TokenIntegrationMock is MinableM5Token, ComplianceStore {
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward,
-    address GDPOracle // solium-disable-line mixedcase
+    address GDPOracle, // solium-disable-line mixedcase
+    address upgradeManager
     ) public 
     {
     require(0 < initialSupply);
     require(0 < blockReward);
 
-    totalSupply_ = initialSupply; // * (10 ** uint256(decimals));
+    totalSupply_ = initialSupply;
 
     balances[initialAccount] = initialSupply;
     Transfer(0x0, initialAccount, initialSupply);
@@ -36,8 +37,8 @@ contract MinableM5TokenIntegrationMock is MinableM5Token, ComplianceStore {
 
     //M5 specific:
     M5Token_ = address(0);
-  
     M5Logic_ = address(0);
+    upgradeManager_ = upgradeManager;
   }
 
 }

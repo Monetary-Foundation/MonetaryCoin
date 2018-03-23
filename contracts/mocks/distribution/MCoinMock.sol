@@ -13,7 +13,8 @@ contract MCoinMock is MinableM5Token, ComplianceStore {
 
   function MCoinMock(
     int256 blockReward,
-    address GDPOracle
+    address GDPOracle,
+    address upgradeManager
     ) public 
     {
     require(0 < blockReward);
@@ -28,6 +29,7 @@ contract MCoinMock is MinableM5Token, ComplianceStore {
     //M5 specific:
     M5Token_ = address(0);
     M5Logic_ = address(0);
+    upgradeManager_ = upgradeManager;
   }
 
 }

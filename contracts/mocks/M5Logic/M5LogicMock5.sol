@@ -13,7 +13,8 @@ contract M5LogicMock5 is GDPOraclizedToken {
 
   address M5Token_;
   address M5Logic_;
-
+  address upgradeManager_;
+  bool isUpgradeFinished_ = false;  
   /**
   * @dev preform a require and return storage value
   * @return An uint256 returns the static value

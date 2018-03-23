@@ -14,7 +14,8 @@ contract M5LogicMock3 is GDPOraclizedToken {
 
   address M5Token_;
   address M5Logic_;
-
+  address upgradeManager_;
+  bool isUpgradeFinished_ = false;  
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount
