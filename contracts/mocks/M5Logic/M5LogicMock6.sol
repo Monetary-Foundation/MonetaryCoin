@@ -25,17 +25,4 @@ contract M5LogicMock6 is GDPOraclizedToken {
     require(0 < blockReward_);
     return true;
   }
-
-  event NewEvent(uint256 value);
-  /**
-  * @dev auxilery function
-  * @param _value parameter 1
-  * @return true
-  */
-  function aux(uint256 _value) public returns (bool) {
-    blockReward_ = int256(_value);
-    require(0 < blockReward_);
-    NewEvent(_value);
-    return true;
-  }
 }

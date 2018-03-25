@@ -328,36 +328,4 @@ contract('MinableM5Token', function (accounts) {
 
     blockReward.should.be.bignumber.equal(3);
   });
-
-  it('should fail on aux() on non upgraded contract', async function () {
-    await assertRevert(token.aux(3));
-  });
-
-  it('should fail on aux() when no such function in upgraded contract', async function () {
-    let M5LogicContract = await M5LogicMock5.new();
-    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
-    await assertRevert(token.aux(3));
-  });
-
-  it('should successfully changed storage on aux() after upgrade', async function () {
-    let M5LogicContract = await M5LogicMock6.new();
-    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
-    await token.aux(3);
-    let blockReward = await token.blockReward();
-
-    blockReward.should.be.bignumber.equal(3);
-  });
-
-  // TODO: REVISE:
-  // it('should emmit NewEvent on aux() after upgrade (event defined in logic contract)', async function () {
-  //   let M5LogicContract = await M5LogicMock6.new();
-  //   await token.upgradeM5Logic(M5LogicContract.address);
-  //   let txObj = await token.aux(3);
-  //   console.log(txObj.logs);
-
-  //   assert.equal(txObj.logs[0].event, 'NewEvent');
-  //   const { value } = txObj.logs[0].args;
-
-  //   assert.equal(value, 3);
-  // });
 });
