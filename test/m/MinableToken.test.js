@@ -3,7 +3,7 @@
 import expectThrow from '../helpers/expectThrow';
 import advanceToBlock from '../helpers/advanceToBlock';
 const BigNumber = web3.BigNumber;
-
+const assert = require('chai').assert;
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(BigNumber))
@@ -12,6 +12,8 @@ require('chai')
 var MinableTokenMock = artifacts.require('MinableTokenMock');
 
 const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
+
+const adress0 = '0x0000000000000000000000000000000000000000';
 
 contract('MinableToken', function (accounts) {
   let token;
@@ -85,17 +87,18 @@ contract('MinableToken', function (accounts) {
     assert.equal(amount, 0);
   });
 
-  it('should emit the correct event during commit', async function () {
+  it('should emit the Commit event', async function () {
     const commitValue = 4;
     // onBlockNumber = commitBlockNumber
     // value = 4
     // atStake = 0
-    const txObj = await token.commit(commitValue);
-    // after one block
-    const { from, value, onBlockNumber, atStake, onBlockReward } = txObj.logs[0].args;
+    const tx = await token.commit(commitValue);
+    
+    const event = tx.logs.find(e => e.event === 'Commit');
+    assert.exists(event);
 
-    assert.equal(txObj.logs[0].event, 'Commit');
-
+    const { from, value, onBlockNumber, atStake, onBlockReward } = event.args;
+    
     assert.equal(from, accounts[0]);
     value.should.be.bignumber.equal(commitValue);
     assert.equal(onBlockNumber.toNumber(), web3.eth.blockNumber);
@@ -160,6 +163,21 @@ contract('MinableToken', function (accounts) {
     assert.equal(zeroReward, 0);
   });
 
+  it('should emit transfer event on commit', async function () {
+    const commitValue = 4;
+
+    const tx = await token.commit(commitValue);
+
+    const event = tx.logs.find(e => e.event === 'Transfer');
+    assert.exists(event);
+
+    const { from, to, value } = event.args;
+    
+    assert.equal(from, accounts[0]);
+    assert.equal(to, adress0);
+    value.should.be.bignumber.equal(commitValue);
+  });
+
   it('should calculate the reward correctly after one block', async function () {
     const commitValue = 4;
     // onBlockNumber = commitBlockNumber
@@ -221,7 +239,7 @@ contract('MinableToken', function (accounts) {
     reward.should.be.bignumber.equal(expectedReward);
   });
 
-  it('should calculate the reward correctly when stake increaces', async function () {
+  it('should calculate the reward correctly after stake increase', async function () {
     // unlock accounts[0] and accounts[1]: ganache-cli -u0 -u1 -u2
     await token.transfer(accounts[1], 4);
 
@@ -245,7 +263,7 @@ contract('MinableToken', function (accounts) {
     reward.should.be.bignumber.equal(expectedReward);
   });
 
-  it('should calculate the reward correctly when 2 stake increaes (odd finalStake)', async function () {
+  it('should calculate the reward correctly after two stake increases (odd finalStake)', async function () {
     // unlock accounts[0], accounts[1], accounts[2]
     await token.transfer(accounts[1], 4);
     await token.transfer(accounts[2], 4);
@@ -273,7 +291,7 @@ contract('MinableToken', function (accounts) {
     reward.should.be.bignumber.equal(expectedReward);
   });
 
-  it('should calculate the reward correctly when stake increaes (even stake)', async function () {
+  it('should calculate the reward correctly after stake increase (even stake)', async function () {
     // unlock accounts[0], accounts[1], accounts[2]
     let finalStake = 0;
 
@@ -321,7 +339,7 @@ contract('MinableToken', function (accounts) {
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
 
-  it('should calculate the reward correctly when 2 stake increaes and 4 more blocks (stake even)', async function () {
+  it('should calculate the reward correctly after two stake increases and 4 more blocks (stake even)', async function () {
     // unlock accounts[0], accounts[1], accounts[2]
     let finalStake = 0;
 
@@ -371,18 +389,35 @@ contract('MinableToken', function (accounts) {
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
 
-  it('should emit the correct event during withdraw', async function () {
+  it('should emit transfer event on withdraw', async function () {
     const commitValue = 4;
-    // onBlockNumber = commitBlockNumber
-    // value = 4
-    // atStake = 0
+    
     await token.commit(commitValue);
     // after one block
-    const txObj = await token.withdraw();
-    // console.log(txObj.logs[0]);
-    const { from, reward, commitment, onBlockNumber } = txObj.logs[0].args;
+    const tx = await token.withdraw();
 
-    assert.equal(txObj.logs[0].event, 'Withdraw');
+    const event = tx.logs.find(e => e.event === 'Transfer');
+    assert.exists(event);
+
+    const { from, to, value } = event.args;
+   
+    let expectedReward = new BigNumber(commitValue * 1 * blockReward).dividedToIntegerBy(commitValue);
+
+    assert.equal(from, adress0);
+    assert.equal(to, accounts[0]);
+    value.should.be.bignumber.equal(expectedReward.plus(commitValue));
+  });
+
+  it('should emit withdraw event', async function () {
+    const commitValue = 4;
+    
+    await token.commit(commitValue);
+    // after one block
+    const tx = await token.withdraw();
+    // console.log(txObj.logs[0]);
+    const event = tx.logs.find(e => e.event === 'Withdraw');
+    assert.exists(event);
+    const { from, reward, commitment, onBlockNumber } = event.args;
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 4 = 5;
