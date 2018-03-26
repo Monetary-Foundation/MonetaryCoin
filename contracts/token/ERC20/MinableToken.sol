@@ -11,8 +11,8 @@ import "./MintableToken.sol";
  * for mining during negative growth period refer to MinableM5Token.sol
 */
 contract MinableToken is MintableToken { 
-  event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward);
-  event Withdraw(address indexed from, uint reward, uint commitment, uint indexed onBlockNumber);
+  event Commit(address indexed from, uint value,uint atStake, int onBlockReward);
+  event Withdraw(address indexed from, uint reward, uint commitment);
 
   uint256 totalStake_ = 0;
   int256 blockReward_; //could be possitive or negative according to GDP change
@@ -50,7 +50,7 @@ contract MinableToken is MintableToken {
       blockReward_ // onBlockReward
       );
     
-    Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
+    Commit(msg.sender, _value, totalStake_, blockReward_); // solium-disable-line
 
     return true;
   }
@@ -76,7 +76,7 @@ contract MinableToken is MintableToken {
     
     commitment.value = 0;
     
-    Withdraw(msg.sender, reward, commitmentValue, block.number);  // solium-disable-line
+    Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
     return (reward, commitmentValue);
   }
 

@@ -97,11 +97,10 @@ contract('MinableToken', function (accounts) {
     const event = tx.logs.find(e => e.event === 'Commit');
     assert.exists(event);
 
-    const { from, value, onBlockNumber, atStake, onBlockReward } = event.args;
+    const { from, value, atStake, onBlockReward } = event.args;
     
     assert.equal(from, accounts[0]);
     value.should.be.bignumber.equal(commitValue);
-    assert.equal(onBlockNumber.toNumber(), web3.eth.blockNumber);
     atStake.should.be.bignumber.equal(commitValue);
     onBlockReward.should.be.bignumber.equal(blockReward);
   });
@@ -417,7 +416,7 @@ contract('MinableToken', function (accounts) {
     // console.log(txObj.logs[0]);
     const event = tx.logs.find(e => e.event === 'Withdraw');
     assert.exists(event);
-    const { from, reward, commitment, onBlockNumber } = event.args;
+    const { from, reward, commitment } = event.args;
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 4 = 5;
@@ -426,7 +425,6 @@ contract('MinableToken', function (accounts) {
     assert.equal(from, accounts[0]);
     assert.equal(commitment, commitValue);
     reward.should.be.bignumber.equal(expectedReward);
-    assert.equal(onBlockNumber.toNumber(), web3.eth.blockNumber);
   });
 
   it('should throw if nothing to withdraw', async function () {
