@@ -36,7 +36,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
     assert.equal(oracleAddress, accounts[1]);
   });
-  it('should emmit event while transferring the oracle', async function () {
+  it('should emit event while transferring the oracle', async function () {
     const txObj = await token.transferGDPOracle(accounts[1]);
 
     const { previousOracle, newOracle } = txObj.logs[0].args;
@@ -69,7 +69,7 @@ contract('GDPOraclizedToken', function (accounts) {
     newReward.should.be.bignumber.equal(50);
   });
 
-  it('should emmit event for setPossitiveGrowth', async function () {
+  it('should emit event for setPossitiveGrowth', async function () {
     // BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
     const txObj = await token.setPossitiveGrowth(50);
 
@@ -110,7 +110,7 @@ contract('GDPOraclizedToken', function (accounts) {
     newReward.should.be.bignumber.equal(-60);
   });
 
-  it('should emmit event for setNegativeGrowth', async function () {
+  it('should emit event for setNegativeGrowth', async function () {
     // BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
     const txObj = await token.setNegativeGrowth(-60);
 

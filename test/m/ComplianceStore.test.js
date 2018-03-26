@@ -60,7 +60,7 @@ contract('ComplianceStore', function (accounts) {
     timestamp.should.be.bignumber.gt(1518978976);
   });
 
-  it('should correctly emmit event during set', async function () {
+  it('should correctly emit event during set', async function () {
     const txObj =
       await ComplianceStore.setHash(2, 3, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
     assert.equal(txObj.logs[0].event, 'SetHash');
