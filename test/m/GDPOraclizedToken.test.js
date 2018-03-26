@@ -70,14 +70,13 @@ contract('GDPOraclizedToken', function (accounts) {
   });
 
   it('should emit event for setPossitiveGrowth', async function () {
-    // BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
+    // BlockRewardChanged(int oldBlockReward, int newBlockReward);
     const txObj = await token.setPossitiveGrowth(50);
 
     assert.equal(txObj.logs[0].event, 'BlockRewardChanged');
-    const { oldBlockReward, newBlockReward, blockNumber } = txObj.logs[0].args;
+    const { oldBlockReward, newBlockReward } = txObj.logs[0].args;
     assert.equal(oldBlockReward, 5);
     assert.equal(newBlockReward, 50);
-    assert.equal(blockNumber, web3.eth.blockNumber);
   });
 
   it('should prevent from non oracle to setPossitiveGrowth', async function () {
@@ -115,10 +114,9 @@ contract('GDPOraclizedToken', function (accounts) {
     const txObj = await token.setNegativeGrowth(-60);
 
     assert.equal(txObj.logs[0].event, 'BlockRewardChanged');
-    const { oldBlockReward, newBlockReward, blockNumber } = txObj.logs[0].args;
+    const { oldBlockReward, newBlockReward } = txObj.logs[0].args;
     assert.equal(oldBlockReward, 5);
     assert.equal(newBlockReward, -60);
-    assert.equal(blockNumber, web3.eth.blockNumber);
   });
 
   it('should prevent from non oracle to setNegativeGrowth', async function () {
