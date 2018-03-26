@@ -37,7 +37,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
-    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
+    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value).div(effectiveStake);
     
     return miningReward;
   }
@@ -89,7 +89,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     require(0 < blockReward_);
     require(M5Token_.call(bytes4(keccak256("swap(address,uint256)")), msg.sender, _value)); // solium-disable-line
     
-    uint256 reward = _value / 10;
+    uint256 reward = _value.div(10);
 
     balances[msg.sender] = balances[msg.sender].add(reward); 
     totalSupply_ = totalSupply_.add(reward);   

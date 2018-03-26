@@ -110,7 +110,7 @@ contract('GDPOraclizedToken', function (accounts) {
   });
 
   it('should emit event for setNegativeGrowth', async function () {
-    // BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
+    // BlockRewardChanged(int oldBlockReward, int newBlockReward);
     const txObj = await token.setNegativeGrowth(-60);
 
     assert.equal(txObj.logs[0].event, 'BlockRewardChanged');

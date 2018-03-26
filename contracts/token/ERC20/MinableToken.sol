@@ -101,7 +101,7 @@ contract MinableToken is MintableToken {
     
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
-    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
+    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value).div(effectiveStake);
        
     return miningReward;
   }
@@ -112,7 +112,7 @@ contract MinableToken is MintableToken {
   * @return An uint256 representing integer average
   */
   function average(uint a, uint b) public pure returns (uint) {
-    return a.add(b) / 2;
+    return a.add(b).div(2);
   }
 
   /**
