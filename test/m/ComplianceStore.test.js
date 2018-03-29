@@ -1,4 +1,5 @@
-
+import { duration } from '../helpers/increaseTime';
+import latestTime from '../helpers/latestTime';
 // import assertRevert from '../helpers/assertRevert';
 const BigNumber = web3.BigNumber;
 
@@ -7,13 +8,53 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var ComplianceStoreMock = artifacts.require('ComplianceStoreMock');
+// const ComplianceStoreMock = artifacts.require('ComplianceStoreMock');
+
+const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
+const MCoinMock = artifacts.require('MCoinMock');
+const windowLength = duration.minutes(5);
 
 contract('ComplianceStore', function (accounts) {
   let ComplianceStore;
+  let distribution;
+
+  const GDPOracle = accounts[0];
+  const initialAccount = accounts[1];
+  const contractCreator = accounts[2];
+  const upgradeManager = accounts[3];
+  // const stranger = accounts[8];
+
+  const initialBlockReward = 5;
+
+  let startTime = latestTime() + 60;
+
+  const firstPeriodWindows = 3;
+  const secondPeriodWindows = 7;
+  const firstPeriodSupply = 100;
+  const secondPeriodSupply = 150;
+  const initialBalance = 50;
 
   beforeEach(async function () {
-    ComplianceStore = await ComplianceStoreMock.new();
+    // New startTime for each test:
+    startTime = latestTime() + 60;
+
+    ComplianceStore = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
+
+    distribution = await MCoinDistributionMock.new(
+      firstPeriodWindows,
+      firstPeriodSupply,
+      secondPeriodWindows,
+      secondPeriodSupply,
+      initialAccount,
+      initialBalance,
+      startTime,
+      windowLength,
+      { from: contractCreator }
+    );
+
+    await ComplianceStore.transferOwnership(distribution.address, { from: contractCreator });
+
+    await distribution.init(ComplianceStore.address, { from: contractCreator });
   });
 
   it('should return zeros for unset address', async function () {

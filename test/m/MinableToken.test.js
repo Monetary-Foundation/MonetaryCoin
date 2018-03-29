@@ -2,6 +2,9 @@
 // import assertRevert from '../helpers/assertRevert';
 import expectThrow from '../helpers/expectThrow';
 import advanceToBlock from '../helpers/advanceToBlock';
+import { duration } from '../helpers/increaseTime';
+import latestTime from '../helpers/latestTime';
+
 const BigNumber = web3.BigNumber;
 const assert = require('chai').assert;
 require('chai')
@@ -9,24 +12,76 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var MinableTokenMock = artifacts.require('MinableTokenMock');
+// const MinableTokenMock = artifacts.require('MinableTokenMock');
 
 const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
-const adress0 = '0x0000000000000000000000000000000000000000';
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
+const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
+const MCoinMock = artifacts.require('MCoinMock');
+
+const windowLength = duration.minutes(5);
+
+// for tests run: ganache-cli -u0 -u1 -u2 -u3
 contract('MinableToken', function (accounts) {
   let token;
+  let distribution;
 
-  // address initialAccount,
-  // uint256 initialBalance,
-  // uint256 blockReward
   const initialAccount = accounts[0];
-  const initialSupply = 500;
-  const blockReward = 5;
+  const GDPOracle = accounts[1];
+  const contractCreator = accounts[2];
+  const upgradeManager = accounts[3];
+
+  // const buyer = accounts[4];
+  // const buyer2 = accounts[5];
+
+  const initialBlockReward = 5;
+
+  let startTime = latestTime() + 60;
+
+  const firstPeriodWindows = 3;
+  const secondPeriodWindows = 7;
+  const firstPeriodSupply = 100;
+  const secondPeriodSupply = 150;
+  const initialBalance = 50;
+  const initialBalanceWei = web3.toWei(new BigNumber(initialBalance));
+
   beforeEach(async function () {
-    token = await MinableTokenMock.new(initialAccount, initialSupply, blockReward);
+    // New startTime for each test:
+    startTime = latestTime() + 60;
+
+    token = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
+
+    distribution = await MCoinDistributionMock.new(
+      firstPeriodWindows,
+      firstPeriodSupply,
+      secondPeriodWindows,
+      secondPeriodSupply,
+      initialAccount,
+      initialBalance,
+      startTime,
+      windowLength,
+      { from: contractCreator }
+    );
+
+    await token.transferOwnership(distribution.address, { from: contractCreator });
+
+    await distribution.init(token.address, { from: contractCreator });
   });
+
+  // contract('MinableToken', function (accounts) {
+  //   let token;
+
+  //   // address initialAccount,
+  //   // uint256 initialBalance,
+  //   // uint256 blockReward
+  //   const initialAccount = accounts[0];
+  //   const initialSupply = 500;
+  //   const blockReward = 5;
+  //   beforeEach(async function () {
+  //     token = await MinableTokenMock.new(initialAccount, initialSupply, blockReward);
+  //   });
 
   it('should return 0 for totalStake after construction', async function () {
     let totalStake = await token.totalStake();
@@ -35,27 +90,22 @@ contract('MinableToken', function (accounts) {
   });
 
   it('should return correct block reward after construction', async function () {
-    const initialAccount = accounts[0];
-    const initialSupply = 5;
-    const blockReward = 5;
-    token = await MinableTokenMock.new(initialAccount, initialSupply, blockReward);
     let tokenBlockReward = await token.blockReward();
 
-    assert.equal(tokenBlockReward, blockReward);
+    assert.equal(tokenBlockReward, initialBlockReward);
   });
 
-  it('should throw if initialSupply = 0', async function () {
-    const initialAccount = accounts[0];
-    const initialSupply = 0;
-    const blockReward = 5;
-    await expectThrow(MinableTokenMock.new(initialAccount, initialSupply, blockReward));
-  });
+  // not nessesery when using MCoinMock
+  // it('should throw if initialSupply = 0', async function () {
+  //   const initialAccount = accounts[0];
+  //   const initialSupply = 0;
+  //   const blockReward = 5;
+  //   await expectThrow(MinableTokenMock.new(initialAccount, initialSupply, blockReward));
+  // });
 
   it('should throw if blockReward = 0', async function () {
-    const initialAccount = accounts[0];
-    const initialSupply = 30;
     const blockReward = 0;
-    await expectThrow(MinableTokenMock.new(initialAccount, initialSupply, blockReward));
+    await expectThrow(MCoinMock.new(blockReward, GDPOracle, upgradeManager, { from: contractCreator }));
   });
 
   it('should increase stake after successfull commit', async function () {
@@ -66,14 +116,14 @@ contract('MinableToken', function (accounts) {
   });
 
   it('should throw if trying to commit more then balance', async function () {
-    await expectThrow(token.commit(initialSupply + 5));
+    await expectThrow(token.commit(initialBalanceWei.plus(5)));
   });
 
   it('should return correct balance after commit', async function () {
     const commitValue = 3;
     await token.commit(commitValue);
     let balance0 = await token.balanceOf(accounts[0]);
-    assert.equal(balance0, initialSupply - commitValue);
+    balance0.should.be.bignumber.equal(initialBalanceWei.minus(commitValue));
   });
 
   it('should return correct commitment for given address', async function () {
@@ -93,16 +143,16 @@ contract('MinableToken', function (accounts) {
     // value = 4
     // atStake = 0
     const tx = await token.commit(commitValue);
-    
+
     const event = tx.logs.find(e => e.event === 'Commit');
     assert.exists(event);
 
     const { from, value, atStake, onBlockReward } = event.args;
-    
+
     assert.equal(from, accounts[0]);
     value.should.be.bignumber.equal(commitValue);
     atStake.should.be.bignumber.equal(commitValue);
-    onBlockReward.should.be.bignumber.equal(blockReward);
+    onBlockReward.should.be.bignumber.equal(initialBlockReward);
   });
 
   it('should throw if trying to commit twice without withdraw', async function () {
@@ -171,9 +221,9 @@ contract('MinableToken', function (accounts) {
     assert.exists(event);
 
     const { from, to, value } = event.args;
-    
+
     assert.equal(from, accounts[0]);
-    assert.equal(to, adress0);
+    assert.equal(to, ZERO_ADDRESS);
     value.should.be.bignumber.equal(commitValue);
   });
 
@@ -188,7 +238,7 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 4 = 5; (if only one miner - he gets the entire block reward)
-    let expectedReward = new BigNumber(commitValue * 1 * blockReward).dividedToIntegerBy(commitValue);
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
 
     reward.should.be.bignumber.equal(expectedReward);
   });
@@ -209,7 +259,7 @@ contract('MinableToken', function (accounts) {
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 3 * 5 / 4) = 15
     let expectedReward =
-      new BigNumber(commitValue * numOfBlocks * blockReward).dividedToIntegerBy(commitValue);
+      new BigNumber(commitValue * numOfBlocks * initialBlockReward).dividedToIntegerBy(commitValue);
 
     reward.should.be.bignumber.equal(expectedReward);
   });
@@ -233,7 +283,7 @@ contract('MinableToken', function (accounts) {
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 2 * 5) / avg(4,200) = 40 / 98
     let expectedReward =
-      new BigNumber(commitValue * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValue, 200));
+      new BigNumber(commitValue * numOfBlocks * initialBlockReward).dividedToIntegerBy(intAvg(commitValue, 200));
 
     reward.should.be.bignumber.equal(expectedReward);
   });
@@ -257,7 +307,7 @@ contract('MinableToken', function (accounts) {
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 2 * 5) / avg(4,8) = 40 / 6
     let expectedReward =
-      new BigNumber(commitValue * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValue, 2 * commitValue));
+      new BigNumber(commitValue * numOfBlocks * initialBlockReward).dividedToIntegerBy(intAvg(commitValue, 2 * commitValue));
 
     reward.should.be.bignumber.equal(expectedReward);
   });
@@ -285,7 +335,7 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     let expectedReward =
-      new BigNumber(commitValue * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValue, finalStake));
+      new BigNumber(commitValue * numOfBlocks * initialBlockReward).dividedToIntegerBy(intAvg(commitValue, finalStake));
 
     reward.should.be.bignumber.equal(expectedReward);
   });
@@ -318,14 +368,14 @@ contract('MinableToken', function (accounts) {
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 3 * 4) / avg(4,12) = 60/8 = 7
     let expectedRewardAcc0 =
-      new BigNumber(commitValueAcc0 * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValueAcc0, finalStake));
+      new BigNumber(commitValueAcc0 * numOfBlocks * initialBlockReward).dividedToIntegerBy(intAvg(commitValueAcc0, finalStake));
     rewardAcc0.should.be.bignumber.equal(expectedRewardAcc0);
 
     let rewardAcc1 = await token.getReward(accounts[1]);
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 2 * 3) / avg(7,12) = 30/9 = 3
     let expectedRewardAcc1 =
-      new BigNumber(commitValueAcc1 * (numOfBlocks - 1) * blockReward)
+      new BigNumber(commitValueAcc1 * (numOfBlocks - 1) * initialBlockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1, finalStake));
     rewardAcc1.should.be.bignumber.equal(expectedRewardAcc1);
 
@@ -333,7 +383,7 @@ contract('MinableToken', function (accounts) {
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 1 * 5) / avg(12,12) = 25/12 = 2
     let expectedRewardAcc2 =
-      new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * blockReward)
+      new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * initialBlockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1 + commitValueAcc2, finalStake));
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
@@ -368,14 +418,14 @@ contract('MinableToken', function (accounts) {
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 7 * 4) / avg(4,12) = 60/8 = 17
     let expectedRewardAcc0 =
-      new BigNumber(commitValueAcc0 * numOfBlocks * blockReward).dividedToIntegerBy(intAvg(commitValueAcc0, finalStake));
+      new BigNumber(commitValueAcc0 * numOfBlocks * initialBlockReward).dividedToIntegerBy(intAvg(commitValueAcc0, finalStake));
     rewardAcc0.should.be.bignumber.equal(expectedRewardAcc0);
 
     let rewardAcc1 = await token.getReward(accounts[1]);
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 6 * 3) / avg(7,12) = 90/9 = 10
     let expectedRewardAcc1 =
-      new BigNumber(commitValueAcc1 * (numOfBlocks - 1) * blockReward)
+      new BigNumber(commitValueAcc1 * (numOfBlocks - 1) * initialBlockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1, finalStake));
     rewardAcc1.should.be.bignumber.equal(expectedRewardAcc1);
 
@@ -383,14 +433,14 @@ contract('MinableToken', function (accounts) {
     // (BlockReward * #blocks * commitValue) / avgStake [integer division]
     // (5 * 5 * 5) / avg(12,12) = 125/12 = 10
     let expectedRewardAcc2 =
-      new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * blockReward)
+      new BigNumber(commitValueAcc2 * (numOfBlocks - 2) * initialBlockReward)
         .dividedToIntegerBy(intAvg(commitValueAcc0 + commitValueAcc1 + commitValueAcc2, finalStake));
     rewardAcc2.should.be.bignumber.equal(expectedRewardAcc2);
   });
 
   it('should emit transfer event on withdraw', async function () {
     const commitValue = 4;
-    
+
     await token.commit(commitValue);
     // after one block
     const tx = await token.withdraw();
@@ -399,17 +449,17 @@ contract('MinableToken', function (accounts) {
     assert.exists(event);
 
     const { from, to, value } = event.args;
-   
-    let expectedReward = new BigNumber(commitValue * 1 * blockReward).dividedToIntegerBy(commitValue);
 
-    assert.equal(from, adress0);
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
+
+    assert.equal(from, ZERO_ADDRESS);
     assert.equal(to, accounts[0]);
     value.should.be.bignumber.equal(expectedReward.plus(commitValue));
   });
 
   it('should emit withdraw event', async function () {
     const commitValue = 4;
-    
+
     await token.commit(commitValue);
     // after one block
     const tx = await token.withdraw();
@@ -420,7 +470,7 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 4 = 5;
-    let expectedReward = new BigNumber(commitValue * 1 * blockReward).dividedToIntegerBy(commitValue);
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
 
     assert.equal(from, accounts[0]);
     assert.equal(commitment, commitValue);
@@ -452,8 +502,8 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 1 * 5) / 4 = 5;
-    let expectedReward = new BigNumber(commitValue * 1 * blockReward).dividedToIntegerBy(commitValue);
-    let expectedBalance = expectedReward.plus(commitValue).plus(initialSupply - commitValue);
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
+    let expectedBalance = expectedReward.plus(commitValue).plus(initialBalanceWei.minus(commitValue));
 
     newBalance.should.be.bignumber.equal(expectedBalance);
   });
@@ -472,8 +522,8 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 2 * 5) / 4 = 20;
-    let expectedReward = new BigNumber(commitValue * 2 * blockReward).dividedToIntegerBy(commitValue);
-    let expectedBalance = expectedReward.plus(commitValue).plus(initialSupply - commitValue).minus(transferValue);
+    let expectedReward = new BigNumber(commitValue * 2 * initialBlockReward).dividedToIntegerBy(commitValue);
+    let expectedBalance = expectedReward.plus(commitValue).plus(initialBalanceWei).minus(commitValue).minus(transferValue);
 
     newBalance.should.be.bignumber.equal(expectedBalance);
   });
@@ -493,7 +543,7 @@ contract('MinableToken', function (accounts) {
 
     // (commitValue * #blocks * BlockReward) / avgStake [integer division]
     // (4 * 2 * 5) / 4 = 20;
-    let expectedReward = new BigNumber(commitValue * 2 * blockReward).dividedToIntegerBy(commitValue);
+    let expectedReward = new BigNumber(commitValue * 2 * initialBlockReward).dividedToIntegerBy(commitValue);
 
     reward.should.be.bignumber.equal(expectedReward);
     commitment.should.be.bignumber.equal(commitValue);

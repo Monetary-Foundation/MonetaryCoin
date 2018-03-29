@@ -32,7 +32,7 @@ contract GDPOraclizedToken is MinableToken {
    */
   function transferGDPOracle(address newOracle) public onlyGDPOracle {
     require(newOracle != address(0));
-    GDPOracleTransferred(owner, newOracle);
+    GDPOracleTransferred(GDPOracle_, newOracle);
     GDPOracle_ = newOracle;
   }
 
