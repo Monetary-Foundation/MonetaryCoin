@@ -155,11 +155,6 @@ contract('MinableToken', function (accounts) {
     onBlockReward.should.be.bignumber.equal(initialBlockReward);
   });
 
-  it('should throw if trying to commit twice without withdraw', async function () {
-    await token.commit(4);
-    await expectThrow(token.commit(4));
-  });
-
   it('should return the correct average', async function () {
     let avg = await token.average(2, 4);
     assert.equal(avg, 3);
@@ -241,6 +236,12 @@ contract('MinableToken', function (accounts) {
     let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
 
     reward.should.be.bignumber.equal(expectedReward);
+  });
+
+  it('should return correct commit value on call', async function () {
+    const commitValue = 4;
+    const value = await token.commit.call(commitValue);
+    value.should.be.bignumber.equal(commitValue);
   });
 
   it('should calculate the reward correctly after 3 blocks', async function () {
@@ -665,5 +666,104 @@ contract('MinableToken', function (accounts) {
 
     let commitment = await token.commitmentOf(accounts[0]);
     commitment.should.be.bignumber.equal(0);
+  });
+
+  it('should return correct commit value on call (commit twice)', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    // after one block
+    // let reward = await token.getReward(accounts[0]);
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 1 * 5) / 4 = 5; (if only one miner - he gets the entire block reward)
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
+
+    // second commit
+    const recommit = await token.commit.call(commitValue);
+    // Two commits and reward gained in between
+    recommit.should.be.bignumber.equal(expectedReward.plus(commitValue).plus(commitValue));
+  });
+
+  it('should commit twice correctly', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    // after one block
+    let reward = await token.getReward(accounts[0]);
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 1 * 5) / 4 = 5; (if only one miner - he gets the entire block reward)
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
+
+    reward.should.be.bignumber.equal(expectedReward);
+
+    // second commit
+    await token.commit(commitValue);
+
+    const newCommitValue = await token.commitmentOf(initialAccount);
+    newCommitValue.should.be.bignumber.equal(expectedReward.plus(commitValue).plus(commitValue));
+  });
+
+  it('should emit events correctly when commiting twice', async function () {
+    const commitValue = 4;
+    // onBlockNumber = commitBlockNumber
+    // value = 4
+    // atStake = 0
+    await token.commit(commitValue);
+    // after one block
+    let reward = await token.getReward(accounts[0]);
+
+    // (commitValue * #blocks * BlockReward) / avgStake [integer division]
+    // (4 * 1 * 5) / 4 = 5; (if only one miner - he gets the entire block reward)
+    let expectedReward = new BigNumber(commitValue * 1 * initialBlockReward).dividedToIntegerBy(commitValue);
+
+    reward.should.be.bignumber.equal(expectedReward);
+
+    // second commit
+    const txObj = await token.commit(commitValue);
+
+    const newCommitValue = expectedReward.plus(commitValue).plus(commitValue);
+
+    // Events sequence for double commit: Transfer, Withdraw, Transfer, Commit
+    const transferEvt1 = txObj.logs[0];
+    const withdrawEvt = txObj.logs[1];
+    const transferEvt2 = txObj.logs[2];
+    const commitEvt1 = txObj.logs[3];
+
+    assert.exists(transferEvt1);
+    assert.exists(withdrawEvt);
+    assert.exists(transferEvt2);
+    assert.exists(commitEvt1);
+
+    {
+      const { from, to, value } = transferEvt1.args;
+      assert.equal(from, ZERO_ADDRESS);
+      assert.equal(to, initialAccount);
+      value.should.be.bignumber.equal(expectedReward.plus(commitValue));
+    }
+    {
+      const { from, reward, commitment } = withdrawEvt.args;
+      assert.equal(from, initialAccount);
+      reward.should.be.bignumber.equal(expectedReward);
+      commitment.should.be.bignumber.equal(commitValue);
+    }
+    {
+      const { from, to, value } = transferEvt2.args;
+      assert.equal(from, initialAccount);
+      assert.equal(to, ZERO_ADDRESS);
+      value.should.be.bignumber.equal(newCommitValue);
+    }
+    {
+      const { from, value, atStake, onBlockReward } = commitEvt1.args;
+      assert.equal(from, initialAccount);
+      value.should.be.bignumber.equal(newCommitValue);
+      atStake.should.be.bignumber.equal(newCommitValue);
+      onBlockReward.should.be.bignumber.equal(initialBlockReward);
+    }
   });
 });

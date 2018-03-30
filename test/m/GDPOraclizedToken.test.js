@@ -235,4 +235,12 @@ contract('GDPOraclizedToken', function (accounts) {
     await token.setNegativeGrowth(-20);
     await assertRevert(token.withdraw({ from: initialAccount }));
   });
+
+  it('should prevent recommit if block reward is negative', async function () {
+    const commitValue = 4;
+
+    await token.commit(commitValue, { from: initialAccount });
+    await token.setNegativeGrowth(-20);
+    await assertRevert(token.commit(commitValue));
+  });
 });
