@@ -10,8 +10,6 @@ contract MinableM5TokenMock is MinableM5Token {
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  //uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
-
   function MinableM5TokenMock(
     address initialAccount,
     uint256 initialSupply,
@@ -24,13 +22,13 @@ contract MinableM5TokenMock is MinableM5Token {
     require(0 < initialSupply);
     require(0 < blockReward);
 
-    totalSupply_ = initialSupply; // * (10 ** uint256(decimals));
+    totalSupply_ = initialSupply; 
 
     balances[initialAccount] = initialSupply;
     Transfer(0x0, initialAccount, initialSupply);
     
     blockReward_ = blockReward;   
-    BlockRewardChanged(0, blockReward_, block.number);
+    BlockRewardChanged(0, blockReward_);
 
     GDPOracle_ = GDPOracle;
     GDPOracleTransferred(0x0, GDPOracle_);

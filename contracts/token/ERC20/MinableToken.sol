@@ -11,8 +11,8 @@ import "./MintableToken.sol";
  * for mining during negative growth period refer to MinableM5Token.sol
 */
 contract MinableToken is MintableToken { 
-  event Commit(address indexed from, uint value, uint indexed onBlockNumber,uint atStake, int onBlockReward);
-  event Withdraw(address indexed from, uint reward, uint commitment, uint indexed onBlockNumber);
+  event Commit(address indexed from, uint value,uint atStake, int onBlockReward);
+  event Withdraw(address indexed from, uint reward, uint commitment);
 
   uint256 totalStake_ = 0;
   int256 blockReward_; //could be possitive or negative according to GDP change
@@ -28,31 +28,43 @@ contract MinableToken is MintableToken {
 
   /**
   * @dev commit amount for minning
+  * if user previously commited, add to an existing commitment. 
+  * this is done by calling withdraw() 
+  * then commit back previous commit + reward + new commit 
   * @param _value The amount to be commited.
-  * @return true on successfull commit
+  * @return the commit value 
+  * _value or prevCommit + reward + _value
   */
-  function commit(uint _value) public returns (bool) {
+  function commit(uint256 _value) public returns (uint256 commitValue) {
     require(0 < _value);
     require(_value <= balances[msg.sender]);
-    //Prevent commiting more then once without withdrawing first:
-    require(miners[msg.sender].value == 0); 
+    
+    commitValue = _value;
+    uint256 prevCommit = miners[msg.sender].value;
+    //In case user already commited, withdraw and recommit 
+    // new commitment value: prevCommit + reward + _value
+    if (0 < prevCommit) {
+      // Will revert if reward is negative
+      commitValue = prevCommit.add(getReward(msg.sender)).add(commitValue);
+      withdraw();
+    }
 
     // sub will throw if there is not enough balance.
-    balances[msg.sender] = balances[msg.sender].sub(_value);
-    // Transfer(msg.sender, 0, _value);
+    balances[msg.sender] = balances[msg.sender].sub(commitValue);
+    Transfer(msg.sender, address(0), commitValue);
 
-    totalStake_ = totalStake_.add(_value);
+    totalStake_ = totalStake_.add(commitValue);
 
     miners[msg.sender] = Commitment(
-      _value, // Commitment.value
+      commitValue, // Commitment.value
       block.number, // onBlockNumber
       totalStake_, // atStake = current stake + commitments value
       blockReward_ // onBlockReward
       );
     
-    Commit(msg.sender, _value, block.number, totalStake_, blockReward_); // solium-disable-line
+    Commit(msg.sender, commitValue, totalStake_, blockReward_); // solium-disable-line
 
-    return true;
+    return commitValue;
   }
 
   /**
@@ -66,18 +78,17 @@ contract MinableToken is MintableToken {
     reward = getReward(msg.sender);
 
     Commitment storage commitment = miners[msg.sender];
-
-    totalStake_ = totalStake_.sub(commitment.value);
+    commitmentValue = commitment.value;
+    
+    totalStake_ = totalStake_.sub(commitmentValue);
     totalSupply_ = totalSupply_.add(reward);
     
-    balances[msg.sender] = balances[msg.sender].add(commitment.value.add(reward));
-    // Transfer(0, msg.sender, reward);
-
-    commitmentValue = commitment.value;
-
+    balances[msg.sender] = balances[msg.sender].add(commitmentValue.add(reward));
+    Transfer(address(0), msg.sender, commitmentValue.add(reward));
+    
     commitment.value = 0;
     
-    Withdraw(msg.sender, reward, commitmentValue, block.number);  // solium-disable-line
+    Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
     return (reward, commitmentValue);
   }
 
@@ -102,7 +113,7 @@ contract MinableToken is MintableToken {
     
     uint256 numberOfBlocks = block.number.sub(commitment.onBlockNumber);
 
-    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value) / effectiveStake;
+    uint256 miningReward = numberOfBlocks.mul(effectiveBlockReward).mul(commitment.value).div(effectiveStake);
        
     return miningReward;
   }
@@ -113,7 +124,7 @@ contract MinableToken is MintableToken {
   * @return An uint256 representing integer average
   */
   function average(uint a, uint b) public pure returns (uint) {
-    return a.add(b) / 2;
+    return a.add(b).div(2);
   }
 
   /**

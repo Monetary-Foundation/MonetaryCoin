@@ -146,7 +146,7 @@ contract MinableM5Token is GDPOraclizedToken {
     commitmentValue = miners[msg.sender].value;
 
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
-    // WithdrawM5(msg.sender);
+    
     return (reward,commitmentValue);
   }
 
@@ -154,7 +154,7 @@ contract MinableM5Token is GDPOraclizedToken {
   event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
-  * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
+  * @dev swap M5 tokens back to regular tokens when GDP is back to possitive 
   * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */
@@ -166,16 +166,4 @@ contract MinableM5Token is GDPOraclizedToken {
     
     return true;
   }
-
-  /**
-  * @dev auxilery function for future use 
-  * @param _value parameter 1
-  * @return true
-  */
-  function aux(uint256 _value) public returns (bool) {
-    require(M5Logic_ != address(0));
-    require(M5Logic_.delegatecall(bytes4(keccak256("aux(uint256)")),_value)); // solium-disable-line
-    return true;
-  }
-
 }

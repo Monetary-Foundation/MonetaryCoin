@@ -24,11 +24,8 @@ contract M5LogicMock2 is GDPOraclizedToken {
     return (2 ** 140);
   }
 
-  function withdrawM5() public pure returns (uint256) {
-    
+  function withdrawM5() public pure returns (uint256) { 
     //WithdrawM5();
     return 1;
   }
-
-  
 }

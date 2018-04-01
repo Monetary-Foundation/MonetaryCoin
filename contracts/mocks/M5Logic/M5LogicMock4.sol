@@ -15,11 +15,10 @@ contract M5LogicMock4 is GDPOraclizedToken {
   address M5Logic_;
   address upgradeManager_;
   bool isUpgradeFinished_ = false;  
-  // getM5Reward was ommited on purpuse
+  
+  // getM5Reward was omited on purpuse
   // function getM5Reward(address _miner) public view returns (uint256) {
   //   return (2 ** 140);
   //   // return miners[_miner].value;
   // }
-
-  
 }

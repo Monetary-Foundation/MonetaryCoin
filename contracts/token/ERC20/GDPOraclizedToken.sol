@@ -6,7 +6,7 @@ import "./MinableToken.sol";
 contract GDPOraclizedToken is MinableToken {
 
   event GDPOracleTransferred(address indexed previousOracle, address indexed newOracle);
-  event BlockRewardChanged(int oldBlockReward, int newBlockReward, uint indexed blockNumber);
+  event BlockRewardChanged(int oldBlockReward, int newBlockReward);
 
   address GDPOracle_;
 
@@ -32,7 +32,7 @@ contract GDPOraclizedToken is MinableToken {
    */
   function transferGDPOracle(address newOracle) public onlyGDPOracle {
     require(newOracle != address(0));
-    GDPOracleTransferred(owner, newOracle);
+    GDPOracleTransferred(GDPOracle_, newOracle);
     GDPOracle_ = newOracle;
   }
 
@@ -44,7 +44,7 @@ contract GDPOraclizedToken is MinableToken {
     // protect against error / overflow
     require(0 <= newBlockReward);
     
-    BlockRewardChanged(blockReward_, newBlockReward, block.number);
+    BlockRewardChanged(blockReward_, newBlockReward);
     blockReward_ = newBlockReward;
   }
 
@@ -55,7 +55,7 @@ contract GDPOraclizedToken is MinableToken {
   function setNegativeGrowth(int256 newBlockReward) public onlyGDPOracle returns(bool) {
     require(newBlockReward < 0);
 
-    BlockRewardChanged(blockReward_, newBlockReward, block.number);
+    BlockRewardChanged(blockReward_, newBlockReward);
     blockReward_ = newBlockReward;
   }
 

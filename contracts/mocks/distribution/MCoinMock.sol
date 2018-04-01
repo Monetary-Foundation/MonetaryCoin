@@ -21,7 +21,7 @@ contract MCoinMock is MinableM5Token, ComplianceStore {
     require(GDPOracle != address(0));
     
     blockReward_ = blockReward;
-    BlockRewardChanged(0, blockReward_, block.number);
+    BlockRewardChanged(0, blockReward_);
 
     GDPOracle_ = GDPOracle;
     GDPOracleTransferred(0x0, GDPOracle_);
