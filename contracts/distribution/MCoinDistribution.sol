@@ -31,8 +31,8 @@ contract MCoinDistribution is Ownable {
   uint256 public foundationReserve;
   address public foundationWallet;
 
-  uint256 startTimestamp;
-  uint256 windowLength;         // in seconds
+  uint256 public startTimestamp;
+  uint256 public windowLength;         // in seconds
 
   mapping (uint256 => uint256) public totals;
   mapping (address => mapping (uint256 => uint256)) public commitment;
