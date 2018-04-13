@@ -212,6 +212,30 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
+  * @dev returns a array filed with totals for every closed window
+  * a convinience function to be called for updating a GUI. 
+  * @return the totals for commited Eth per window
+  */
+  function getCommitmentsOf(address from) public view returns (uint256[MAX_WINDOWS] commitments) {
+    for (uint256 i = 0; i < totalWindows; i++) {
+      commitments[i] = commitment[from][i];
+    }
+    return commitments;
+  }
+
+  /**
+  * @dev returns a array filed with eth totals for every window
+  * a convinience function to be called for updating a GUI. 
+  * @return the totals for commited Eth per window
+  */
+  function getTotals() public view returns (uint256[MAX_WINDOWS] ethTotals) {
+    for (uint256 i = 0; i < totalWindows; i++) {
+      ethTotals[i] = totals[i];
+    }
+    return ethTotals;
+  }
+
+  /**
   * @dev moves Eth to the foundation wallet.
   * @return the amount to be moved.
   */
