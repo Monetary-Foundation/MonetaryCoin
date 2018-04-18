@@ -205,7 +205,9 @@ contract MCoinDistribution is Ownable {
   * @return the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
-    for (uint256 i = 0; i < currentWindow(); i++) {
+    // maxWindow = min(currentWindow(),MAX_WINDOWS)
+    uint256 maxWindow = currentWindow() < MAX_WINDOWS ? currentWindow() : MAX_WINDOWS;
+    for (uint256 i = 0; i < maxWindow; i++) {
       rewards[i] = withdraw(i);
     }
     return rewards;
