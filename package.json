@@ -1,8 +1,8 @@
 {
-  "name": "tokens",
+  "name": "MCoin",
   "private": true,
-  "version": "1.6.0",
-  "description": "Secure Smart Contract library for Solidity",
+  "version": "1.0.0",
+  "description": "Monetary coin smart contracts",
   "scripts": {
     "test": "scripts/test.sh",
     "lint": "eslint .",
@@ -13,7 +13,8 @@
     "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
     "console": "truffle console",
     "coverage": "scripts/coverage.sh",
-    "tests": "cd scripts && tests.bat || ECHO."
+    "tests": "cd scripts && tests.bat || ECHO.",
+    "migrate": "truffle.cmd --network testrpc migrate --reset"
   },
   "repository": {
     "type": "git",

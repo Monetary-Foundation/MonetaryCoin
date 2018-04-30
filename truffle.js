@@ -20,7 +20,7 @@ module.exports = {
   networks: {
     development: {
       host: '127.0.0.1',
-      port: 7454,
+      port: 8454,
       network_id: '*', // eslint-disable-line camelcase
     },
     ropsten: {

@@ -1,4 +1,4 @@
-function latestTime () {
+function latestTime() {
   return web3.eth.getBlock('latest').timestamp;
 }
 
@@ -25,17 +25,16 @@ module.exports = async function (deployer, network, accounts) {
   // const contractCreator = accounts[2];
   const upgradeManager = accounts[3];
 
-  const initialBlockReward = 5;
+  const initialBlockReward = 1 * (10 ** 18);
 
-  const firstPeriodWindows = 3;
-  const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
-  const secondPeriodSupply = 150;
+  const firstPeriodWindows = 50;
+  const secondPeriodWindows = 170;
+  const firstPeriodSupply = 10000;
+  const secondPeriodSupply = 15000;
   const initialBalance = 50;
 
-  // New startTime for each test:
   const startTime = latestTime() + 60;
-  const windowLength = duration.minutes(5);
+  const windowLength = duration.minutes(2);
   /* eslint-disable */
 
   await deployer.deploy(
@@ -65,6 +64,6 @@ module.exports = async function (deployer, network, accounts) {
 
   console.log('Distribution address: ' + distribution.address);
   console.log('Token address: ' + token.address);
-  
+
 };
   /* eslint-enable */
