@@ -1,5 +1,17 @@
-function latestTime() {
-  return web3.eth.getBlock('latest').timestamp;
+const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
+const MCoinMock = artifacts.require('MCoinMock');
+
+const getBlock = () => // eslint-disable-line no-inner-declarations
+  new Promise((resolve, reject) => {
+    web3.eth.getBlock('latest', (err, data) => {
+      if (err !== null) return reject(err);
+      return resolve(data);
+    });
+  });
+
+async function latestTime () {
+  const latestBlock = await getBlock();
+  return latestBlock.timestamp;
 }
 
 const duration = {
@@ -11,19 +23,37 @@ const duration = {
   years: function (val) { return val * this.days(365); },
 };
 
-const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
-const MCoinMock = artifacts.require('MCoinMock');
-
+// set MNEMONIC="HDkey"
 module.exports = async function (deployer, network, accounts) {
   // deployment steps
-
   var token;
   var distribution;
 
-  const initialAccount = accounts[0];
-  const GDPOracle = accounts[1];
-  // const contractCreator = accounts[2];
-  const upgradeManager = accounts[3];
+  const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
+
+  if (accounts[0].toLowerCase() !== contractCreator.toLowerCase()) {
+    console.log(`accounts[0] isn't equal to expected value`); //eslint-disable-line
+    console.log(`accounts[0]: ${accounts[0].toLowerCase()}`);
+    console.log(`contractCreator: ${contractCreator.toLowerCase()}`);
+    process.exit(1);
+  }
+
+  const initialAccount = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
+  const GDPOracle = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
+  const upgradeManager = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
+  // const initialAccount = accounts[0];
+  // const GDPOracle = accounts[0];
+  // const upgradeManager = accounts[0];
+
+  console.log('\nContractCreator (accounts[0]):');
+  console.log(accounts[0]);
+  console.log('InitialAccount:');
+  console.log(initialAccount);
+  console.log('GDPOracle:');
+  console.log(GDPOracle);
+  console.log('UpgradeManager:');
+  console.log(upgradeManager);
+  console.log();
 
   const initialBlockReward = 1 * (10 ** 18);
 
@@ -33,17 +63,15 @@ module.exports = async function (deployer, network, accounts) {
   const secondPeriodSupply = 15000;
   const initialBalance = 50;
 
-  const startTime = latestTime() + 60;
-  const windowLength = duration.minutes(2);
+  const startTime = await latestTime() + 60;
+  const windowLength = duration.minutes(10);
   /* eslint-disable */
-
   await deployer.deploy(
     MCoinMock,
     initialBlockReward,
     GDPOracle,
     upgradeManager
   );
-
   await deployer.deploy(
     MCoinDistributionMock,
     firstPeriodWindows,
@@ -64,6 +92,5 @@ module.exports = async function (deployer, network, accounts) {
 
   console.log('Distribution address: ' + distribution.address);
   console.log('Token address: ' + token.address);
-
 };
   /* eslint-enable */
