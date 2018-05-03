@@ -46,6 +46,7 @@
     "max-len": [2, 150, 2],
     "generator-star-spacing": ["error", "before"],
     "promise/avoid-new": 0,
-    "promise/always-return": 0
+    "promise/always-return": 0,
+    "no-multiple-empty-line": 0
   }
 }
