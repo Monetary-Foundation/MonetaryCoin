@@ -1,17 +1,13 @@
-// const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
-// const MCoinMock = artifacts.require('MCoinMock');
-
 const MCoinDistribution = artifacts.require('MCoinDistributionWrap');
-const MUSA = artifacts.require('MUSA');
-const MERO = artifacts.require('MERO');
+const MCoin = artifacts.require('MCoin');
 
 // set MNEMONIC="HDkey"
 module.exports = async function (deployer, network, accounts) {
   const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
 
-  const initialAccount = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
-  const GDPOracle = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
-  const upgradeManager = '0x004fee9c1fdd187076f05b9e82b15553863f16c1';
+  const initialAccount = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+  const GDPOracle = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+  const upgradeManager = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
 
   verifyContractCreator(accounts[0], contractCreator);
   logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
@@ -19,17 +15,20 @@ module.exports = async function (deployer, network, accounts) {
   const firstPeriodWindows = 7;
   const secondPeriodWindows = 173;
   const startTime = await latestTime() + 240;
-  const windowLength = duration.minutes(10);
+  const windowLength = duration.hours(23);
 
   // MUSA Params:
+  let MCoinName = 'MonetaryCoin USA';
+  let MCoinSymbol = 'MUSA';
   let initialBlockReward = '26536';
   let firstPeriodSupply = 6.9737 * (10 ** 9);
   let secondPeriodSupply = firstPeriodSupply;
   let initialBalance = 2 * firstPeriodSupply;
   
   await deployMCoin(
-    'MUSA',
-    MUSA,
+    MCoinName,
+    MCoinSymbol,
+    MCoin,
     initialBlockReward,
     GDPOracle,
     upgradeManager,
@@ -47,14 +46,17 @@ module.exports = async function (deployer, network, accounts) {
   );
 
   // MERO Params:
+  MCoinName = 'MonetaryCoin China';
+  MCoinSymbol = 'MCNY';
   initialBlockReward = '21462';
   firstPeriodSupply = 5.640 * (10 ** 9);
   secondPeriodSupply = firstPeriodSupply;
   initialBalance = 2 * firstPeriodSupply;
 
   await deployMCoin(
-    'MERO',
-    MERO,
+    MCoinName,
+    MCoinSymbol,
+    MCoin,
     initialBlockReward,
     GDPOracle,
     upgradeManager,
@@ -75,6 +77,7 @@ module.exports = async function (deployer, network, accounts) {
 async function deployMCoin (
   // Token:
   MCoinName,
+  MCoinSymbol,
   MCoinArtifact,
   initialBlockReward,
   GDPOracle,
@@ -95,6 +98,8 @@ async function deployMCoin (
   /* eslint-disable */
   await deployer.deploy(
     MCoinArtifact,
+    MCoinName,
+    MCoinSymbol,
     initialBlockReward,
     GDPOracle,
     upgradeManager

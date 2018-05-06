@@ -8,21 +8,26 @@ import "../token/ERC20/ComplianceStore.sol";
  * @title MERO
  * @dev MERO
  */
-contract MERO is MinableM5Token, ComplianceStore {
+contract MCoin is MinableM5Token, ComplianceStore {
 
-  string public constant name = "ERO"; // solium-disable-line uppercase
-  string public constant symbol = "ERO"; // solium-disable-line uppercase
+  string public name; // solium-disable-line uppercase
+  string public symbol; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  function MERO(
+  function MCoin(
+    string tokenName,
+    string tokenSymbol,
     uint256 blockReward, // will be transformed using toDecimals()
     address GDPOracle,
     address upgradeManager
     ) public 
     {
-    require(0 < blockReward);
     require(GDPOracle != address(0));
+    require(upgradeManager != address(0));
     
+    name = tokenName;
+    symbol = tokenSymbol;
+
     blockReward_ = toDecimals(blockReward);
     BlockRewardChanged(0, blockReward_);
 
