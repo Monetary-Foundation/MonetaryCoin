@@ -31,8 +31,8 @@ contract MCoinDistribution is Ownable {
   uint256 public foundationReserve;
   address public foundationWallet;
 
-  uint256 startTimestamp;
-  uint256 windowLength;         // in seconds
+  uint256 public startTimestamp;
+  uint256 public windowLength;         // in seconds
 
   mapping (uint256 => uint256) public totals;
   mapping (address => mapping (uint256 => uint256)) public commitment;
@@ -205,10 +205,36 @@ contract MCoinDistribution is Ownable {
   * @return the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
-    for (uint256 i = 0; i < currentWindow(); i++) {
+    // maxWindow = min(currentWindow(),MAX_WINDOWS)
+    uint256 maxWindow = currentWindow() < MAX_WINDOWS ? currentWindow() : MAX_WINDOWS;
+    for (uint256 i = 0; i < maxWindow; i++) {
       rewards[i] = withdraw(i);
     }
     return rewards;
+  }
+
+  /**
+  * @dev returns a array filed with totals for every closed window
+  * a convinience function to be called for updating a GUI. 
+  * @return the totals for commited Eth per window
+  */
+  function getCommitmentsOf(address from) public view returns (uint256[MAX_WINDOWS] commitments) {
+    for (uint256 i = 0; i < totalWindows; i++) {
+      commitments[i] = commitment[from][i];
+    }
+    return commitments;
+  }
+
+  /**
+  * @dev returns a array filed with eth totals for every window
+  * a convinience function to be called for updating a GUI. 
+  * @return the totals for commited Eth per window
+  */
+  function getTotals() public view returns (uint256[MAX_WINDOWS] ethTotals) {
+    for (uint256 i = 0; i < totalWindows; i++) {
+      ethTotals[i] = totals[i];
+    }
+    return ethTotals;
   }
 
   /**

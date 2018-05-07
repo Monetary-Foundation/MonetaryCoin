@@ -1,5 +1,144 @@
-function latestTime () {
-  return web3.eth.getBlock('latest').timestamp;
+const MCoinDistribution = artifacts.require('MCoinDistributionWrap');
+const MCoin = artifacts.require('MCoin');
+
+// set MNEMONIC="HDkey"
+module.exports = async function (deployer, network, accounts) {
+  const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
+
+  const initialAccount = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+  const GDPOracle = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+  const upgradeManager = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+
+  verifyContractCreator(accounts[0], contractCreator);
+  logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
+
+  const firstPeriodWindows = 7;
+  const secondPeriodWindows = 173;
+  const startTime = await latestTime() + 240;
+  const windowLength = duration.hours(23);
+
+  // MUSA Params:
+  let MCoinName = 'MonetaryCoin USA';
+  let MCoinSymbol = 'MUSA';
+  let initialBlockReward = '26536';
+  let firstPeriodSupply = 6.9737 * (10 ** 9);
+  let secondPeriodSupply = firstPeriodSupply;
+  let initialBalance = 2 * firstPeriodSupply;
+  
+  await deployMCoin(
+    MCoinName,
+    MCoinSymbol,
+    MCoin,
+    initialBlockReward,
+    GDPOracle,
+    upgradeManager,
+
+    MCoinDistribution,
+    firstPeriodWindows,
+    firstPeriodSupply,
+    secondPeriodWindows,
+    secondPeriodSupply,
+    initialAccount,
+    initialBalance,
+    startTime,
+    windowLength,
+    deployer,
+  );
+
+  // MERO Params:
+  MCoinName = 'MonetaryCoin China';
+  MCoinSymbol = 'MCNY';
+  initialBlockReward = '21462';
+  firstPeriodSupply = 5.640 * (10 ** 9);
+  secondPeriodSupply = firstPeriodSupply;
+  initialBalance = 2 * firstPeriodSupply;
+
+  await deployMCoin(
+    MCoinName,
+    MCoinSymbol,
+    MCoin,
+    initialBlockReward,
+    GDPOracle,
+    upgradeManager,
+
+    MCoinDistribution,
+    firstPeriodWindows,
+    firstPeriodSupply,
+    secondPeriodWindows,
+    secondPeriodSupply,
+    initialAccount,
+    initialBalance,
+    startTime,
+    windowLength,
+    deployer,
+  );
+};
+
+async function deployMCoin (
+  // Token:
+  MCoinName,
+  MCoinSymbol,
+  MCoinArtifact,
+  initialBlockReward,
+  GDPOracle,
+  upgradeManager,
+  // Distribution:
+  MCoinDistributionArtifact,
+  firstPeriodWindows,
+  firstPeriodSupply,
+  secondPeriodWindows,
+  secondPeriodSupply,
+  initialAccount,
+  initialBalance,
+  startTime,
+  windowLength,
+  // Tools:
+  deployer,
+) {
+  /* eslint-disable */
+  await deployer.deploy(
+    MCoinArtifact,
+    MCoinName,
+    MCoinSymbol,
+    initialBlockReward,
+    GDPOracle,
+    upgradeManager
+  );
+  await deployer.deploy(
+    MCoinDistributionArtifact,
+    firstPeriodWindows,
+    firstPeriodSupply,
+    secondPeriodWindows,
+    secondPeriodSupply,
+    initialAccount,
+    initialBalance,
+    startTime,
+    windowLength
+  );
+  /* eslint-enable */
+  const token = await MCoinArtifact.deployed();
+  const distribution = await MCoinDistributionArtifact.deployed();
+
+  await token.transferOwnership(distribution.address);
+  await distribution.init(token.address);
+
+  console.log('\nSuccesfully deployed ' + MCoinName);
+  console.log('Distribution address: ' + distribution.address);
+  console.log('Token address: ' + token.address);
+  console.log();
+};
+
+const getBlock = () => // eslint-disable-line no-inner-declarations
+  new Promise((resolve, reject) => {
+    web3.eth.getBlock('latest', (err, data) => {
+      if (err !== null) return reject(err);
+      return resolve(data);
+    });
+  });
+
+async function latestTime () {
+  const latestBlock = await getBlock();
+  return latestBlock.timestamp;
 }
 
 const duration = {
@@ -11,60 +150,25 @@ const duration = {
   years: function (val) { return val * this.days(365); },
 };
 
-const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
-const MCoinMock = artifacts.require('MCoinMock');
-
-module.exports = async function (deployer, network, accounts) {
-  // deployment steps
-
-  var token;
-  var distribution;
-
-  const initialAccount = accounts[0];
-  const GDPOracle = accounts[1];
-  // const contractCreator = accounts[2];
-  const upgradeManager = accounts[3];
-
-  const initialBlockReward = 5;
-
-  const firstPeriodWindows = 3;
-  const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
-  const secondPeriodSupply = 150;
-  const initialBalance = 50;
-
-  // New startTime for each test:
-  const startTime = latestTime() + 60;
-  const windowLength = duration.minutes(5);
-  /* eslint-disable */
-
-  await deployer.deploy(
-    MCoinMock,
-    initialBlockReward,
-    GDPOracle,
-    upgradeManager
-  );
-
-  await deployer.deploy(
-    MCoinDistributionMock,
-    firstPeriodWindows,
-    firstPeriodSupply,
-    secondPeriodWindows,
-    secondPeriodSupply,
-    initialAccount,
-    initialBalance,
-    startTime,
-    windowLength
-  );
-
-  token = await MCoinMock.deployed();
-  distribution = await MCoinDistributionMock.deployed();
-
-  await token.transferOwnership(distribution.address);
-  await distribution.init(token.address);
-
-  console.log('Distribution address: ' + distribution.address);
-  console.log('Token address: ' + token.address);
-  
+const verifyContractCreator = (account, expected) => {
+  const accountNorm = account.toLowerCase();
+  const expectedNorm = expected.toLowerCase();
+  if (accountNorm !== expectedNorm) {
+    console.log(`accounts[0] isn't equal to expected value`); //eslint-disable-line
+    console.log(`accounts[0]: ${accountNorm}`);
+    console.log(`contractCreator: ${expectedNorm}`);
+    process.exit(1);
+  }
 };
-  /* eslint-enable */
+
+const logRoles = (contractCreator, initialAccount, GDPOracle, upgradeManager) => {
+  console.log('\nContractCreator (accounts[0]):');
+  console.log(contractCreator);
+  console.log('InitialAccount:');
+  console.log(initialAccount);
+  console.log('GDPOracle:');
+  console.log(GDPOracle);
+  console.log('UpgradeManager:');
+  console.log(upgradeManager);
+  console.log();
+};

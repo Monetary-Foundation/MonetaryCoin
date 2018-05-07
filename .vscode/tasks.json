@@ -7,6 +7,11 @@
       "type": "npm",
       "script": "tests",
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "migrate",
+      "problemMatcher": []
     }
   ]
 }
