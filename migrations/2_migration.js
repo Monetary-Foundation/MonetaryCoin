@@ -1,6 +1,10 @@
 const MCoinDistribution = artifacts.require('MCoinDistributionWrap');
 const MCoin = artifacts.require('MCoin');
 
+// change to false while runing test to prevent rece condition
+// see https://github.com/trufflesuite/truffle/issues/557 for details
+const deploy = false;
+
 // set MNEMONIC="HDkey"
 module.exports = async function (deployer, network, accounts) {
   const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
@@ -24,26 +28,28 @@ module.exports = async function (deployer, network, accounts) {
   let firstPeriodSupply = 6.9737 * (10 ** 9);
   let secondPeriodSupply = firstPeriodSupply;
   let initialBalance = 2 * firstPeriodSupply;
-  
-  await deployMCoin(
-    MCoinName,
-    MCoinSymbol,
-    MCoin,
-    initialBlockReward,
-    GDPOracle,
-    upgradeManager,
 
-    MCoinDistribution,
-    firstPeriodWindows,
-    firstPeriodSupply,
-    secondPeriodWindows,
-    secondPeriodSupply,
-    initialAccount,
-    initialBalance,
-    startTime,
-    windowLength,
-    deployer,
-  );
+  if (deploy) {
+    await deployMCoin(
+      MCoinName,
+      MCoinSymbol,
+      MCoin,
+      initialBlockReward,
+      GDPOracle,
+      upgradeManager,
+
+      MCoinDistribution,
+      firstPeriodWindows,
+      firstPeriodSupply,
+      secondPeriodWindows,
+      secondPeriodSupply,
+      initialAccount,
+      initialBalance,
+      startTime,
+      windowLength,
+      deployer,
+    );
+  }
 
   // MERO Params:
   MCoinName = 'MonetaryCoin China';
@@ -53,28 +59,30 @@ module.exports = async function (deployer, network, accounts) {
   secondPeriodSupply = firstPeriodSupply;
   initialBalance = 2 * firstPeriodSupply;
 
-  await deployMCoin(
-    MCoinName,
-    MCoinSymbol,
-    MCoin,
-    initialBlockReward,
-    GDPOracle,
-    upgradeManager,
+  if (deploy) {
+    await deployMCoin(
+      MCoinName,
+      MCoinSymbol,
+      MCoin,
+      initialBlockReward,
+      GDPOracle,
+      upgradeManager,
 
-    MCoinDistribution,
-    firstPeriodWindows,
-    firstPeriodSupply,
-    secondPeriodWindows,
-    secondPeriodSupply,
-    initialAccount,
-    initialBalance,
-    startTime,
-    windowLength,
-    deployer,
-  );
+      MCoinDistribution,
+      firstPeriodWindows,
+      firstPeriodSupply,
+      secondPeriodWindows,
+      secondPeriodSupply,
+      initialAccount,
+      initialBalance,
+      startTime,
+      windowLength,
+      deployer,
+    );
+  }
 };
 
-async function deployMCoin (
+async function deployMCoin(
   // Token:
   MCoinName,
   MCoinSymbol,
@@ -136,7 +144,7 @@ const getBlock = () => // eslint-disable-line no-inner-declarations
     });
   });
 
-async function latestTime () {
+async function latestTime() {
   const latestBlock = await getBlock();
   return latestBlock.timestamp;
 }
@@ -162,13 +170,15 @@ const verifyContractCreator = (account, expected) => {
 };
 
 const logRoles = (contractCreator, initialAccount, GDPOracle, upgradeManager) => {
-  console.log('\nContractCreator (accounts[0]):');
-  console.log(contractCreator);
-  console.log('InitialAccount:');
-  console.log(initialAccount);
-  console.log('GDPOracle:');
-  console.log(GDPOracle);
-  console.log('UpgradeManager:');
-  console.log(upgradeManager);
-  console.log();
+  if (deploy) {
+    console.log('\nContractCreator (accounts[0]):');
+    console.log(contractCreator);
+    console.log('InitialAccount:');
+    console.log(initialAccount);
+    console.log('GDPOracle:');
+    console.log(GDPOracle);
+    console.log('UpgradeManager:');
+    console.log(upgradeManager);
+    console.log();
+  }
 };
