@@ -92,7 +92,7 @@ contract MinableToken is MintableToken {
     balances[msg.sender] = balances[msg.sender].add(withdrawnSum);
     Transfer(address(0), msg.sender, commitmentValue.add(reward));
     
-    commitment.value = 0;
+    delete miners[msg.sender];
     
     Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
     return (reward, commitmentValue);
