@@ -82,14 +82,6 @@ contract('MinableToken', function (accounts) {
     assert.equal(tokenBlockReward, initialBlockReward);
   });
 
-  // not nessesery when using MCoinMock
-  // it('should throw if initialSupply = 0', async function () {
-  //   const initialAccount = accounts[0];
-  //   const initialSupply = 0;
-  //   const blockReward = 5;
-  //   await expectThrow(MinableTokenMock.new(initialAccount, initialSupply, blockReward));
-  // });
-
   it('should throw if blockReward = 0', async function () {
     const blockReward = 0;
     await expectThrow(MCoinMock.new(blockReward, GDPOracle, upgradeManager, { from: contractCreator }));
@@ -122,6 +114,19 @@ contract('MinableToken', function (accounts) {
   it('should return correct commitment for new address', async function () {
     let amount = await token.commitmentOf(accounts[0]);
     assert.equal(amount, 0);
+  });
+
+  it('should return correct commitment fields for given address', async function () {
+    const nextBlockNumber = web3.eth.getBlock('latest').number + 1;
+    
+    const commitValue = 7;
+    await token.commit(commitValue);
+    const [ value, onBlockNumber, atStake, onBlockReward ] = await token.getCommitment(accounts[0]);
+
+    value.should.be.bignumber.equal(commitValue);
+    onBlockNumber.should.be.bignumber.equal(nextBlockNumber);
+    atStake.should.be.bignumber.equal(commitValue);
+    onBlockReward.should.be.bignumber.equal(initialBlockReward);
   });
 
   it('should emit the Commit event', async function () {

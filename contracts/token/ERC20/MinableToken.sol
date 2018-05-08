@@ -152,10 +152,32 @@ contract MinableToken is MintableToken {
   /**
   * @dev Gets the commitment of the specified address.
   * @param _miner The address to query the the commitment Of
-  * @return An uint256 representing the amount commited by the passed address.
+  * @return the amount commited.
   */
   function commitmentOf(address _miner) public view returns (uint256) {
     return miners[_miner].value;
+  }
+
+  /**
+  * @dev Gets the all fields for commitment of the specified address.
+  * @param _miner The address to query the the commitment Of
+  * @return value the amount commited.
+  * @return onBlockNumber block number of commitment.
+  * @return atStake stake when commited.
+  * @return onBlockReward block reward when commited.
+  */
+  function getCommitment(address _miner) public view 
+  returns (
+    uint256 value,             // value commited to mining
+    uint256 onBlockNumber,     // commited on block
+    uint256 atStake,           // stake during commit
+    int256 onBlockReward       // block reward during commit
+    ) 
+  {
+    value = miners[_miner].value;
+    onBlockNumber = miners[_miner].onBlockNumber;
+    atStake = miners[_miner].atStake;
+    onBlockReward = miners[_miner].onBlockReward;
   }
 
   /**
