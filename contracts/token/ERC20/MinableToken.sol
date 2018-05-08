@@ -83,11 +83,13 @@ contract MinableToken is MintableToken {
 
     Commitment storage commitment = miners[msg.sender];
     commitmentValue = commitment.value;
+
+    uint256 withdrawnSum = commitmentValue.add(reward);
     
     totalStake_ = totalStake_.sub(commitmentValue);
     totalSupply_ = totalSupply_.add(reward);
     
-    balances[msg.sender] = balances[msg.sender].add(commitmentValue.add(reward));
+    balances[msg.sender] = balances[msg.sender].add(withdrawnSum);
     Transfer(address(0), msg.sender, commitmentValue.add(reward));
     
     commitment.value = 0;
