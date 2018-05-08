@@ -25,7 +25,7 @@ contract('GDPOraclizedToken', function (accounts) {
   const initialAccount = accounts[1];
   const contractCreator = accounts[2];
   const upgradeManager = accounts[3];
-  const stranger = accounts[8];
+  const stranger = accounts[4];
 
   const initialBlockReward = 5;
 
@@ -89,7 +89,7 @@ contract('GDPOraclizedToken', function (accounts) {
     assert.equal(newOracle, accounts[5]);
   });
 
-  it('should fail to transfer the oracle from unothorized address', async function () {
+  it('should fail to transfer the oracle from unauthorized address', async function () {
     await expectThrow(token.transferGDPOracle(accounts[2], { from: stranger }));
   });
 
@@ -101,19 +101,19 @@ contract('GDPOraclizedToken', function (accounts) {
     // token = await GDPOraclizedToken.new(initialAccount, initialSupply, setBlockReward, accounts[1]);
     await token.transferGDPOracle(accounts[2]);
     await expectThrow(token.transferGDPOracle(accounts[3]));
-    await expectThrow(token.setPossitiveGrowth(5));
+    await expectThrow(token.setPositiveGrowth(5));
   });
 
-  it('should correctly setPossitiveGrowth', async function () {
-    await token.setPossitiveGrowth(50);
+  it('should correctly setPositiveGrowth', async function () {
+    await token.setPositiveGrowth(50);
     let newReward = await token.blockReward();
 
     newReward.should.be.bignumber.equal(50);
   });
 
-  it('should emit event for setPossitiveGrowth', async function () {
+  it('should emit event for setPositiveGrowth', async function () {
     // BlockRewardChanged(int oldBlockReward, int newBlockReward);
-    const txObj = await token.setPossitiveGrowth(50);
+    const txObj = await token.setPositiveGrowth(50);
 
     assert.equal(txObj.logs[0].event, 'BlockRewardChanged');
     const { oldBlockReward, newBlockReward } = txObj.logs[0].args;
@@ -121,17 +121,17 @@ contract('GDPOraclizedToken', function (accounts) {
     assert.equal(newBlockReward, 50);
   });
 
-  it('should prevent from non oracle to setPossitiveGrowth', async function () {
-    await assertRevert(token.setPossitiveGrowth(50, { from: stranger }));
+  it('should prevent from non oracle to setPositiveGrowth', async function () {
+    await assertRevert(token.setPositiveGrowth(50, { from: stranger }));
   });
 
-  it('should prevent setting negative value for setPossitiveGrowth', async function () {
-    await assertRevert(token.setPossitiveGrowth(-50));
+  it('should prevent setting negative value for setPositiveGrowth', async function () {
+    await assertRevert(token.setPositiveGrowth(-50));
   });
 
-  it('should correctly setPossitiveGrowth after transfering oracle address', async function () {
+  it('should correctly setPositiveGrowth after transfering oracle address', async function () {
     await token.transferGDPOracle(accounts[1]);
-    await token.setPossitiveGrowth(51, { from: accounts[1] });
+    await token.setPositiveGrowth(51, { from: accounts[1] });
 
     let newReward = await token.blockReward();
 
@@ -140,8 +140,8 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should prevent original oracle to do actions after transffer', async function () {
     await token.transferGDPOracle(accounts[1]);
-    await token.setPossitiveGrowth(50, { from: accounts[1] });
-    await expectThrow(token.setPossitiveGrowth(50, { from: accounts[0] }));
+    await token.setPositiveGrowth(50, { from: accounts[1] });
+    await expectThrow(token.setPositiveGrowth(50, { from: accounts[0] }));
   });
 
   it('should correctly setNegativeGrowth', async function () {
@@ -193,7 +193,7 @@ contract('GDPOraclizedToken', function (accounts) {
     // atStake = 0
     await token.commit(commitValue, { from: initialAccount });
     // next block:
-    await token.setPossitiveGrowth(11);
+    await token.setPositiveGrowth(11);
 
     let reward = await token.getReward(initialAccount);
     // effectiveBlockReward (5+11) / 2 = 8
@@ -208,7 +208,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
     await token.commit(commitValue, { from: initialAccount });
     // next block:
-    await token.setPossitiveGrowth(11);
+    await token.setPositiveGrowth(11);
 
     // effectiveBlockReward = (5+11) / 2 = 8
     // (commitValue * #blocks * effectiveBlockReward) / effectiveStake [integer division]
