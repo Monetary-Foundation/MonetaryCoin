@@ -29,7 +29,8 @@ contract MinableToken is MintableToken {
   mapping( address => Commitment ) miners;
 
   /**
-  * @dev commit amount for minning
+  * @dev commit _value for minning
+  * the _value will be substructed from user balance and added to the stake.
   * if user previously commited, add to an existing commitment. 
   * this is done by calling withdraw() 
   * then commit back previous commit + reward + new commit 
@@ -46,12 +47,13 @@ contract MinableToken is MintableToken {
     //In case user already commited, withdraw and recommit 
     // new commitment value: prevCommit + reward + _value
     if (0 < prevCommit) {
-      // Will revert if reward is negative
-      commitValue = prevCommit.add(getReward(msg.sender)).add(commitValue);
-      withdraw();
+      // withdraw Will revert if reward is negative
+      uint256 prevReward;
+      (prevReward, prevCommit) = withdraw();
+      commitValue = prevReward.add(prevCommit).add(_value);
     }
 
-    // sub will throw if there is not enough balance.
+    // sub will revert if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(commitValue);
     Transfer(msg.sender, address(0), commitValue);
 

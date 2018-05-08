@@ -70,19 +70,6 @@ contract('MinableToken', function (accounts) {
     await distribution.init(token.address, { from: contractCreator });
   });
 
-  // contract('MinableToken', function (accounts) {
-  //   let token;
-
-  //   // address initialAccount,
-  //   // uint256 initialBalance,
-  //   // uint256 blockReward
-  //   const initialAccount = accounts[0];
-  //   const initialSupply = 500;
-  //   const blockReward = 5;
-  //   beforeEach(async function () {
-  //     token = await MinableTokenMock.new(initialAccount, initialSupply, blockReward);
-  //   });
-
   it('should return 0 for totalStake after construction', async function () {
     let totalStake = await token.totalStake();
 
