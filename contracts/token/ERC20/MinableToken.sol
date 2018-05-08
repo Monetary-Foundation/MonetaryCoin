@@ -139,12 +139,14 @@ contract MinableToken is MintableToken {
   * @return An int256 representing integer average
   */
   function signedAverage(int256 a, int256 b) public pure returns (int256) {
-    int ans = a + b;
+    int256 ans = a + b;
 
-    if (a > 0 && b > 0 && ans < 0)
-         require(false);
-    if (a < 0 && b < 0 && ans > 0)
-         require(false);
+    if (a > 0 && b > 0 && ans < 0) {
+      require(false);
+    }
+    if (a < 0 && b < 0 && ans > 0) {
+      require(false);
+    }
 
     return ans / 2;
   }

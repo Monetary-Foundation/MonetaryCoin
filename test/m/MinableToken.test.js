@@ -151,11 +151,35 @@ contract('MinableToken', function (accounts) {
     let avg = await token.average(2, 4);
     assert.equal(avg, 3);
   });
+
   it('should return the correct average (round down)', async function () {
     let avg = await token.average(2, 1);
     assert.equal(avg, 1);
   });
+  
+  it('should return the correct average (zero arg)', async function () {
+    let avg = await token.average(2, 0);
+    assert.equal(avg, 1);
+  });
 
+  it('should return the correct average (zero arg)', async function () {
+    let avg = await token.average(0, 10);
+    assert.equal(avg, 5);
+  });
+
+  it('should return the correct average (zero args)', async function () {
+    let avg = await token.average(0, 0);
+    assert.equal(avg, 0);
+  });
+
+  it('should throw on average overflow', async function () {
+    const maxUint256 = new BigNumber(2).pow(256).minus(1);
+    // console.log('num: ');
+    // console.log(maxUint256.toString());
+    // console.log(maxUint256.toString(2));
+    await expectThrow(token.average(maxUint256, maxUint256));
+  });
+  
   it('should return the correct signed average', async function () {
     let avg = await token.signedAverage(2, 4);
     assert.equal(avg, 3);
@@ -186,12 +210,43 @@ contract('MinableToken', function (accounts) {
     assert.equal(avg, -3);
   });
 
-  // // OVERVIEW:
-  // it('should throw on possitive overflow ', async function () {
-  //   const big = new BigNumber(2).pow(256).minus(1);
-  //   // let ans = await token.signedAverage(big, big);
-  //   // console.log(ans.toString());
-  //   await expectThrow(token.signedAverage(big, big));
+  it('should return the correct signed average (negative result)', async function () {
+    let avg = await token.signedAverage(-11, 1);
+    assert.equal(avg, -5);
+  });
+
+  it('should return the correct signed average (zero arg)', async function () {
+    let avg = await token.signedAverage(0, 10);
+    assert.equal(avg, 5);
+  });
+
+  it('should return the correct signed average (zero arg)', async function () {
+    let avg = await token.signedAverage(0, -10);
+    assert.equal(avg, -5);
+  });
+
+  it('should return the correct signed average (zero args)', async function () {
+    let avg = await token.signedAverage(0, 0);
+    assert.equal(avg, 0);
+  });
+
+  // some env bug, test directly against the Blockchain
+  // it('should throw on signedAverage overflow', async function () {
+  //   const maxInt256 = new BigNumber(2).pow(252).minus(1);
+  //   console.log('num: ');
+  //   console.log(maxInt256.toString());
+  //   console.log(maxInt256.toString(2));
+  //   // expected to throw
+  //   // await expectThrow(token.signedAverage(maxInt256, maxInt256));
+  //   const ans = await (token.signedAverage(maxInt256, maxInt256));
+  //   console.log('ans: ');
+  //   console.log(ans.toString());
+  //   console.log(ans.toString(2));
+
+  //   // int256 constant INT256_MIN = int256((uint256(1) << 255));
+  //   // int256 constant INT256_MAX = int256(~((uint256(1) << 255)));
+  //   // uint256 constant UINT256_MIN = 0;
+  //   // uint256 constant UINT256_MAX = ~uint256(0);
   // });
 
   it('should return the correct reward if nothing was commited', async function () {
