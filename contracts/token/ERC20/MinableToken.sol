@@ -109,11 +109,11 @@ contract MinableToken is MintableToken {
 
     Commitment storage commitment = miners[_miner];
 
-    int averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
+    int256 averageBlockReward = signedAverage(commitment.onBlockReward, blockReward_);
     
     require(0 <= averageBlockReward);
     
-    uint256 effectiveBlockReward = uint(averageBlockReward);
+    uint256 effectiveBlockReward = uint256(averageBlockReward);
     
     uint256 effectiveStake = average(commitment.atStake, totalStake_);
     
