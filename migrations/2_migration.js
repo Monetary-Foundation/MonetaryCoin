@@ -1,35 +1,35 @@
 const MCoinDistribution = artifacts.require('MCoinDistributionWrap');
 const MCoin = artifacts.require('MCoin');
 
-// change to false while runing test to prevent rece condition
-// see https://github.com/trufflesuite/truffle/issues/557 for details
+// change to false while runing test to prevent race condition
+// see https://github.com/trufflesuite/truffle/issues/557
 const deploy = false;
 
 // set MNEMONIC="HDkey"
 module.exports = async function (deployer, network, accounts) {
-  const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
-
-  const initialAccount = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
-  const GDPOracle = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
-  const upgradeManager = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
-
-  verifyContractCreator(accounts[0], contractCreator);
-  logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
-
-  const firstPeriodWindows = 7;
-  const secondPeriodWindows = 173;
-  const startTime = await latestTime() + 240;
-  const windowLength = duration.hours(23);
-
-  // MUSA Params:
-  let MCoinName = 'MonetaryCoin USA';
-  let MCoinSymbol = 'MUSA';
-  let initialBlockReward = '26536';
-  let firstPeriodSupply = 6.9737 * (10 ** 9);
-  let secondPeriodSupply = firstPeriodSupply;
-  let initialBalance = 2 * firstPeriodSupply;
-
   if (deploy) {
+    const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
+
+    const initialAccount = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+    const GDPOracle = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+    const upgradeManager = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+
+    verifyContractCreator(accounts[0], contractCreator);
+    logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
+
+    const firstPeriodWindows = 7;
+    const secondPeriodWindows = 173;
+    const startTime = await latestTime() + 240;
+    const windowLength = duration.hours(23);
+
+    // MUSA Params:
+    let MCoinName = 'MonetaryCoin USA';
+    let MCoinSymbol = 'MUSA';
+    let initialBlockReward = '26536';
+    let firstPeriodSupply = 6.9737 * (10 ** 9);
+    let secondPeriodSupply = firstPeriodSupply;
+    let initialBalance = 2 * firstPeriodSupply;
+
     await deployMCoin(
       MCoinName,
       MCoinSymbol,
@@ -49,17 +49,15 @@ module.exports = async function (deployer, network, accounts) {
       windowLength,
       deployer,
     );
-  }
 
-  // MERO Params:
-  MCoinName = 'MonetaryCoin China';
-  MCoinSymbol = 'MCNY';
-  initialBlockReward = '21462';
-  firstPeriodSupply = 5.640 * (10 ** 9);
-  secondPeriodSupply = firstPeriodSupply;
-  initialBalance = 2 * firstPeriodSupply;
+    // MERO Params:
+    MCoinName = 'MonetaryCoin China';
+    MCoinSymbol = 'MCNY';
+    initialBlockReward = '21462';
+    firstPeriodSupply = 5.640 * (10 ** 9);
+    secondPeriodSupply = firstPeriodSupply;
+    initialBalance = 2 * firstPeriodSupply;
 
-  if (deploy) {
     await deployMCoin(
       MCoinName,
       MCoinSymbol,
@@ -79,10 +77,10 @@ module.exports = async function (deployer, network, accounts) {
       windowLength,
       deployer,
     );
-  }
+  };
 };
 
-async function deployMCoin(
+async function deployMCoin (
   // Token:
   MCoinName,
   MCoinSymbol,
@@ -144,7 +142,7 @@ const getBlock = () => // eslint-disable-line no-inner-declarations
     });
   });
 
-async function latestTime() {
+async function latestTime () {
   const latestBlock = await getBlock();
   return latestBlock.timestamp;
 }
