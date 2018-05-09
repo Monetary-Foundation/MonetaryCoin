@@ -144,7 +144,7 @@ contract MinableM5Token is GDPOraclizedToken {
     require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
     
-    //will revert if reward is possitive
+    // will revert if reward is positive
     reward = getM5Reward(msg.sender);
     commitmentValue = miners[msg.sender].value;
 
@@ -157,7 +157,7 @@ contract MinableM5Token is GDPOraclizedToken {
   event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
-  * @dev swap M5 tokens back to regular tokens when GDP is back to possitive 
+  * @dev swap M5 tokens back to regular tokens when GDP is back to positive 
   * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */

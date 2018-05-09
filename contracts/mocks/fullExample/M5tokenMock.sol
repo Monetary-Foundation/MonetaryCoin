@@ -15,7 +15,7 @@ contract M5tokenMock is BurnableToken, MintableToken {
   event Swap(address indexed from, uint256 _value);
 
   /**
-   * @dev Swap M5 Tokens for Mcoin after GDP is back to possitive
+   * @dev Swap M5 Tokens for Mcoin after GDP is back to positive
    * This function is triggered by the monetary coin contract
    * to swap M5 tokens trigger swap function in monetary coin contract
    * @param from owner of M5 tokens

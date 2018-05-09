@@ -58,7 +58,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     
     commitmentValue = commitment.value;
 
-    // will throw if averageBlockReward is possitive:
+    // will throw if averageBlockReward is positive:
     reward = getM5Reward(msg.sender);
 
     totalStake_ = totalStake_.sub(commitment.value);
@@ -79,7 +79,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
   event Swap(address indexed from, uint256 M5Value, uint256 value);
 
   /**
-  * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
+  * @dev swap M5 tokens back to normal tokens when GDP is back to positive 
   * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */

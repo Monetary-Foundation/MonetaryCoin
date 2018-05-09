@@ -144,7 +144,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     await assertRevert(token.getM5Reward(accounts[0]));
   });
 
-  it('should fail to withdrawM5() if effective reward is possitive', async function () {
+  it('should fail to withdrawM5() if effective reward is positive', async function () {
     const negativeBlockReward = -10;
     await token.setNegativeGrowth(negativeBlockReward, { from: GDPOracle });
     const commitValue = 4;
@@ -262,14 +262,14 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     await token.withdrawM5();
     // We have M5 tokens now
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     // trying to swap more then we have
     await assertRevert(token.swap(100));
   });
 
-  it('should successfully swap M5 token for regular token when GDP is back to possitive', async function () {
+  it('should successfully swap M5 token for regular token when GDP is back to positive', async function () {
     await token.setNegativeGrowth(-100, { from: GDPOracle });
     const commitValue = 5;
     const swapValue = 80;
@@ -280,7 +280,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     // let M5Balance = await M5Token.balanceOf(accounts[0]);
     let balance = await token.balanceOf(accounts[0]);
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     await token.swap(swapValue);
@@ -299,7 +299,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
 
     let supply = await token.totalSupply();
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     await token.swap(swapValue);
@@ -318,7 +318,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     let M5Balance = await M5Token.balanceOf(accounts[0]);
     // let balance = await token.balanceOf(accounts[0]);
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     await token.swap(swapValue);
@@ -338,7 +338,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     let M5Supply = await M5Token.totalSupply();
     // let balance = await token.balanceOf(accounts[0]);
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     await token.swap(swapValue);
@@ -356,7 +356,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     await token.withdrawM5();
     // We have M5 tokens now
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
 
     await assertRevert(M5Token.swap(accounts[0], swapValue));
@@ -370,7 +370,7 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     await token.withdrawM5();
     // We have M5 tokens now
 
-    // GDP back to possitive:
+    // GDP back to positive:
     await token.setPositiveGrowth(10, { from: GDPOracle });
     let txObj = await token.swap(80);
 

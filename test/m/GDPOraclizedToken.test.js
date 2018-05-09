@@ -165,7 +165,7 @@ contract('GDPOraclizedToken', function (accounts) {
     await expectThrow(token.setNegativeGrowth(50, { from: stranger }));
   });
 
-  it('should prevent setting possitive value for setNegativeGrowth', async function () {
+  it('should prevent setting positive value for setNegativeGrowth', async function () {
     await expectThrow(token.setNegativeGrowth(50));
   });
 

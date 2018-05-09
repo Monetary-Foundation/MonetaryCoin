@@ -16,7 +16,7 @@ contract M5LogicMock6 is GDPOraclizedToken {
   address upgradeManager_;
   bool isUpgradeFinished_ = false;  
   /**
-  * @dev swap M5 tokens back to normal tokens when GDP is back to possitive 
+  * @dev swap M5 tokens back to normal tokens when GDP is back to positive 
   * @param _value The amount of M5 tokens to swap for regular tokens
   * @return true
   */

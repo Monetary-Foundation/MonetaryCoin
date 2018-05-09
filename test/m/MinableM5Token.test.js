@@ -146,7 +146,7 @@ contract('MinableM5Token', function (accounts) {
     BigNumber.config({ ROUNDING_MODE: 2 });
     
     await token.setNegativeGrowth(-51);
-    
+
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock2.new();
@@ -158,7 +158,7 @@ contract('MinableM5Token', function (accounts) {
     reward.toPrecision(11).should.be.bignumber.equal((2 ** 140).toPrecision(11));
   });
 
-  it('should revert upgraded M5reward if block reward is possitive', async function () {
+  it('should revert upgraded M5reward if block reward is positive', async function () {
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock5.new();
