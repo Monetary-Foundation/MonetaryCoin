@@ -112,6 +112,16 @@ contract('MinableM5Token', function (accounts) {
     reward.should.be.bignumber.equal(0);
   });
 
+  it('should revert if averageBlockReward is not negative (even if not restricted by M5 logic)', async function () {
+    await token.commit(5);
+
+    let M5LogicContract = await M5LogicMock2.new();
+
+    await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+
+    await assertRevert(token.getM5Reward(accounts[0]));
+  });
+
   // TODO: REVISE:
   // it('should revert if non exist function (after logic upgrade to address)', async function () {
   //   await token.upgradeM5Logic(accounts[2]);
@@ -134,6 +144,9 @@ contract('MinableM5Token', function (accounts) {
 
   it('should correctly call getM5Reward and get static value (uint256)', async function () {
     BigNumber.config({ ROUNDING_MODE: 2 });
+    
+    await token.setNegativeGrowth(-51);
+    
     await token.commit(5);
 
     let M5LogicContract = await M5LogicMock2.new();

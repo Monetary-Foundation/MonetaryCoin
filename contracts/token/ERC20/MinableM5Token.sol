@@ -106,6 +106,8 @@ contract MinableM5Token is GDPOraclizedToken {
     if (miners[_miner].value == 0) {
       return 0;
     }
+    // check that effective block reward is indeed negative
+    require(signedAverage(miners[_miner].onBlockReward, blockReward_) < 0);
 
     // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
     // return length
@@ -142,6 +144,7 @@ contract MinableM5Token is GDPOraclizedToken {
     require(M5Logic_ != address(0));
     require(miners[msg.sender].value > 0); 
     
+    //will revert if reward is possitive
     reward = getM5Reward(msg.sender);
     commitmentValue = miners[msg.sender].value;
 
