@@ -194,6 +194,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock5.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     await token.withdrawM5();
   });
@@ -208,6 +209,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock5.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     await token.withdrawM5();
 
@@ -226,6 +228,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock7.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     await token.withdrawM5();
 
@@ -244,6 +247,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock5.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5.call();
 
@@ -266,6 +270,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock5.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5.call({ from: accounts[1] });
 
@@ -303,6 +308,7 @@ contract('MinableM5Token', function (accounts) {
     let M5LogicContract = await M5LogicMock5.new();
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
+    await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5();
 

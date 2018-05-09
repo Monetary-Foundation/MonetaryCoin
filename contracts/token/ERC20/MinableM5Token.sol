@@ -142,6 +142,7 @@ contract MinableM5Token is GDPOraclizedToken {
   */
   function withdrawM5() public returns (uint256 reward, uint256 commitmentValue) {
     require(M5Logic_ != address(0));
+    require(M5Token_ != address(0));
     require(miners[msg.sender].value > 0); 
     
     // will revert if reward is positive
