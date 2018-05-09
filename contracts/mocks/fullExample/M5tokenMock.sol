@@ -26,6 +26,7 @@ contract M5tokenMock is BurnableToken, MintableToken {
 
     balances[from] = balances[from].sub(_value);
     totalSupply_ = totalSupply_.sub(_value);
+    Transfer(msg.sender, 0x0, _value);
     Swap(from, _value);
   }
 }

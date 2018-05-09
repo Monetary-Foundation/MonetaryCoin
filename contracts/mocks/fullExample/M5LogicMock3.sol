@@ -94,6 +94,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     balances[msg.sender] = balances[msg.sender].add(reward); 
     totalSupply_ = totalSupply_.add(reward);   
 
+    Transfer(0x0, msg.sender, reward);
     Swap(msg.sender, _value, reward);
     return true;
   }
