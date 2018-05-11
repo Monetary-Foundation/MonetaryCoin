@@ -68,6 +68,7 @@ contract MCoinDistribution is Ownable {
 
     totalWindows = firstPeriodWindows.add(secondPeriodWindows);
     require(totalWindows <= MAX_WINDOWS);
+    require(currentWindow() == 0);
   }
 
   /**

@@ -28,12 +28,10 @@ const windowLength = duration.minutes(5);
 const windowTimeStamp = (startTime, windowNumber) =>
   startTime + duration.seconds(5) + windowNumber * windowLength;
 
-// for tests run: ganache-cli -u0 -u1 -u2 -u3
+// for tests run: ganache-cli -u0 -u1 -u2 -u3 -u4 -u5
 contract('MCoinDistributionMock', function (accounts) {
   let token;
   let distribution;
-  // let M5Token;
-  // let M5Logic;
 
   const initialAccount = accounts[0];
   const GDPOracle = accounts[1];
@@ -55,7 +53,7 @@ contract('MCoinDistributionMock', function (accounts) {
 
   beforeEach(async function () {
     // New startTime for each test:
-    startTime = latestTime() + 60;
+    startTime = latestTime() + 120;
 
     token = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
 
@@ -82,16 +80,6 @@ contract('MCoinDistributionMock', function (accounts) {
     await token.transferOwnership(distribution.address, { from: contractCreator });
 
     await distribution.init(token.address, { from: contractCreator });
-
-    // M5Token = await M5TokenMock.new();
-    // M5Logic = await M5LogicMock3.new();
-
-    // // upgrade token to new logic
-    // await token.upgradeM5Logic(M5Logic.address);
-    // await token.upgradeM5Token(M5Token.address);
-
-    // // transfer ownership of M5token to token:
-    // await M5Token.transferOwnership(token.address);
   });
 
   it('should return the correct reward if nothing was commited', async function () {
