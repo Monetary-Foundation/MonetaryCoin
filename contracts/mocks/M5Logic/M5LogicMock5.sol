@@ -25,7 +25,7 @@ contract M5LogicMock5 is GDPOraclizedToken {
   }
 
   /**
-  * @dev set miners commitmet to zero
+  * @dev set miners commitment to zero
   * @return reward
   * @return commitmentValue
   */

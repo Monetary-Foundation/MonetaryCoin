@@ -237,7 +237,7 @@ contract('MinableM5Token', function (accounts) {
     assert.equal(changedAddress, '0x0000000000000000000000000000000000000000');
   });
 
-  it('should successfully call withdrawM5 to get reward and commitmet', async function () {
+  it('should successfully call withdrawM5 to get reward and commitment', async function () {
     const commitValue = 5;
 
     await token.commit(commitValue);
@@ -250,7 +250,8 @@ contract('MinableM5Token', function (accounts) {
     await token.upgradeM5Token(M5LogicContract.address, { from: upgradeManager });
 
     let txObj = await token.withdrawM5.call();
-
+    // console.log(txObj);
+    
     let reward = txObj[0];
 
     let commitmentValue = txObj[1];
@@ -259,7 +260,7 @@ contract('MinableM5Token', function (accounts) {
     commitmentValue.should.be.bignumber.equal(commitValue);
   });
 
-  it('should successfully call withdrawM5 from different address to get reward and commitmet', async function () {
+  it('should successfully call withdrawM5 from different address to get reward and commitment', async function () {
     await token.transfer(accounts[1], 10);
     const commitValue = 4;
     await token.commit(commitValue, { from: accounts[0] });
@@ -294,7 +295,7 @@ contract('MinableM5Token', function (accounts) {
 
     await token.upgradeM5Logic(M5LogicContract.address, { from: upgradeManager });
 
-    // no commitmet for accounts[3]
+    // no commitment for accounts[3]
     await assertRevert(token.withdrawM5.call({ from: accounts[3] }));
   });
 
