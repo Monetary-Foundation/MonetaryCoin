@@ -38,14 +38,14 @@ contract MCoinDistribution is Ownable {
   mapping (address => mapping (uint256 => uint256)) public commitment;
   
   function MCoinDistribution (
-    uint _firstPeriodWindows,
-    uint _firstPeriodSupply,
-    uint _secondPeriodWindows,
-    uint _secondPeriodSupply,
+    uint256 _firstPeriodWindows,
+    uint256 _firstPeriodSupply,
+    uint256 _secondPeriodWindows,
+    uint256 _secondPeriodSupply,
     address _foundationWallet,
-    uint _foundationReserve,
-    uint _startTimestamp,
-    uint _windowLength
+    uint256 _foundationReserve,
+    uint256 _startTimestamp,
+    uint256 _windowLength
   ) public 
   {
     require(0 < _firstPeriodWindows);
