@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
 
 import "../token/ERC20/MinableM5Token.sol";
 import "../token/ERC20/ComplianceStore.sol";
