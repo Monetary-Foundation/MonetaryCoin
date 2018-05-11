@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.4.21;
 
 import "./GDPOraclizedToken.sol";
 
@@ -110,27 +110,35 @@ contract MinableM5Token is GDPOraclizedToken {
     require(signedAverage(miners[_miner].onBlockReward, blockReward_) < 0);
 
     // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
-    // return length
-    uint16 returnSize = 256;
+    // and https://github.com/androlo/solidity-workshop/blob/master/tutorials/2016-04-04-solidity-inline-assembly-I.md
+    // return length (bytes)
+    uint32 returnSize = 32;
     // target contract
     address target = M5Logic_;
+    // method signeture for target contract
+    bytes32 signature = keccak256("getM5Reward(address)");
+    // size of calldata for getM5Reward function: 4 for signeture and 32 for one variable (address)
+    uint32 calldataSize = 4 + 32;
     // variable to check delegatecall result (success or failure)
     uint8 callResult;
+    // result from target.getM5Reward()
+    uint256 result;
     
     assembly { // solium-disable-line
         // return _dest.delegatecall(msg.data)
-        // calldatacopy(t, f, s)	-	copy s bytes from calldata at position f to mem at position t
-        calldatacopy(0x0, 0x0, calldatasize)
+        mstore(0, signature) // 4 bytes of method signature
+        mstore(4, _miner)    // 20 bytes of address
         // delegatecall(g, a, in, insize, out, outsize)	- call contract at address a with input mem[in..(in+insize))
         // providing g gas and v wei and output area mem[out..(out+outsize)) returning 0 on error (eg. out of gas) and 1 on success
         // keep caller and callvalue
-        callResult := delegatecall(sub(gas, 10000), target, 0x0, calldatasize, 0, returnSize)
+        callResult := delegatecall(sub(gas, 10000), target, 0x0, calldataSize, 0, returnSize)
         switch callResult 
         case 0 
           { revert(0,0) } 
         default 
-          { return(0, returnSize) }
+          { result := mload(0x0) }
     }
+    return result;
   }
 
   event WithdrawM5(address indexed from,uint commitment, uint M5Reward);
@@ -148,7 +156,7 @@ contract MinableM5Token is GDPOraclizedToken {
     // will revert if reward is positive
     reward = getM5Reward(msg.sender);
     commitmentValue = miners[msg.sender].value;
-
+    
     require(M5Logic_.delegatecall(bytes4(keccak256("withdrawM5()")))); // solium-disable-line
     
     return (reward,commitmentValue);
