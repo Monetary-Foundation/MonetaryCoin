@@ -57,7 +57,7 @@ contract('ComplianceStore', function (accounts) {
     await distribution.init(ComplianceStore.address, { from: contractCreator });
   });
 
-  it('should return zeros for unset address', async function () {
+  it('should return empty digest for unset address', async function () {
     let multiHash = await ComplianceStore.getHash(accounts[0]);
 
     const hashFunction = multiHash[0]; // bignumber
@@ -71,7 +71,7 @@ contract('ComplianceStore', function (accounts) {
     timestamp.should.be.bignumber.equal(0);
   });
 
-  it('should return zeros for unset address 2', async function () {
+  it('should return empty digest for unset address 2', async function () {
     let multiHash = await ComplianceStore.getHash(accounts[1]);
 
     const hashFunction = multiHash[0]; // bignumber
@@ -113,5 +113,22 @@ contract('ComplianceStore', function (accounts) {
     size.should.be.bignumber.equal(3);
     assert.equal(hash, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
     timestamp.should.be.bignumber.gt(1518978976);
+  });
+
+  it('should clear the multihash', async function () {
+    await ComplianceStore.setHash(1, 2, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
+    await ComplianceStore.clearHash();
+    let multiHash = await ComplianceStore.getHash(accounts[0]);
+    
+    // console.log(multiHash);
+    const hashFunction = multiHash[0]; // bignumber
+    const size = multiHash[1]; // bignumber
+    const hash = multiHash[2]; // string 0x...
+    const timestamp = multiHash[3]; // bignumber
+
+    hashFunction.should.be.bignumber.equal(0);
+    size.should.be.bignumber.equal(0);
+    assert.equal(hash, '0x0000000000000000000000000000000000000000000000000000000000000000');
+    timestamp.should.be.bignumber.equal(0);
   });
 });

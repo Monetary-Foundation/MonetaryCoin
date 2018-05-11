@@ -44,6 +44,11 @@ contract ComplianceStore is MultihashStore {
     store[msg.sender] = Multihash(_hashFunction, _size, _hash, block.timestamp); // solium-disable-line
     SetHash(msg.sender, _hashFunction, _size, _hash, block.timestamp); // solium-disable-line
   }
+
+  /** @dev removes a multihash from the store */
+  function clearHash() public returns (bool) {
+    delete store[msg.sender]; 
+  }
   
   /** @dev get hash from store for specific address
   * @return hashFunction
