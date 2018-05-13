@@ -146,16 +146,16 @@ contract('MCoinDistributionMock', function (accounts) {
     }
   });
 
-  it('should revert a commitOn() before first window', async function () {
+  it('should allow a commitOn() before first window is started', async function () {
     const window = 0;
     const txObj = {
       from: buyer,
       value: web3.toWei(new BigNumber(0.2), 'ether'),
     };
-    await assertRevert(distribution.commitOn(window, txObj));
+    await distribution.commitOn(window, txObj);
   });
 
-  it('should revert a commitOn() before after distribution is over', async function () {
+  it('should revert a commitOn() after distribution is over', async function () {
     await increaseTimeTo(windowTimeStamp(startTime, firstPeriodWindows + secondPeriodWindows));
 
     const window = 0;

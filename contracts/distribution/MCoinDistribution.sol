@@ -137,8 +137,6 @@ contract MCoinDistribution is Ownable {
   * @param window to commit [0-totalWindows)
   */
   function commitOn(uint256 window) public payable {
-    // Distribution have started
-    require(startTimestamp < block.timestamp);
     // Distribution didn't ended
     require(currentWindow() < totalWindows);
     // Commit only for present or future windows
