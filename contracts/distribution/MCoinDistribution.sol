@@ -129,8 +129,12 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev commit funds for the given window
-  * @param window to commit 
+  * @dev commit funds for a given window
+  * Tokens for commited window need to be withdrawn after
+  * window closes using withdraw(uint256 window) function
+  * first window: 0
+  * last window: totalWindows - 1
+  * @param window to commit [0-totalWindows)
   */
   function commitOn(uint256 window) public payable {
     // Distribution have started
@@ -160,9 +164,9 @@ contract MCoinDistribution is Ownable {
   }
   
   /**
-  * @dev Withdraw tokens after the window was closed
+  * @dev Withdraw tokens after the window has closed
   * @param window to withdraw 
-  * @return the calculated number pf tokens
+  * @return the calculated number of tokens
   */
   function withdraw(uint256 window) public returns (uint256 reward) {
     // Requested window already been closed
@@ -177,7 +181,7 @@ contract MCoinDistribution is Ownable {
     // The reward is price * commitment
     // uint256 reward = price.mul(commitment[msg.sender][window]);
     
-    // Same calculation optimized for accuracy (without the rounding of .div in price calculation):
+    // Same calculation optimized for accuracy (without the .div rounding for price calculation):
     reward = allocationFor(window).mul(commitment[msg.sender][window]).div(totals[window]);
     
     // Transfer the tokens
@@ -202,7 +206,7 @@ contract MCoinDistribution is Ownable {
   /**
   * @dev returns a array filed with reward for every closed window
   * a convinience function to be called for updating a GUI. 
-  * To actually recive the rewards use withdrawAll(), which consumes less gas.
+  * To recive the rewards use withdrawAll(), which consumes less gas.
   * @return the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
