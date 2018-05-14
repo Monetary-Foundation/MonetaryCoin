@@ -182,11 +182,10 @@ contract MCoinDistribution is Ownable {
     // Same calculation optimized for accuracy (without the .div rounding for price calculation):
     reward = allocationFor(window).mul(commitment[msg.sender][window]).div(totals[window]);
     
-    // Transfer the tokens
-    MCoin.transfer(msg.sender, reward);
-
     // Init the commitment
     commitment[msg.sender][window] = 0;
+    // Transfer the tokens
+    MCoin.transfer(msg.sender, reward);
     // Log
     Withdraw(msg.sender, reward, window);
     return reward;
