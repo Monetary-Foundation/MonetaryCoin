@@ -11,7 +11,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-// var GDPOraclizedToken = artifacts.require('GDPOraclizedTokenMock');
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 const MCoinMock = artifacts.require('MCoinMock');
@@ -73,33 +73,71 @@ contract('GDPOraclizedToken', function (accounts) {
 
     assert.equal(oracleAddress, accounts[0]);
   });
+
+  it('should return the correct pending oracle address after init', async function () {
+    let pendingOracleAddress = await token.pendingGDPOracle();
+    assert.equal(pendingOracleAddress, ZERO_ADDRESS);
+  });
+
   it('should transfer the oracle correctly', async function () {
     await token.transferGDPOracle(accounts[1]);
-    let oracleAddress = await token.GDPOracle();
+    let pendingOracleAddress = await token.pendingGDPOracle();
 
+    assert.equal(pendingOracleAddress, accounts[1]);
+  });
+
+  it('should be able to cancel transfer if not claimed', async function () {
+    await token.transferGDPOracle(accounts[1]);
+    await token.transferGDPOracle(ZERO_ADDRESS);
+    let pendingOracleAddress = await token.pendingGDPOracle();
+    assert.equal(pendingOracleAddress, ZERO_ADDRESS);
+  });
+
+  it('should claim the oracle correctly', async function () {
+    await token.transferGDPOracle(accounts[1]);
+    await token.claimOracle({ from: accounts[1] });
+
+    let oracleAddress = await token.GDPOracle();
     assert.equal(oracleAddress, accounts[1]);
   });
-  it('should emit event while transferring the oracle', async function () {
-    const txObj = await token.transferGDPOracle(accounts[5]);
+
+  it('should zero the pendingGDPOracle after transfer', async function () {
+    await token.transferGDPOracle(accounts[1]);
+    await token.claimOracle({ from: accounts[1] });
+
+    let pendingOracleAddress = await token.pendingGDPOracle();
+
+    assert.equal(pendingOracleAddress, ZERO_ADDRESS);
+  });
+
+  it('should emit event after claiming the oracle', async function () {
+    await token.transferGDPOracle(accounts[1]);
+    const txObj = await token.claimOracle({ from: accounts[1] });
 
     const { previousOracle, newOracle } = txObj.logs[0].args;
 
     assert.equal(txObj.logs[0].event, 'GDPOracleTransferred');
     assert.equal(previousOracle, accounts[0]);
-    assert.equal(newOracle, accounts[5]);
+    assert.equal(newOracle, accounts[1]);
   });
 
   it('should fail to transfer the oracle from unauthorized address', async function () {
     await expectThrow(token.transferGDPOracle(accounts[2], { from: stranger }));
   });
 
-  it('should fail to transfer the oracle to 0x0 address', async function () {
-    await expectThrow(token.transferGDPOracle(0));
+  it('should fail to claim the oracle from unauthorized address', async function () {
+    await token.transferGDPOracle(accounts[1]);
+    await expectThrow(token.claimOracle({ from: stranger }));
+  });
+
+  it('should fail to claim the oracle if transfer not started', async function () {
+    await expectThrow(token.claimOracle({ from: stranger }));
   });
 
   it('should prevent old oracle to do actions after transffer', async function () {
     // token = await GDPOraclizedToken.new(initialAccount, initialSupply, setBlockReward, accounts[1]);
     await token.transferGDPOracle(accounts[2]);
+    await token.claimOracle({ from: accounts[2] });
     await expectThrow(token.transferGDPOracle(accounts[3]));
     await expectThrow(token.setPositiveGrowth(5));
   });
@@ -131,6 +169,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should correctly setPositiveGrowth after transfering oracle address', async function () {
     await token.transferGDPOracle(accounts[1]);
+    await token.claimOracle({ from: accounts[1] });
     await token.setPositiveGrowth(51, { from: accounts[1] });
 
     let newReward = await token.blockReward();
@@ -140,6 +179,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should prevent original oracle to do actions after transffer', async function () {
     await token.transferGDPOracle(accounts[1]);
+    await token.claimOracle({ from: accounts[1] });
     await token.setPositiveGrowth(50, { from: accounts[1] });
     await expectThrow(token.setPositiveGrowth(50, { from: accounts[0] }));
   });
@@ -171,6 +211,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should correctly setNegativeGrowth after transfering oracle address', async function () {
     await token.transferGDPOracle(accounts[1]);
+    await token.claimOracle({ from: accounts[1] });
     await token.setNegativeGrowth(-51, { from: accounts[1] });
 
     let newReward = await token.blockReward();

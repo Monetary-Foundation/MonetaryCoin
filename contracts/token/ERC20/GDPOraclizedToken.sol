@@ -2,38 +2,50 @@ pragma solidity ^0.4.21;
 
 import "./MinableToken.sol";
 
-
+/**
+ * @title GDPOraclizedToken
+ * @dev Interface for controling the mining rate using a GDP Oracle
+ */
 contract GDPOraclizedToken is MinableToken {
 
   event GDPOracleTransferred(address indexed previousOracle, address indexed newOracle);
   event BlockRewardChanged(int oldBlockReward, int newBlockReward);
 
   address GDPOracle_;
+  address pendingGDPOracle_;
 
   /**
-   * @dev The GDPOraclizedToken constructor sets the oracle account
-   */
-  /* 
-  function GdpOraclizedToken(address oracle) public {
-    GDPOracle = oracle;
-  }*/
-
-  /**
-   * @dev Throws if called by any account other than the GDPOracle.
+   * @dev Modifier Throws if called by any account other than the GDPOracle.
    */
   modifier onlyGDPOracle() {
     require(msg.sender == GDPOracle_);
     _;
   }
+  
+  /**
+   * @dev Modifier throws if called by any account other than the pendingGDPOracle.
+   */
+  modifier onlyPendingGDPOracle() {
+    require(msg.sender == pendingGDPOracle_);
+    _;
+  }
 
   /**
    * @dev Allows the current GDPOracle to transfer control to a newOracle.
+   * The new GDPOracle need to call claimOracle() to finalize
    * @param newOracle The address to transfer ownership to.
    */
   function transferGDPOracle(address newOracle) public onlyGDPOracle {
-    require(newOracle != address(0));
-    GDPOracleTransferred(GDPOracle_, newOracle);
-    GDPOracle_ = newOracle;
+    pendingGDPOracle_ = newOracle;
+  }
+
+  /**
+   * @dev Allows the pendingGDPOracle_ address to finalize the transfer.
+   */
+  function claimOracle() onlyPendingGDPOracle public {
+    GDPOracleTransferred(GDPOracle_, pendingGDPOracle_);
+    GDPOracle_ = pendingGDPOracle_;
+    pendingGDPOracle_ = address(0);
   }
 
   /**
@@ -67,4 +79,11 @@ contract GDPOraclizedToken is MinableToken {
     return GDPOracle_;
   }
 
+  /**
+  * @dev get GDPOracle
+  * @return the address of the GDPOracle
+  */
+  function pendingGDPOracle() public view returns (address) { // solium-disable-line mixedcase
+    return pendingGDPOracle_;
+  }
 }
