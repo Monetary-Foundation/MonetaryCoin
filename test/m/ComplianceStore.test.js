@@ -1,6 +1,5 @@
 import { duration } from '../helpers/increaseTime';
 import latestTime from '../helpers/latestTime';
-// import assertRevert from '../helpers/assertRevert';
 const BigNumber = web3.BigNumber;
 
 require('chai')
@@ -8,53 +7,14 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-// const ComplianceStoreMock = artifacts.require('ComplianceStoreMock');
-
-const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
-const MCoinMock = artifacts.require('MCoinMock');
-const windowLength = duration.minutes(5);
+const ComplianceStoreMock = artifacts.require('ComplianceStoreMock');
 
 contract('ComplianceStore', function (accounts) {
   let ComplianceStore;
-  let distribution;
-
-  const GDPOracle = accounts[0];
-  const initialAccount = accounts[1];
   const contractCreator = accounts[2];
-  const upgradeManager = accounts[3];
-  // const stranger = accounts[8];
-
-  const initialBlockReward = 5;
-
-  let startTime = latestTime() + 60;
-
-  const firstPeriodWindows = 3;
-  const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
-  const secondPeriodSupply = 150;
-  const initialBalance = 50;
-
+  
   beforeEach(async function () {
-    // New startTime for each test:
-    startTime = latestTime() + 60;
-
-    ComplianceStore = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
-
-    distribution = await MCoinDistributionMock.new(
-      firstPeriodWindows,
-      firstPeriodSupply,
-      secondPeriodWindows,
-      secondPeriodSupply,
-      initialAccount,
-      initialBalance,
-      startTime,
-      windowLength,
-      { from: contractCreator }
-    );
-
-    await ComplianceStore.transferOwnership(distribution.address, { from: contractCreator });
-
-    await distribution.init(ComplianceStore.address, { from: contractCreator });
+    ComplianceStore = await ComplianceStoreMock.new({ from: contractCreator });
   });
 
   it('should return empty digest for unset address', async function () {
@@ -130,5 +90,22 @@ contract('ComplianceStore', function (accounts) {
     size.should.be.bignumber.equal(0);
     assert.equal(hash, '0x0000000000000000000000000000000000000000000000000000000000000000');
     timestamp.should.be.bignumber.equal(0);
+  });
+
+  it('should correctly emit event during touch', async function () {
+    let txObj = await ComplianceStore.setHash(2, 3, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
+    const firstTimestamp = txObj.logs[0].args.timestamp;
+    setTimeout(async function (){
+      txObj = await ComplianceStore.touch();
+      assert.equal(txObj.logs[0].event, 'SetHash');
+      
+      const { from, hashFunction, size, hash, timestamp } = txObj.logs[0].args;
+      assert.equal(from, accounts[0]);
+
+      hashFunction.should.be.bignumber.equal(2);
+      size.should.be.bignumber.equal(3);
+      assert.equal(hash, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
+      timestamp.should.be.bignumber.gt(firstTimestamp);
+    }, 1100);
   });
 });

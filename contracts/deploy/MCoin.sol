@@ -1,14 +1,13 @@
 pragma solidity ^0.4.21;
 
 import "../token/ERC20/MinableM5Token.sol";
-import "../token/ERC20/ComplianceStore.sol";
 
 
 /**
  * @title MERO
  * @dev MERO
  */
-contract MCoin is MinableM5Token, ComplianceStore {
+contract MCoin is MinableM5Token {
 
   string public name; // solium-disable-line uppercase
   string public symbol; // solium-disable-line uppercase

@@ -1,7 +1,7 @@
 pragma solidity ^0.4.21;
 
 
-import "../token/ERC20/ComplianceStore.sol";
+import "../storage/ComplianceStore.sol";
 
 
 // mock class using ComplianceStore
