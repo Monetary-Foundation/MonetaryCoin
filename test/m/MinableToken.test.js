@@ -230,25 +230,6 @@ contract('MinableToken', function (accounts) {
     assert.equal(avg, 0);
   });
 
-  // some env bug, test directly against the Blockchain
-  // it('should throw on signedAverage overflow', async function () {
-  //   const maxInt256 = new BigNumber(2).pow(252).minus(1);
-  //   console.log('num: ');
-  //   console.log(maxInt256.toString());
-  //   console.log(maxInt256.toString(2));
-  //   // expected to throw
-  //   // await expectThrow(token.signedAverage(maxInt256, maxInt256));
-  //   const ans = await (token.signedAverage(maxInt256, maxInt256));
-  //   console.log('ans: ');
-  //   console.log(ans.toString());
-  //   console.log(ans.toString(2));
-
-  //   // int256 constant INT256_MIN = int256((uint256(1) << 255));
-  //   // int256 constant INT256_MAX = int256(~((uint256(1) << 255)));
-  //   // uint256 constant UINT256_MIN = 0;
-  //   // uint256 constant UINT256_MAX = ~uint256(0);
-  // });
-
   it('should return the correct reward if nothing was commited', async function () {
     let zeroReward = await token.getReward(accounts[0]);
     assert.equal(zeroReward, 0);
