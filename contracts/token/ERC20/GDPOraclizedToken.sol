@@ -2,6 +2,7 @@ pragma solidity ^0.4.21;
 
 import "./MinableToken.sol";
 
+
 /**
  * @title GDPOraclizedToken
  * @dev Interface for controling the mining rate using a GDP Oracle
