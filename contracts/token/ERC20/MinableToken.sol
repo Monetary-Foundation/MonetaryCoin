@@ -126,25 +126,25 @@ contract MinableToken is MintableToken {
 
   /**
   * @dev Calculate the average of two integer numbers 
-  * 1.5 will be rounded down
+  * 1.5 will be rounded toward zero
   * @return An uint256 representing integer average
   */
-  function average(uint a, uint b) public pure returns (uint) {
+  function average(uint256 a, uint256 b) public pure returns (uint) {
     return a.add(b).div(2);
   }
 
   /**
   * @dev Calculate the average of two signed integers numbers 
-  * 1.5 will be rounded down
+  * 1.5 will be toward zero
   * @return An int256 representing integer average
   */
   function signedAverage(int256 a, int256 b) public pure returns (int256) {
     int256 ans = a + b;
 
-    if (a > 0 && b > 0 && ans < 0) {
+    if (a > 0 && b > 0 && ans <= 0) {
       require(false);
     }
-    if (a < 0 && b < 0 && ans > 0) {
+    if (a < 0 && b < 0 && ans >= 0) {
       require(false);
     }
 
