@@ -123,8 +123,6 @@ contract MinableM5Token is GDPOraclizedToken {
     // check that effective block reward is indeed negative
     require(signedAverage(miners[_miner].onBlockReward, blockReward_) < 0);
 
-    // adopted from https://gist.github.com/olekon/27710c731c58fd0e0bd2503e02f4e144
-    // and https://github.com/androlo/solidity-workshop/blob/master/tutorials/2016-04-04-solidity-inline-assembly-I.md
     // return length (bytes)
     uint32 returnSize = 32;
     // target contract
