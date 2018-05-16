@@ -66,9 +66,8 @@ contract('MinableM5TokenIntegrationMock', function (accounts) {
     M5Token = await M5TokenMock.new();
     M5Logic = await M5LogicMock3.new();
 
-    // upgrade token to new logic
-    await token.upgradeM5Logic(M5Logic.address, { from: upgradeManager });
-    await token.upgradeM5Token(M5Token.address, { from: upgradeManager });
+    // upgrade token and new logic
+    await token.upgradeM5(M5Token.address, M5Logic.address, { from: upgradeManager });
 
     // transfer ownership of M5token to token:
     await M5Token.transferOwnership(token.address);
