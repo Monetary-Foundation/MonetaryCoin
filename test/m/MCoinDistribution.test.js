@@ -125,9 +125,9 @@ contract('MCoinDistributionMock', function (accounts) {
 
   it('should return correct window details before start', async function () {
     const totalWindows = firstPeriodWindows + secondPeriodWindows;
-    let start, end, remainingTime, allocation, commitment, window;
+    let start, end, remainingTime, allocation, totalEth, window;
     for (let i = 0; i < totalWindows; i++) {
-      [start, end, remainingTime, allocation, commitment, window] = await distribution.detailsOf(i);
+      [start, end, remainingTime, allocation, totalEth, window] = await distribution.detailsOf(i);
       start.should.be.bignumber.equal(startTime + windowLength * i);
       end.should.be.bignumber.equal(startTime + windowLength + windowLength * i);
       remainingTime.should.be.bignumber.at.least(windowTimeStamp(startTime, i) - latestTime());
@@ -136,17 +136,17 @@ contract('MCoinDistributionMock', function (accounts) {
         ? new BigNumber(web3.toWei(firstPeriodSupply, 'ether')).dividedToIntegerBy(firstPeriodWindows)
         : new BigNumber(web3.toWei(secondPeriodSupply, 'ether')).dividedToIntegerBy(secondPeriodWindows);
       allocation.should.be.bignumber.equal(expectedAlloc);
-      commitment.should.be.bignumber.equal(0);
+      totalEth.should.be.bignumber.equal(0);
       window.should.be.bignumber.equal(i);
     }
   });
 
   it('should return correct window details during the distrebution', async function () {
     const totalWindows = firstPeriodWindows + secondPeriodWindows;
-    let start, end, remainingTime, allocation, commitment, window;
+    let start, end, remainingTime, allocation, totalEth, window;
     for (let i = 0; i < totalWindows; i++) {
       await increaseTimeTo(windowTimeStamp(startTime, i));
-      [start, end, remainingTime, allocation, commitment, window] = await distribution.detailsOfWindow();
+      [start, end, remainingTime, allocation, totalEth, window] = await distribution.detailsOfWindow();
       start.should.be.bignumber.equal(startTime + windowLength * i);
       end.should.be.bignumber.equal(startTime + windowLength + windowLength * i);
       remainingTime.should.be.bignumber.at.most(windowLength);
@@ -154,7 +154,7 @@ contract('MCoinDistributionMock', function (accounts) {
         ? new BigNumber(web3.toWei(firstPeriodSupply, 'ether')).dividedToIntegerBy(firstPeriodWindows)
         : new BigNumber(web3.toWei(secondPeriodSupply, 'ether')).dividedToIntegerBy(secondPeriodWindows);
       allocation.should.be.bignumber.equal(expectedAlloc);
-      commitment.should.be.bignumber.equal(0);
+      totalEth.should.be.bignumber.equal(0);
       window.should.be.bignumber.equal(i);
     }
   });

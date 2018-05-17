@@ -130,7 +130,7 @@ contract MCoinDistribution is Ownable {
       uint256 end,    // window end timestamp
       uint256 remainingTime, // remaining time (sec), zero if ended
       uint256 allocation,    // number of tokens to be distributed
-      uint256 commitment,    // total eth commited this window
+      uint256 totalEth,      // total eth commited this window
       uint256 number         // requested window
     ) 
     {
@@ -142,8 +142,8 @@ contract MCoinDistribution is Ownable {
       : 0; 
 
     allocation = allocationFor(window);
-    commitment = totals[window];
-    return (start, end, remainingTime, allocation, commitment, window);
+    totalEth = totals[window];
+    return (start, end, remainingTime, allocation, totalEth, window);
   }
 
   /**
@@ -156,7 +156,7 @@ contract MCoinDistribution is Ownable {
       uint256 end,    // window end timestamp
       uint256 remainingTime, // remaining time (sec), zero if ended
       uint256 allocation,    // number of tokens to be distributed
-      uint256 commitment,    // total eth commited this window
+      uint256 totalEth,      // total eth commited this window
       uint256 number         // current window
     )
   {
