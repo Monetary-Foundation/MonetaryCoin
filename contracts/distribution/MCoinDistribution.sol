@@ -109,7 +109,6 @@ contract MCoinDistribution is Ownable {
 
   /**
   * @dev Return the window number for given timestamp
-  * Each window is 23 hours long
   * @param timestamp 
   * @return number of the current window in [0,inf)
   * 0 will be returned before distribution start and during the first window.
@@ -121,11 +120,55 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
+  * @dev Return information about the selected window
+  * @param window number: [0-totalWindows)
+  * @return 
+  */
+  function detailsOf(uint256 window) view public 
+    returns (
+      uint256 start,  // window start timestamp
+      uint256 end,    // window end timestamp
+      uint256 remainingTime, // remaining time (sec), zero if ended
+      uint256 allocation,    // number of tokens to be distributed
+      uint256 commitment,    // total eth commited this window
+      uint256 number         // requested window
+    ) 
+    {
+    require(window < totalWindows);
+    start = startTimestamp.add(windowLength.mul(window));
+    end = start.add(windowLength);
+    remainingTime = (block.timestamp < end) // solium-disable-line
+      ? end.sub(block.timestamp)            // solium-disable-line
+      : 0; 
+
+    allocation = allocationFor(window);
+    commitment = totals[window];
+    return (start, end, remainingTime, allocation, commitment, window);
+  }
+
+  /**
+  * @dev Return information about the current window
+  * @return 
+  */
+  function detailsOfWindow() view public
+    returns (
+      uint256 start,  // window start timestamp
+      uint256 end,    // window end timestamp
+      uint256 remainingTime, // remaining time (sec), zero if ended
+      uint256 allocation,    // number of tokens to be distributed
+      uint256 commitment,    // total eth commited this window
+      uint256 number         // current window
+    )
+  {
+    return (detailsOf(currentWindow()));
+  }
+
+  /**
   * @dev return the number of the current window
   * @return the window, range: [0-totalWindows)
   */
   function currentWindow() view public returns (uint256) {
-    return windowOf(block.timestamp);
+    return windowOf(block.timestamp); // solium-disable-line
   }
 
   /**

@@ -123,7 +123,43 @@ contract('MCoinDistributionMock', function (accounts) {
     window.should.be.bignumber.equal(0);
   });
 
-  it('should return 0 for currentWindow() (first window counts as 0)', async function () {
+  it('should return correct window details before start', async function () {
+    const totalWindows = firstPeriodWindows + secondPeriodWindows;
+    let start, end, remainingTime, allocation, commitment, window;
+    for (let i = 0; i < totalWindows; i++) {
+      [start, end, remainingTime, allocation, commitment, window] = await distribution.detailsOf(i);
+      start.should.be.bignumber.equal(startTime + windowLength * i);
+      end.should.be.bignumber.equal(startTime + windowLength + windowLength * i);
+      remainingTime.should.be.bignumber.at.least(windowTimeStamp(startTime, i) - latestTime());
+      remainingTime.should.be.bignumber.at.most(windowTimeStamp(startTime, i) + windowLength - latestTime());
+      const expectedAlloc = (i < firstPeriodWindows)
+        ? new BigNumber(web3.toWei(firstPeriodSupply, 'ether')).dividedToIntegerBy(firstPeriodWindows)
+        : new BigNumber(web3.toWei(secondPeriodSupply, 'ether')).dividedToIntegerBy(secondPeriodWindows);
+      allocation.should.be.bignumber.equal(expectedAlloc);
+      commitment.should.be.bignumber.equal(0);
+      window.should.be.bignumber.equal(i);
+    }
+  });
+
+  it('should return correct window details during the distrebution', async function () {
+    const totalWindows = firstPeriodWindows + secondPeriodWindows;
+    let start, end, remainingTime, allocation, commitment, window;
+    for (let i = 0; i < totalWindows; i++) {
+      await increaseTimeTo(windowTimeStamp(startTime, i));
+      [start, end, remainingTime, allocation, commitment, window] = await distribution.detailsOfWindow();
+      start.should.be.bignumber.equal(startTime + windowLength * i);
+      end.should.be.bignumber.equal(startTime + windowLength + windowLength * i);
+      remainingTime.should.be.bignumber.at.most(windowLength);
+      const expectedAlloc = (i < firstPeriodWindows)
+        ? new BigNumber(web3.toWei(firstPeriodSupply, 'ether')).dividedToIntegerBy(firstPeriodWindows)
+        : new BigNumber(web3.toWei(secondPeriodSupply, 'ether')).dividedToIntegerBy(secondPeriodWindows);
+      allocation.should.be.bignumber.equal(expectedAlloc);
+      commitment.should.be.bignumber.equal(0);
+      window.should.be.bignumber.equal(i);
+    }
+  });
+
+  it('should return 0 for currentWindow() (first window marked 0)', async function () {
     await increaseTimeTo(windowTimeStamp(startTime, 0));
     let window = await distribution.currentWindow();
     window.should.be.bignumber.equal(0);
