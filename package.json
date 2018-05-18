@@ -13,7 +13,8 @@
     "lint:all:fix": "npm run lint:fix && npm run lint:sol:fix",
     "console": "truffle console",
     "tests": "cd scripts && tests.bat || ECHO.",
-    "migrate": "truffle.cmd --network testrpc migrate --reset"
+    "migrate": "truffle.cmd --network testrpc migrate --reset",
+    "compile": "truffle.cmd --network testrpc compile --all"
   },
   "repository": {
     "type": "git",
