@@ -17,8 +17,6 @@ contract MCoinDistribution is Ownable {
   event MoveFunds(uint256 value);
 
   MinableToken public MCoin;
-  
-  uint256 constant MAX_WINDOWS = 365;
 
   uint256 public firstPeriodWindows;
   uint256 public firstPeriodSupply;
@@ -67,7 +65,6 @@ contract MCoinDistribution is Ownable {
     windowLength = _windowLength;
 
     totalWindows = firstPeriodWindows.add(secondPeriodWindows);
-    require(totalWindows <= MAX_WINDOWS);
     require(currentWindow() == 0);
   }
 
@@ -249,10 +246,11 @@ contract MCoinDistribution is Ownable {
   * To recive the rewards use withdrawAll(), which consumes less gas.
   * @return the calculated number of tokens for every closed window
   */
-  function getAllRewards() public view returns (uint256[MAX_WINDOWS] rewards) {
-    // maxWindow = min(currentWindow(),MAX_WINDOWS)
-    uint256 maxWindow = currentWindow() < MAX_WINDOWS ? currentWindow() : MAX_WINDOWS;
-    for (uint256 i = 0; i < maxWindow; i++) {
+  function getAllRewards() public view returns (uint256[]) {
+    uint256[] memory rewards = new uint256[](totalWindows);
+    // lastClosedWindow = min(currentWindow(),totalWindows);
+    uint256 lastWindow = currentWindow() < totalWindows ? currentWindow() : totalWindows;
+    for (uint256 i = 0; i < lastWindow; i++) {
       rewards[i] = withdraw(i);
     }
     return rewards;
@@ -263,7 +261,8 @@ contract MCoinDistribution is Ownable {
   * a convinience function to be called for updating a GUI. 
   * @return the totals for commited Eth per window
   */
-  function getCommitmentsOf(address from) public view returns (uint256[MAX_WINDOWS] commitments) {
+  function getCommitmentsOf(address from) public view returns (uint256[]) {
+    uint256[] memory commitments = new uint256[](totalWindows);
     for (uint256 i = 0; i < totalWindows; i++) {
       commitments[i] = commitment[from][i];
     }
@@ -275,7 +274,8 @@ contract MCoinDistribution is Ownable {
   * a convinience function to be called for updating a GUI. 
   * @return the totals for commited Eth per window
   */
-  function getTotals() public view returns (uint256[MAX_WINDOWS] ethTotals) {
+  function getTotals() public view returns (uint256[]) {
+    uint256[] memory ethTotals = new uint256[](totalWindows);
     for (uint256 i = 0; i < totalWindows; i++) {
       ethTotals[i] = totals[i];
     }

@@ -592,6 +592,19 @@ contract('MCoinDistributionMock', function (accounts) {
     reward.should.be.bignumber.equal(expectedReward.plus(expectedReward2));
   });
 
+  it('should succesfully return correct array lenght for getAllRewards()', async function () {
+    const rewards = await distribution.getAllRewards({ from: buyer });
+    assert.equal(rewards.length, firstPeriodWindows + secondPeriodWindows);
+  });
+
+  it('should succesfully return empty array for getCommitmentsOf()', async function () {
+    const rewards = await distribution.getAllRewards({ from: buyer });
+    const arrayLen = firstPeriodWindows + secondPeriodWindows;
+    for (let i = 0; i < arrayLen; i++) {
+      rewards[i].should.be.bignumber.equal(0);
+    }
+  });
+
   it('should succesfully return an array for getAllRewards()', async function () {
     const commitWindow = 2;
     const commitWindow2 = 6;
@@ -617,6 +630,79 @@ contract('MCoinDistributionMock', function (accounts) {
 
     rewards[commitWindow].should.be.bignumber.equal(expectedReward);
     rewards[commitWindow2].should.be.bignumber.equal(expectedReward2);
+  });
+
+  it('should succesfully return correct array lenght for getCommitmentsOf()', async function () {
+    const commitments = await distribution.getCommitmentsOf(buyer);
+    assert.equal(commitments.length, firstPeriodWindows + secondPeriodWindows);
+  });
+
+  it('should succesfully return empty array for getCommitmentsOf()', async function () {
+    const commitments = await distribution.getCommitmentsOf(buyer);
+    const arrayLen = firstPeriodWindows + secondPeriodWindows;
+    for (let i = 0; i < arrayLen; i++) {
+      commitments[i].should.be.bignumber.equal(0);
+    }
+  });
+
+  it('should succesfully return an array for getCommitmentsOf()', async function () {
+    const commitWindow = 2;
+    const commitWindow2 = 6;
+    const withdrawWindow = 7;
+    await increaseTimeTo(windowTimeStamp(startTime, commitWindow));
+
+    const ethValue = web3.toWei(new BigNumber(0.1), 'ether');
+    const txObj = {
+      from: buyer,
+      value: ethValue,
+    };
+
+    await distribution.commit(txObj);
+    await increaseTimeTo(windowTimeStamp(startTime, commitWindow2));
+    await distribution.commit(txObj);
+
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow));
+    const commitments = await distribution.getCommitmentsOf(buyer);
+
+    commitments[commitWindow].should.be.bignumber.equal(ethValue);
+    commitments[commitWindow2].should.be.bignumber.equal(ethValue);
+  });
+
+  it('should succesfully return correct array lenght for getTotals()', async function () {
+    const totals = await distribution.getTotals();
+    assert.equal(totals.length, firstPeriodWindows + secondPeriodWindows);
+  });
+
+  it('should succesfully return empty array for getTotals()', async function () {
+    const totals = await distribution.getTotals();
+    const arrayLen = firstPeriodWindows + secondPeriodWindows;
+    for (let i = 0; i < arrayLen; i++) {
+      totals[i].should.be.bignumber.equal(0);
+    }
+  });
+
+  it('should succesfully return an array for getTotals()', async function () {
+    const commitWindow = 2;
+    const commitWindow2 = 6;
+    const withdrawWindow = 7;
+    await increaseTimeTo(windowTimeStamp(startTime, commitWindow));
+
+    const ethValue = web3.toWei(new BigNumber(0.1), 'ether');
+    const txObj = {
+      from: buyer,
+      value: ethValue,
+    };
+
+    await distribution.commit(txObj);
+    await increaseTimeTo(windowTimeStamp(startTime, commitWindow2));
+    await distribution.commit(txObj);
+    await distribution.commit({ from: buyer2, value: ethValue });
+
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow));
+    const totals = await distribution.getTotals();
+
+    totals[commitWindow].should.be.bignumber.equal(ethValue);
+    totals[commitWindow2].should.be.bignumber.equal(ethValue.plus(ethValue));
   });
 
   it('should moveFunds() successfully ', async function () {
