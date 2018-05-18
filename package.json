@@ -57,7 +57,7 @@
     "solidity-coverage": "^0.4.3",
     "solium": "1.1.7",
     "truffle": "^4.0.0",
-    "truffle-hdwallet-provider": "0.0.5"
+    "truffle-hdwallet-provider": "0.0.3"
   },
   "dependencies": {
     "dotenv": "^4.0.0",
