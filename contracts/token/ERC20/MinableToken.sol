@@ -38,11 +38,11 @@ contract MinableToken is MintableToken {
   * @return the commit value 
   * _value or prevCommit + reward + _value
   */
-  function commit(uint256 _value) public returns (uint256 commitValue) {
+  function commit(uint256 _value) public returns (uint256 commitmentValue) {
     require(0 < _value);
     require(_value <= balances[msg.sender]);
     
-    commitValue = _value;
+    commitmentValue = _value;
     uint256 prevCommit = miners[msg.sender].value;
     //In case user already commited, withdraw and recommit 
     // new commitment value: prevCommit + reward + _value
@@ -50,25 +50,25 @@ contract MinableToken is MintableToken {
       // withdraw Will revert if reward is negative
       uint256 prevReward;
       (prevReward, prevCommit) = withdraw();
-      commitValue = prevReward.add(prevCommit).add(_value);
+      commitmentValue = prevReward.add(prevCommit).add(_value);
     }
 
     // sub will revert if there is not enough balance.
-    balances[msg.sender] = balances[msg.sender].sub(commitValue);
-    Transfer(msg.sender, address(0), commitValue);
+    balances[msg.sender] = balances[msg.sender].sub(commitmentValue);
+    Transfer(msg.sender, address(0), commitmentValue);
 
-    totalStake_ = totalStake_.add(commitValue);
+    totalStake_ = totalStake_.add(commitmentValue);
 
     miners[msg.sender] = Commitment(
-      commitValue, // Commitment.value
+      commitmentValue, // Commitment.value
       block.number, // onBlockNumber
       totalStake_, // atStake = current stake + commitments value
       blockReward_ // onBlockReward
       );
     
-    Commit(msg.sender, commitValue, totalStake_, blockReward_); // solium-disable-line
+    Commit(msg.sender, commitmentValue, totalStake_, blockReward_); // solium-disable-line
 
-    return commitValue;
+    return commitmentValue;
   }
 
   /**
