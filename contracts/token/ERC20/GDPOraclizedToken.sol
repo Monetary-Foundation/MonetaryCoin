@@ -1,13 +1,13 @@
 pragma solidity ^0.4.23;
 
-import "./MinableToken.sol";
+import "./MineableToken.sol";
 
 
 /**
  * @title GDPOraclizedToken
  * @dev Interface for controling the mining rate using a GDP Oracle
  */
-contract GDPOraclizedToken is MinableToken {
+contract GDPOraclizedToken is MineableToken {
 
   event GDPOracleTransferred(address indexed previousOracle, address indexed newOracle);
   event BlockRewardChanged(int oldBlockReward, int newBlockReward);

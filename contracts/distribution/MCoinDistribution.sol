@@ -2,7 +2,7 @@ pragma solidity ^0.4.23;
 
 import "../math/SafeMath.sol";
 import "../ownership/Ownable.sol";
-import "../token/ERC20/MinableToken.sol";
+import "../token/ERC20/MineableToken.sol";
 
 
 /**
@@ -16,7 +16,7 @@ contract MCoinDistribution is Ownable {
   event Withdraw(address indexed from, uint256 value, uint256 window);
   event MoveFunds(uint256 value);
 
-  MinableToken public MCoin;
+  MineableToken public MCoin;
 
   uint256 public firstPeriodWindows;
   uint256 public firstPeriodSupply;
@@ -79,7 +79,7 @@ contract MCoinDistribution is Ownable {
   * @dev initiate the distribution
   * @param _MCoin the token to distribute
   */
-  function init(MinableToken _MCoin) public onlyOwner {
+  function init(MineableToken _MCoin) public onlyOwner {
     require(address(MCoin) == address(0));
     require(_MCoin.owner() == address(this));
     require(_MCoin.totalSupply() == 0);

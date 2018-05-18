@@ -1,16 +1,16 @@
 pragma solidity ^0.4.23;
 
-import "../token/ERC20/MinableM5Token.sol";
+import "../token/ERC20/MineableM5Token.sol";
 
 
 // mock class using StandardToken
-contract MinableM5TokenMock is MinableM5Token {
+contract MineableM5TokenMock is MineableM5Token {
 
   string public constant name = "Token"; // solium-disable-line uppercase
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  function MinableM5TokenMock(
+  function MineableM5TokenMock(
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward,

@@ -8,7 +8,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var StandardTokenMock = artifacts.require('MinableTokenMockERC20');
+var StandardTokenMock = artifacts.require('MineableTokenMockERC20');
 
 const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 const MCoinMock = artifacts.require('MCoinMock');

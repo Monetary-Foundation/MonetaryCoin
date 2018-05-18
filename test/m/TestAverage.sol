@@ -1,13 +1,13 @@
 pragma solidity ^0.4.23;
 import "truffle/Assert.sol";
-import "../../contracts/mocks/MinableTokenMockNoParams.sol";
+import "../../contracts/mocks/MineableTokenMockNoParams.sol";
 
 
 contract TestAverage {
-  MinableTokenMockNoParams coin;
+  MineableTokenMockNoParams coin;
   
   function TestAverage() public {
-    coin = new MinableTokenMockNoParams();
+    coin = new MineableTokenMockNoParams();
   }
 
   function testAssumptions() public {

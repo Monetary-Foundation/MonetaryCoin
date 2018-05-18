@@ -6,7 +6,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-var MinableM5TokenMock = artifacts.require('MinableM5TokenMock');
+var MineableM5TokenMock = artifacts.require('MineableM5TokenMock');
 var M5LogicMock2 = artifacts.require('M5LogicMock2');
 var M5LogicMock4 = artifacts.require('M5LogicMock4');
 var M5LogicMock5 = artifacts.require('M5LogicMock5');
@@ -15,7 +15,7 @@ var M5LogicMock7 = artifacts.require('M5LogicMock7');
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-contract('MinableM5Token', function (accounts) {
+contract('MineableM5Token', function (accounts) {
   let token;
 
   const initialAccount = accounts[0];
@@ -25,7 +25,7 @@ contract('MinableM5Token', function (accounts) {
   const upgradeManager = accounts[3];
 
   beforeEach(async function () {
-    token = await MinableM5TokenMock.new(initialAccount, initialSupply, setBlockReward, GDPOracle, upgradeManager);
+    token = await MineableM5TokenMock.new(initialAccount, initialSupply, setBlockReward, GDPOracle, upgradeManager);
   });
 
   it('should be created with M5Token contract address = 0', async function () {

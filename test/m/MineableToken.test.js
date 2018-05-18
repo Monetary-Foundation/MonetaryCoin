@@ -12,7 +12,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-// const MinableTokenMock = artifacts.require('MinableTokenMock');
+// const MineableTokenMock = artifacts.require('MineableTokenMock');
 
 const intAvg = (a, b) => new BigNumber(a + b).dividedToIntegerBy(2);
 
@@ -24,7 +24,7 @@ const MCoinMock = artifacts.require('MCoinMock');
 const windowLength = duration.minutes(5);
 
 // for tests run: ganache-cli -u0 -u1 -u2 -u3
-contract('MinableToken', function (accounts) {
+contract('MineableToken', function (accounts) {
   let token;
   let distribution;
 

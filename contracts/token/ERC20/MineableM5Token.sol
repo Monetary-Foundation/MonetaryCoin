@@ -10,7 +10,7 @@ import "./GDPOraclizedToken.sol";
  * The logic for M5 mining will be determined after all economic considerations were addressed.
  * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permenently seal the upgrade ability.
 */
-contract MinableM5Token is GDPOraclizedToken { 
+contract MineableM5Token is GDPOraclizedToken { 
   
   event M5TokenUpgrade(address indexed oldM5Token, address indexed newM5Token);
   event M5LogicUpgrade(address indexed oldM5Logic, address indexed newM5Logic);

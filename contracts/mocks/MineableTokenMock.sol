@@ -1,10 +1,10 @@
 pragma solidity ^0.4.23;
 
-import "../token/ERC20/MinableM5Token.sol";
+import "../token/ERC20/MineableToken.sol";
 
 
 // mock class using StandardToken
-contract MinableM5TokenIntegrationMock is MinableM5Token {
+contract MineableTokenMock is MineableToken {
 
   string public constant name = "Token"; // solium-disable-line uppercase
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
@@ -12,32 +12,21 @@ contract MinableM5TokenIntegrationMock is MinableM5Token {
 
   //uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
 
-  function MinableM5TokenIntegrationMock(
+  function MineableTokenMock(
     address initialAccount,
     uint256 initialSupply,
-    int256 blockReward,
-    address GDPOracle, // solium-disable-line mixedcase
-    address upgradeManager
+    int256 blockReward
     ) public 
     {
     require(0 < initialSupply);
     require(0 < blockReward);
 
-    totalSupply_ = initialSupply;
+    totalSupply_ = initialSupply; // * (10 ** uint256(decimals));
 
     balances[initialAccount] = initialSupply;
     emit Transfer(0x0, initialAccount, initialSupply);
     
-    blockReward_ = blockReward;
-    emit BlockRewardChanged(0, blockReward_);
-
-    GDPOracle_ = GDPOracle;
-    emit GDPOracleTransferred(0x0, GDPOracle_);
-
-    //M5 specific:
-    M5Token_ = address(0);
-    M5Logic_ = address(0);
-    upgradeManager_ = upgradeManager;
+    blockReward_ = blockReward;   
   }
 
 }

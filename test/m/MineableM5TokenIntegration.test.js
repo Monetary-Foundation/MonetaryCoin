@@ -10,7 +10,7 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should();
 
-// var MinableM5GDPOraclizedTokenMock = artifacts.require('MinableM5TokenIntegrationMock');
+// var MineableM5GDPOraclizedTokenMock = artifacts.require('MineableM5TokenIntegrationMock');
 const M5TokenMock = artifacts.require('M5TokenMock');
 const M5LogicMock3 = artifacts.require('M5LogicMock3');
 
@@ -20,7 +20,7 @@ const MCoinMock = artifacts.require('MCoinMock');
 const windowLength = duration.minutes(5);
 
 // for tests run: ganache-cli -u0 -u1 -u2 -u3
-contract('MinableM5TokenIntegrationMock', function (accounts) {
+contract('MineableM5TokenIntegrationMock', function (accounts) {
   let token;
   let distribution;
   let M5Token;
