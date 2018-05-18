@@ -17,7 +17,7 @@ contract MinableTokenMockNoParams is MinableToken {
   function MinableTokenMockNoParams() public {
     totalSupply_ = _initialSupply; 
     balances[_initialAccount] = _initialSupply;
-    Transfer(0x0, _initialAccount, _initialSupply);
+    emit Transfer(0x0, _initialAccount, _initialSupply);
     
     blockReward_ = _blockReward;   
   }

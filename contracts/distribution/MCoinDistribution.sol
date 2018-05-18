@@ -191,7 +191,7 @@ contract MCoinDistribution is Ownable {
     // Add to window total
     totals[window] = totals[window].add(msg.value);
     // Log
-    Commit(msg.sender, msg.value, window);
+    emit Commit(msg.sender, msg.value, window);
   }
 
   /**
@@ -227,7 +227,7 @@ contract MCoinDistribution is Ownable {
     // Transfer the tokens
     MCoin.transfer(msg.sender, reward);
     // Log
-    Withdraw(msg.sender, reward, window);
+    emit Withdraw(msg.sender, reward, window);
     return reward;
   }
 
@@ -292,7 +292,7 @@ contract MCoinDistribution is Ownable {
 
     foundationWallet.transfer(value);
     
-    MoveFunds(value);
+    emit MoveFunds(value);
     return value;
   }
 }

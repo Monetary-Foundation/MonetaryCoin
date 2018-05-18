@@ -42,7 +42,7 @@ contract ComplianceStore is MultihashStore {
     returns (bool) 
   {
     store[msg.sender] = Multihash(_hashFunction, _size, _hash, block.timestamp); // solium-disable-line
-    SetHash(msg.sender, _hashFunction, _size, _hash, block.timestamp); // solium-disable-line
+    emit SetHash(msg.sender, _hashFunction, _size, _hash, block.timestamp); // solium-disable-line
     return true;
   }
 

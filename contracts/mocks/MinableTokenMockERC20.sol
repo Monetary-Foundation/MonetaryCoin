@@ -19,7 +19,7 @@ contract MinableTokenMockERC20 is MinableToken {
     {
     totalSupply_ = initialBalance;
     balances[initialAccount] = initialBalance;
-    Transfer(0x0, initialAccount, initialBalance);
+    emit Transfer(0x0, initialAccount, initialBalance);
     
 
     //totalSupply_ = INITIAL_SUPPLY;

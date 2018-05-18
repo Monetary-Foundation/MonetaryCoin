@@ -20,10 +20,10 @@ contract MCoinMock is MinableM5Token {
     require(GDPOracle != address(0));
     
     blockReward_ = blockReward;
-    BlockRewardChanged(0, blockReward_);
+    emit BlockRewardChanged(0, blockReward_);
 
     GDPOracle_ = GDPOracle;
-    GDPOracleTransferred(0x0, GDPOracle_);
+    emit GDPOracleTransferred(0x0, GDPOracle_);
 
     //M5 specific:
     M5Token_ = address(0);

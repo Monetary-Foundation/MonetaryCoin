@@ -25,13 +25,13 @@ contract MinableM5TokenMock is MinableM5Token {
     totalSupply_ = initialSupply; 
 
     balances[initialAccount] = initialSupply;
-    Transfer(0x0, initialAccount, initialSupply);
+    emit Transfer(0x0, initialAccount, initialSupply);
     
     blockReward_ = blockReward;   
-    BlockRewardChanged(0, blockReward_);
+    emit BlockRewardChanged(0, blockReward_);
 
     GDPOracle_ = GDPOracle;
-    GDPOracleTransferred(0x0, GDPOracle_);
+    emit GDPOracleTransferred(0x0, GDPOracle_);
 
     //M5 specific:
     M5Token_ = address(0);

@@ -44,7 +44,7 @@ contract GDPOraclizedToken is MinableToken {
    * @dev Allows the pendingGDPOracle_ address to finalize the transfer.
    */
   function claimOracle() onlyPendingGDPOracle public {
-    GDPOracleTransferred(GDPOracle_, pendingGDPOracle_);
+    emit GDPOracleTransferred(GDPOracle_, pendingGDPOracle_);
     GDPOracle_ = pendingGDPOracle_;
     pendingGDPOracle_ = address(0);
   }
@@ -57,7 +57,7 @@ contract GDPOraclizedToken is MinableToken {
     // protect against error / overflow
     require(0 <= newBlockReward);
     
-    BlockRewardChanged(blockReward_, newBlockReward);
+    emit BlockRewardChanged(blockReward_, newBlockReward);
     blockReward_ = newBlockReward;
   }
 
@@ -68,7 +68,7 @@ contract GDPOraclizedToken is MinableToken {
   function setNegativeGrowth(int256 newBlockReward) public onlyGDPOracle returns(bool) {
     require(newBlockReward < 0);
 
-    BlockRewardChanged(blockReward_, newBlockReward);
+    emit BlockRewardChanged(blockReward_, newBlockReward);
     blockReward_ = newBlockReward;
   }
 

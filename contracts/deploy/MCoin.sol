@@ -28,10 +28,10 @@ contract MCoin is MinableM5Token {
     symbol = tokenSymbol;
 
     blockReward_ = toDecimals(blockReward);
-    BlockRewardChanged(0, blockReward_);
+    emit BlockRewardChanged(0, blockReward_);
 
     GDPOracle_ = GDPOracle;
-    GDPOracleTransferred(0x0, GDPOracle_);
+    emit GDPOracleTransferred(0x0, GDPOracle_);
 
     M5Token_ = address(0);
     M5Logic_ = address(0);

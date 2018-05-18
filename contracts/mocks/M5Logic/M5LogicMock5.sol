@@ -37,7 +37,7 @@ contract M5LogicMock5 is GDPOraclizedToken {
 
     miners[msg.sender].value = 0;
 
-    WithdrawM5(msg.sender, commitmentValue, reward); // solium-disable-line
+    emit WithdrawM5(msg.sender, commitmentValue, reward); // solium-disable-line
     return (reward,commitmentValue);
   }
 

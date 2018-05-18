@@ -71,7 +71,7 @@ contract M5LogicMock3 is GDPOraclizedToken {
     //mint M5 token for msg.sender:
     require(M5Token_.call(bytes4(keccak256("mint(address,uint256)")), msg.sender, reward)); // solium-disable-line
 
-    WithdrawM5(msg.sender, commitmentValue, reward);
+    emit WithdrawM5(msg.sender, commitmentValue, reward);
     return (reward, commitmentValue);
   }
 
@@ -94,8 +94,8 @@ contract M5LogicMock3 is GDPOraclizedToken {
     balances[msg.sender] = balances[msg.sender].add(reward); 
     totalSupply_ = totalSupply_.add(reward);   
 
-    Transfer(0x0, msg.sender, reward);
-    Swap(msg.sender, _value, reward);
+    emit Transfer(0x0, msg.sender, reward);
+    emit Swap(msg.sender, _value, reward);
     return true;
   }
 }

@@ -55,7 +55,7 @@ contract MinableToken is MintableToken {
 
     // sub will revert if there is not enough balance.
     balances[msg.sender] = balances[msg.sender].sub(commitmentValue);
-    Transfer(msg.sender, address(0), commitmentValue);
+    emit Transfer(msg.sender, address(0), commitmentValue);
 
     totalStake_ = totalStake_.add(commitmentValue);
 
@@ -66,7 +66,7 @@ contract MinableToken is MintableToken {
       blockReward_ // onBlockReward
       );
     
-    Commit(msg.sender, commitmentValue, totalStake_, blockReward_); // solium-disable-line
+    emit Commit(msg.sender, commitmentValue, totalStake_, blockReward_); // solium-disable-line
 
     return commitmentValue;
   }
@@ -90,11 +90,11 @@ contract MinableToken is MintableToken {
     totalSupply_ = totalSupply_.add(reward);
     
     balances[msg.sender] = balances[msg.sender].add(withdrawnSum);
-    Transfer(address(0), msg.sender, commitmentValue.add(reward));
+    emit Transfer(address(0), msg.sender, commitmentValue.add(reward));
     
     delete miners[msg.sender];
     
-    Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
+    emit Withdraw(msg.sender, reward, commitmentValue);  // solium-disable-line
     return (reward, commitmentValue);
   }
 

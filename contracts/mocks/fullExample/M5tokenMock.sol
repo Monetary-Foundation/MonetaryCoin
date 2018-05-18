@@ -26,7 +26,7 @@ contract M5tokenMock is MintableToken {
 
     balances[from] = balances[from].sub(_value);
     totalSupply_ = totalSupply_.sub(_value);
-    Transfer(msg.sender, 0x0, _value);
-    Swap(from, _value);
+    emit Transfer(msg.sender, 0x0, _value);
+    emit Swap(from, _value);
   }
 }

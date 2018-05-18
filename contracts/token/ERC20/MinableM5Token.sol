@@ -72,7 +72,7 @@ contract MinableM5Token is GDPOraclizedToken {
    */
   function upgradeM5Token(address newM5Token) public onlyUpgradeManager { // solium-disable-line
     require(newM5Token != address(0));
-    M5TokenUpgrade(M5Token_, newM5Token);
+    emit M5TokenUpgrade(M5Token_, newM5Token);
     M5Token_ = newM5Token;
   }
 
@@ -82,7 +82,7 @@ contract MinableM5Token is GDPOraclizedToken {
    */
   function upgradeM5Logic(address newM5Logic) public onlyUpgradeManager { // solium-disable-line
     require(newM5Logic != address(0));
-    M5LogicUpgrade(M5Logic_, newM5Logic);
+    emit M5LogicUpgrade(M5Logic_, newM5Logic);
     M5Logic_ = newM5Logic;
   }
 
@@ -94,8 +94,8 @@ contract MinableM5Token is GDPOraclizedToken {
   function upgradeM5(address newM5Token, address newM5Logic) public onlyUpgradeManager { // solium-disable-line
     require(newM5Token != address(0));
     require(newM5Logic != address(0));
-    M5TokenUpgrade(M5Token_, newM5Token);
-    M5LogicUpgrade(M5Logic_, newM5Logic);
+    emit M5TokenUpgrade(M5Token_, newM5Token);
+    emit M5LogicUpgrade(M5Logic_, newM5Logic);
     M5Token_ = newM5Token;
     M5Logic_ = newM5Logic;
   }
@@ -106,7 +106,7 @@ contract MinableM5Token is GDPOraclizedToken {
   */
   function finishUpgrade() onlyUpgradeManager public returns (bool) {
     isUpgradeFinished_ = true;
-    FinishUpgrade();
+    emit FinishUpgrade();
     return true;
   }
 
