@@ -148,15 +148,6 @@ contract('MinableM5Token', function (accounts) {
     await assertRevert(token.getM5Reward(accounts[0]));
   });
 
-  // TODO: REVISE:
-  // it('should revert if non exist function (after logic upgrade to address)', async function () {
-  //   await token.upgradeM5Logic(accounts[2]);
-  //   await token.commit(5);
-  //   // await assertRevert(token.getM5Reward(accounts[0]));
-  //   let ans = await token.getM5Reward(accounts[0]);
-  //   console.log(ans.toString());
-  // });
-
   it('should revert if calling non existant function in logic contract', async function () {
     await token.upgradeM5Logic(accounts[2], { from: upgradeManager });
     await token.commit(5);
