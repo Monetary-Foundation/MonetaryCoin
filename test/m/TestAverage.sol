@@ -39,7 +39,7 @@ contract TestAverage {
 
   function testAverageShouldNotRevert() public {
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("average(uint256,uint256)")), 1, 2);
+    bool result = address(coin).call(bytes4(keccak256("average(uint256,uint256)")), 1, 2);
 
     Assert.equal(result, true, "Should not throw");
   }
@@ -49,7 +49,7 @@ contract TestAverage {
     uint256 a = ~ uint256(0); //max uint256
     uint256 b = ~ uint256(0);
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("average(uint256,uint256)")), a, b);
+    bool result = address(coin).call(bytes4(keccak256("average(uint256,uint256)")), a, b);
 
     Assert.equal(result, false, "Should throw on overflow");
   }
@@ -80,7 +80,7 @@ contract TestAverage {
     int256 a = 5;
     int256 b = -5;
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("signedAverage(int256,int256)")), a, b);
+    bool result = address(coin).call(bytes4(keccak256("signedAverage(int256,int256)")), a, b);
 
     Assert.equal(result, true, "Should throw on overflow");
   }
@@ -88,7 +88,7 @@ contract TestAverage {
   function testSignedAverageShouldRevert() public {
     int256 INT256_MAX = int256(~((uint256(1) << 255)));
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MAX, INT256_MAX);
+    bool result = address(coin).call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MAX, INT256_MAX);
 
     Assert.equal(result, false, "Should throw on overflow");
   }
@@ -97,7 +97,7 @@ contract TestAverage {
     int256 INT256_MIN = int256((uint256(1) << 255));
     int256 INT256 = int256((uint256(1) << 255)) + 2;
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MIN, INT256);
+    bool result = address(coin).call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MIN, INT256);
 
     Assert.equal(result, false, "Should throw on overflow");
   }
@@ -105,7 +105,7 @@ contract TestAverage {
   function testSignedAverageShouldRevert3() public {
     int256 INT256_MIN = int256((uint256(1) << 255));
     // will return false on revert / throw
-    bool result = coin.call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MIN, INT256_MIN);
+    bool result = address(coin).call(bytes4(keccak256("signedAverage(int256,int256)")), INT256_MIN, INT256_MIN);
 
     Assert.equal(result, false, "Should throw on overflow");
   }
