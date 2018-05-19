@@ -12,7 +12,7 @@ contract MineableM5TokenIntegrationMock is MineableM5Token {
 
   //uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
 
-  function MineableM5TokenIntegrationMock(
+  constructor(
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward,

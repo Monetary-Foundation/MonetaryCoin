@@ -13,7 +13,7 @@ contract MCoin is MineableM5Token {
   string public symbol; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  function MCoin(
+  constructor(
     string tokenName,
     string tokenSymbol,
     uint256 blockReward, // will be transformed using toDecimals()

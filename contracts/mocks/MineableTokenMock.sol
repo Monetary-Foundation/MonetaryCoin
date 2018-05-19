@@ -12,7 +12,7 @@ contract MineableTokenMock is MineableToken {
 
   //uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
 
-  function MineableTokenMock(
+  constructor(
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward

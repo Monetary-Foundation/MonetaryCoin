@@ -14,7 +14,7 @@ contract MineableTokenMockNoParams is MineableToken {
   uint256 public constant _initialSupply = 10; // solium-disable-line uppercase
   int256 public constant _blockReward = 5; // solium-disable-line uppercase
 
-  function MineableTokenMockNoParams() public {
+  constructor() public {
     totalSupply_ = _initialSupply; 
     balances[_initialAccount] = _initialSupply;
     emit Transfer(0x0, _initialAccount, _initialSupply);

@@ -35,7 +35,7 @@ contract MCoinDistribution is Ownable {
   mapping (uint256 => uint256) public totals;
   mapping (address => mapping (uint256 => uint256)) public commitment;
   
-  function MCoinDistribution (
+  constructor(
     uint256 _firstPeriodWindows,
     uint256 _firstPeriodSupply,
     uint256 _secondPeriodWindows,

@@ -14,7 +14,7 @@ contract MCoinDistributionMock is MCoinDistribution {
   
   uint8 public constant DECIMALS = 18;
 
-  function MCoinDistributionMock (
+  constructor (
     uint256 firstPeriodWindows,
     uint256 firstPeriodSupply,
     uint256 secondPeriodWindows,

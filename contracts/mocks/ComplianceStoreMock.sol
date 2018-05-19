@@ -7,7 +7,7 @@ import "../storage/ComplianceStore.sol";
 // mock class using ComplianceStore
 contract ComplianceStoreMock is ComplianceStore {
 
-  function ComplianceStoreMock() public {
+  constructor() public {
     
   }
 }

@@ -10,7 +10,7 @@ contract MCoinMock is MineableM5Token {
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  function MCoinMock(
+  constructor(
     int256 blockReward,
     address GDPOracle,
     address upgradeManager

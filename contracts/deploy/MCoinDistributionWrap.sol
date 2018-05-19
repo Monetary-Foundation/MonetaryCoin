@@ -14,7 +14,7 @@ contract MCoinDistributionWrap is MCoinDistribution {
   
   uint8 public constant decimals = 18;  // solium-disable-line uppercase
 
-  function MCoinDistributionWrap (
+  constructor(
     uint256 firstPeriodWindows,
     uint256 firstPeriodSupply,
     uint256 secondPeriodWindows,

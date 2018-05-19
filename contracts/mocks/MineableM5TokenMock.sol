@@ -10,7 +10,7 @@ contract MineableM5TokenMock is MineableM5Token {
   string public constant symbol = "SIMb"; // solium-disable-line uppercase
   uint8 public constant decimals = 18; // solium-disable-line uppercase
 
-  function MineableM5TokenMock(
+  constructor(
     address initialAccount,
     uint256 initialSupply,
     int256 blockReward,

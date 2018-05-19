@@ -10,7 +10,7 @@ contract M5tokenMock is MintableToken {
   //   balances[initialAccount] = initialBalance;
   //   totalSupply_ = initialBalance;
   // }
-  function M5tokenMock() public {}
+  constructor() public {}
 
   event Swap(address indexed from, uint256 _value);
 

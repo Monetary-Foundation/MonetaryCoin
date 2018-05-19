@@ -12,7 +12,7 @@ contract MineableTokenMockERC20 is MineableToken {
 
   //uint256 public constant INITIAL_SUPPLY = 10000 * (10 ** uint256(decimals));
 
-  function MineableTokenMockERC20(
+  constructor(
     address initialAccount,
     uint256 initialBalance
     ) public 
