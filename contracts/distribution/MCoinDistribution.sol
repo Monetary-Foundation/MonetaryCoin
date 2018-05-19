@@ -241,9 +241,9 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev returns a array filed with reward for every closed window
+  * @dev returns a array filled with reward for every closed window
   * a convinience function to be called for updating a GUI. 
-  * To recive the rewards use withdrawAll(), which consumes less gas.
+  * To get the reward tokens use withdrawAll(), which consumes less gas.
   * @return the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[]) {
@@ -257,9 +257,9 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev returns a array filed with totals for every closed window
+  * @dev returns a array filled with commitments of address for every window
   * a convinience function to be called for updating a GUI. 
-  * @return the totals for commited Eth per window
+  * @return the commited Eth per window of a given address
   */
   function getCommitmentsOf(address from) public view returns (uint256[]) {
     uint256[] memory commitments = new uint256[](totalWindows);
@@ -270,7 +270,7 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev returns a array filed with eth totals for every window
+  * @dev returns a array filled with eth totals for every window
   * a convinience function to be called for updating a GUI. 
   * @return the totals for commited Eth per window
   */
