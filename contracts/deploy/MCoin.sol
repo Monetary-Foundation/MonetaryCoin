@@ -4,8 +4,8 @@ import "../token/ERC20/MineableM5Token.sol";
 
 
 /**
- * @title MERO
- * @dev MERO
+ * @title MCoin
+ * @dev MCoin constract
  */
 contract MCoin is MineableM5Token {
 

@@ -1,13 +1,12 @@
 pragma solidity ^0.4.23;
 
 import "../math/SafeMath.sol";
-// import "../ownership/Ownable.sol";
 import "../distribution/MCoinDistribution.sol";
 
 
 /**
  * @title MCoinDistributionWrap
- * @dev MCoinDistributionWrap
+ * @dev MCoinDistribution wrapper contract
  */
 contract MCoinDistributionWrap is MCoinDistribution {
   using SafeMath for uint256;

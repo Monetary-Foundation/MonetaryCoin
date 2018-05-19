@@ -1,15 +1,4 @@
-# MContracts
-
-## tests:
-run testRpc: 
-
-`ganache-cli -u0 -u1 -u2`
-
-on windows: 
-
-`cd scripts`
-
-`tests.bat`
+# MonetaryCoin smart contracts
 
 
 ## License

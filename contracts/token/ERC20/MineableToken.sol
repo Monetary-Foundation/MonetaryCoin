@@ -6,7 +6,7 @@ import "./MintableToken.sol";
 /**
  * @title Mineable token
  * @dev ERC20 Token with Pos mining
- * The blockReward_ is controlled by GDP.
+ * The blockReward_ is controlled by a GDP oracle.
  * This type of mining will be used and during initial distribution period and when the growth is positive.
  * for mining during negative growth period refer to MineableM5Token.sol
  * Unlike standard erc20 token, the totalSupply is equal sum(all user balances) + totalStake
@@ -17,12 +17,12 @@ contract MineableToken is MintableToken {
   event Withdraw(address indexed from, uint reward, uint commitment);
 
   uint256 totalStake_ = 0;
-  int256 blockReward_; //could be positive or negative according to GDP change
+  int256 blockReward_;         //could be positive or negative according to GDP
 
   struct Commitment {
-    uint256 value;          // value commited to mining
+    uint256 value;             // value commited to mining
     uint256 onBlockNumber;     // commitment done on block
-    uint256 atStake; // stake during commitment
+    uint256 atStake;           // stake during commitment
     int256 onBlockReward;
   }
 
