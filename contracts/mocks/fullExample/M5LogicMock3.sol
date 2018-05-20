@@ -4,8 +4,8 @@ import "../../token/ERC20/GDPOraclizedToken.sol";
 
 
 /**
- * @title M5 Mineable token 
- * @dev ERC20 Token for mining when GDP is negative
+ * @title M5LogicMock3
+ * @dev ERC20 Token for mining when GDP is negative - Reference implementation of M5 mining logic 
 */
 contract M5LogicMock3 is GDPOraclizedToken { 
   string public constant name = "Token"; // solium-disable-line uppercase
@@ -15,7 +15,8 @@ contract M5LogicMock3 is GDPOraclizedToken {
   address M5Token_;
   address M5Logic_;
   address upgradeManager_;
-  bool isUpgradeFinished_ = false;  
+  bool isUpgradeFinished_ = false;
+    
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
   * @return An uint256 representing the reward amount

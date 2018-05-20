@@ -4,12 +4,12 @@ import "../../token/ERC20/BurnableToken.sol";
 import "../../token/ERC20/MintableToken.sol";
 
 
+/**
+ * @title M5tokenMock
+ * @dev M5 ERC20 Token for mining when GDP is negative - Reference implementation of M5 token 
+*/
 contract M5tokenMock is MintableToken {
 
-  // function M5tokenMock(address initialAccount, uint initialBalance) public {
-  //   balances[initialAccount] = initialBalance;
-  //   totalSupply_ = initialBalance;
-  // }
   constructor() public {}
 
   event Swap(address indexed from, uint256 _value);
