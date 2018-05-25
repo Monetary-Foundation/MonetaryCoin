@@ -4,11 +4,11 @@ import "./GDPOraclizedToken.sol";
 
 
 /**
- * @title M5 mining ability.
- * @dev This contract adds the ability to mine for M5 tokens when growth is negative.
- * M5 token is a distinct ERC20 token which could be obtained only when the GDP growth is negative.
+ * @title MineableM5Token
+ * @notice This contract adds the ability to mine for M5 tokens when growth is negative.
+ * The M5 token is a distinct ERC20 token which could be obtained only when the GDP growth is negative.
  * The logic for M5 mining will be determined after all economic considerations were addressed.
- * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permenently seal the upgrade ability.
+ * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to seal the upgradeability permanently.
 */
 contract MineableM5Token is GDPOraclizedToken { 
   
@@ -112,6 +112,8 @@ contract MineableM5Token is GDPOraclizedToken {
 
   /**
   * @dev Calculate the reward if withdrawM5() happans on this block
+  * @notice This is a wrapper, which calls and return result from M5Logic
+  * the actual logic is found in the M5Logic contract
   * @param _miner The address of the _miner
   * @return An uint256 representing the reward amount
   */
@@ -157,8 +159,10 @@ contract MineableM5Token is GDPOraclizedToken {
 
   /**
   * @dev withdraw M5 reward, only appied to mining when GDP is negative
-  * @return reward
-  * @return commitmentValue
+  * @return {
+    "uint256 reward": the new M5 supply
+    "uint256 commitmentValue": the commitment to be returned
+    }
   */
   function withdrawM5() public returns (uint256 reward, uint256 commitmentValue) {
     require(M5Logic_ != address(0));

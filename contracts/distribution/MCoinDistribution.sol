@@ -8,6 +8,15 @@ import "../token/ERC20/MineableToken.sol";
 /**
  * @title MCoinDistribution
  * @dev MCoinDistribution
+ * Used to distribute a fixed amount of token per window.
+ * Users can commit Ether to a certain window.
+ * After a window closes, a user can withdraw the reward using  
+ * withdraw(uint256 window) function or use
+ * withdrawAll() function to get tokens from all windows in a single transaction.
+ * The amount of tokens allocated to a user for a given window equals 
+ * (window allocation) * (user eth) / (total eth) 
+ * User can get the details of the current window using detailsOfWindow() function.
+ * The first-period allocation is larger than second-period allocation (per window)
  */
 contract MCoinDistribution is Ownable {
   using SafeMath for uint256;
@@ -108,7 +117,7 @@ contract MCoinDistribution is Ownable {
   * @dev Return the window number for given timestamp
   * @param timestamp 
   * @return number of the current window in [0,inf)
-  * 0 will be returned before distribution start and during the first window.
+  * zero will be returned before distribution start and during the first window.
   */
   function windowOf(uint256 timestamp) view public returns (uint256) {
     return (startTimestamp < timestamp) 
@@ -119,7 +128,14 @@ contract MCoinDistribution is Ownable {
   /**
   * @dev Return information about the selected window
   * @param window number: [0-totalWindows)
-  * @return 
+  * @return {
+    "uint256 start": window start timestamp
+    "uint256 end": window end timestamp
+    "uint256 remainingTime": remaining time (sec), zero if ended
+    "uint256 allocation": number of tokens to be distributed
+    "uint256 totalEth": total eth commited this window
+    "uint256 number": # of requested window
+    }
   */
   function detailsOf(uint256 window) view public 
     returns (
@@ -128,7 +144,7 @@ contract MCoinDistribution is Ownable {
       uint256 remainingTime, // remaining time (sec), zero if ended
       uint256 allocation,    // number of tokens to be distributed
       uint256 totalEth,      // total eth commited this window
-      uint256 number         // requested window
+      uint256 number         // # of requested window
     ) 
     {
     require(window < totalWindows);
@@ -144,8 +160,15 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev Return information about the current window
-  * @return 
+  * @dev Return information for the current window
+  * @return {
+    "uint256 start": window start timestamp
+    "uint256 end": window end timestamp
+    "uint256 remainingTime": remaining time (sec), zero if ended
+    "uint256 allocation": number of tokens to be distributed
+    "uint256 totalEth": total eth commited this window
+    "uint256 number": # of requested window
+    }
   */
   function detailsOfWindow() view public
     returns (
@@ -241,10 +264,10 @@ contract MCoinDistribution is Ownable {
   }
 
   /**
-  * @dev returns a array filled with reward for every closed window
+  * @dev returns a array which contains reward for every closed window
   * a convinience function to be called for updating a GUI. 
   * To get the reward tokens use withdrawAll(), which consumes less gas.
-  * @return the calculated number of tokens for every closed window
+  * @return uint256[] rewards - the calculated number of tokens for every closed window
   */
   function getAllRewards() public view returns (uint256[]) {
     uint256[] memory rewards = new uint256[](totalWindows);
@@ -259,7 +282,7 @@ contract MCoinDistribution is Ownable {
   /**
   * @dev returns a array filled with commitments of address for every window
   * a convinience function to be called for updating a GUI. 
-  * @return the commited Eth per window of a given address
+  * @return uint256[] commitments - the commited Eth per window of a given address
   */
   function getCommitmentsOf(address from) public view returns (uint256[]) {
     uint256[] memory commitments = new uint256[](totalWindows);
@@ -272,7 +295,7 @@ contract MCoinDistribution is Ownable {
   /**
   * @dev returns a array filled with eth totals for every window
   * a convinience function to be called for updating a GUI. 
-  * @return the totals for commited Eth per window
+  * @return uint256[] ethTotals - the totals for commited Eth per window
   */
   function getTotals() public view returns (uint256[]) {
     uint256[] memory ethTotals = new uint256[](totalWindows);

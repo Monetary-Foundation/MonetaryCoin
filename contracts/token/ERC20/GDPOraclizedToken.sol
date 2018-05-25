@@ -5,7 +5,9 @@ import "./MineableToken.sol";
 
 /**
  * @title GDPOraclizedToken
- * @dev Interface for controling the mining rate using a GDP Oracle
+ * @dev An interface for the GDP Oracle to control the mining rate.
+ * For security reasons, two distinct functions were created: 
+ * setPositiveGrowth() and setNegativeGrowth()
  */
 contract GDPOraclizedToken is MineableToken {
 

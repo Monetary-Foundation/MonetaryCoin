@@ -6,7 +6,9 @@ import "../distribution/MCoinDistribution.sol";
 
 /**
  * @title MCoinDistributionWrap
- * @dev MCoinDistribution wrapper contract
+ * @dev MCoinDistribution wrapper contract.
+ * This contracts wraps MCoinDistribution.sol and used to create the distribution contract.
+ * See MCoinDistribution.sol for full distribution details.
  */
 contract MCoinDistributionWrap is MCoinDistribution {
   using SafeMath for uint256;

@@ -3,8 +3,8 @@ pragma solidity ^0.4.23;
 
 /**
  * @title MultihashStore
- * @dev interface for storing and retriving a multihash
- * @dev supports one multihash per address
+ * @dev interface for storing and retrieving a multihash
+ * @notice supports one multihash per address
  */
 contract MultihashStore {
   

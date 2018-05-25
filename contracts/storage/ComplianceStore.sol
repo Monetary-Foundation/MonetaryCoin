@@ -5,14 +5,14 @@ import "./MultihashStore.sol";
 
 /**
  * @title ComplianceStore
- * @dev enables to store optional Compliance data
+ * @dev enables to store optional compliance data
  * supports one multihash per address
  * more information about multihash can be found on https://github.com/multiformats/multihash
  * Important hash functions:
- * Name, hashFunction, size (bytes)
- * sha1, 0x11, 20
- * sha2-256, 0x12, 32
- * sha3-256, 0x16, 32
+ * (Name, hashFunction, size in bytes)
+ * (sha1, 0x11, 20)
+ * (sha2-256, 0x12, 32)
+ * (sha3-256, 0x16, 32)
  * Full list can be found on https://github.com/multiformats/multihash/blob/master/hashtable.csv
  */
 contract ComplianceStore is MultihashStore {
@@ -56,7 +56,7 @@ contract ComplianceStore is MultihashStore {
   }
 
   /** 
-  * @dev updates the timestamp for already existing hash
+  * @dev updates the timestamp for existing hash
   * @return true on success
   */
   function touch() public returns (bool) {

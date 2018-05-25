@@ -4,12 +4,12 @@ import "./MintableToken.sol";
 
 
 /**
- * @title Mineable token
- * @dev ERC20 Token with Pos mining
+ * @title MineableToken
+ * @dev ERC20 Token with Pos mining.
  * The blockReward_ is controlled by a GDP oracle.
- * This type of mining will be used and during initial distribution period and when the growth is positive.
- * for mining during negative growth period refer to MineableM5Token.sol
- * Unlike standard erc20 token, the totalSupply is equal sum(all user balances) + totalStake
+ * This type of mining will be used during initial distribution period and when the growth is positive.
+ * For mining during negative growth period refer to MineableM5Token.sol
+ * Unlike standard erc20 token, the totalSupply is sum(all user balances) + totalStake
  * instead of sum(all user balances).
 */
 contract MineableToken is MintableToken { 
@@ -30,13 +30,11 @@ contract MineableToken is MintableToken {
 
   /**
   * @dev commit _value for minning
-  * the _value will be substructed from user balance and added to the stake.
+  * @notice the _value will be substructed from user balance and added to the stake.
   * if user previously commited, add to an existing commitment. 
-  * this is done by calling withdraw() 
-  * then commit back previous commit + reward + new commit 
+  * this is done by calling withdraw() then commit back previous commit + reward + new commit 
   * @param _value The amount to be commited.
-  * @return the commit value 
-  * _value or prevCommit + reward + _value
+  * @return the commit value: _value OR prevCommit + reward + _value
   */
   function commit(uint256 _value) public returns (uint256 commitmentValue) {
     require(0 < _value);
@@ -73,7 +71,10 @@ contract MineableToken is MintableToken {
 
   /**
   * @dev withdraw reward
-  * @return reward to withdraw
+  * @return {
+    "uint256 reward": the new supply
+    "uint256 commitmentValue": the commitment to be returned
+    }
   */
   function withdraw() public returns (uint256 reward, uint256 commitmentValue) {
     require(miners[msg.sender].value > 0); 
@@ -100,6 +101,10 @@ contract MineableToken is MintableToken {
 
   /**
   * @dev Calculate the reward if withdraw() happans on this block
+  * @notice The reward is calculated by the formula:
+  * (numberOfBlocks) * (effectiveBlockReward) * (commitment.value) / (effectiveStake) 
+  * effectiveBlockReward is the average between the block reward during commit and the block reward during the call
+  * effectiveStake is the average between the stake during the commit and the stake during call (liniar aproximation)
   * @return An uint256 representing the reward amount
   */ 
   function getReward(address _miner) public view returns (uint256) {
@@ -126,16 +131,16 @@ contract MineableToken is MintableToken {
 
   /**
   * @dev Calculate the average of two integer numbers 
-  * 1.5 will be rounded toward zero
+  * @notice 1.5 will be rounded toward zero
   * @return An uint256 representing integer average
   */
-  function average(uint256 a, uint256 b) public pure returns (uint) {
+  function average(uint256 a, uint256 b) public pure returns (uint256) {
     return a.add(b).div(2);
   }
 
   /**
   * @dev Calculate the average of two signed integers numbers 
-  * 1.5 will be toward zero
+  * @notice 1.5 will be toward zero
   * @return An int256 representing integer average
   */
   function signedAverage(int256 a, int256 b) public pure returns (int256) {
@@ -161,12 +166,14 @@ contract MineableToken is MintableToken {
   }
 
   /**
-  * @dev Gets the all fields for commitment of the specified address.
+  * @dev Gets the all fields for the commitment of the specified address.
   * @param _miner The address to query the the commitment Of
-  * @return value the amount commited.
-  * @return onBlockNumber block number of commitment.
-  * @return atStake stake when commited.
-  * @return onBlockReward block reward when commited.
+  * @return {
+    "uint256 value": the amount commited.
+    "uint256 onBlockNumber": block number of commitment.
+    "uint256 atStake": stake when commited.
+    "int256 onBlockReward": block reward when commited.
+    }
   */
   function getCommitment(address _miner) public view 
   returns (
@@ -183,7 +190,7 @@ contract MineableToken is MintableToken {
   }
 
   /**
-  * @dev total stake of tokens
+  * @dev the total stake
   * @return the total stake
   */
   function totalStake() public view returns (uint256) {
@@ -191,7 +198,7 @@ contract MineableToken is MintableToken {
   }
 
   /**
-  * @dev the total block reward
+  * @dev the block reward
   * @return the current block reward
   */
   function blockReward() public view returns (int256) {
