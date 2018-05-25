@@ -14,11 +14,12 @@
     "console": "truffle console",
     "tests": "cd scripts && tests.bat || ECHO.",
     "migrate": "truffle.cmd --network testrpc migrate --reset",
-    "compile": "truffle.cmd --network testrpc compile --all"
+    "compile": "truffle.cmd --network testrpc compile --all",
+	  "create-docs": "solidity-docgen --exclude mocks MonetaryCoin/ MonetaryCoin/contracts/ MonetaryCoin-docs/docs/"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/Monetary-Foundation/MonetaryCoin.git"
   },
   "keywords": [
     "solidity",
@@ -32,9 +33,9 @@
   "author": "Paul Laux <lauxpaul@protonmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": ""
+    "url": "https://github.com/Monetary-Foundation/MonetaryCoin/issues"
   },
-  "homepage": "",
+  "homepage": "http://monetarycoin.org",
   "devDependencies": {
     "babel-polyfill": "^6.23.0",
     "babel-preset-es2015": "^6.18.0",
