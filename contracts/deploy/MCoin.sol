@@ -6,12 +6,11 @@ import "../token/ERC20/MineableM5Token.sol";
 /**
  * @title MCoin
  * @dev The MonetaryCoin contract
- * allows the creation of a new monetary coin.
- * The supply of the coin is defined by GDP oracle of the same country.
- * Example: If the GDP of a given country grows by 3%, there will be 3% more coins available for mining
- * Proof of stake forging is defined by the MineableToken.sol contract.
- * Initially, the coins will be distributed by the proof of stake forging mechanism.
- * After the distribution is over, new coins will be created at the same rate as the economy growths.
+ * The MonetaryCoin contract allows for the creation of a new monetary coin.
+ * The supply of a minable coin in a period is defined by an oracle that reports GDP data from the country related to that coin.
+ * Example: If the GDP of a given country grows by 3%, then 3% more coins will be available for forging (i.e. mining) in the next period.
+ * Coins will be distributed by the proof of stake forging mechanism both during and after the initial distribution period.
+ * The Proof of stake forging is defined by the MineableToken.sol contract. 
  */
 contract MCoin is MineableM5Token {
 

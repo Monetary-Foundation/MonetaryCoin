@@ -8,15 +8,13 @@ import "../token/ERC20/MineableToken.sol";
 /**
  * @title MCoinDistribution
  * @dev MCoinDistribution
- * Used to distribute a fixed amount of token per window.
- * Users can commit Ether to a certain window.
- * After a window closes, a user can withdraw the reward using  
- * withdraw(uint256 window) function or use
- * withdrawAll() function to get tokens from all windows in a single transaction.
- * The amount of tokens allocated to a user for a given window equals 
- * (window allocation) * (user eth) / (total eth) 
- * User can get the details of the current window using detailsOfWindow() function.
- * The first-period allocation is larger than second-period allocation (per window)
+ * MCoinDistribution is used to distribute a fixed amount of token per window of time.
+ * Users may commit Ether to a window of their choice.
+ * After a window closes, a user may withdraw their reward using the withdraw(uint256 window) function or use the withdrawAll() 
+ * function to get tokens from all windows in a single transaction.
+ * The amount of tokens allocated to a user for a given window equals (window allocation) * (user eth) / (total eth).
+ * A user can get the details of the current window with the detailsOfWindow() function.
+ * The first-period allocation is larger than second-period allocation (per window). 
  */
 contract MCoinDistribution is Ownable {
   using SafeMath for uint256;

@@ -6,9 +6,9 @@ import "./GDPOraclizedToken.sol";
 /**
  * @title MineableM5Token
  * @notice This contract adds the ability to mine for M5 tokens when growth is negative.
- * The M5 token is a distinct ERC20 token which could be obtained only when the GDP growth is negative.
- * The logic for M5 mining will be determined after all economic considerations were addressed.
- * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to seal the upgradeability permanently.
+ * The M5 token is a distinct ERC20 token that may be obtained only following a period of negative GDP growth.
+ * The logic for M5 mining will be finalized in advance of the close of the initial distribution period – see the White Paper for additional details.
+ * After upgrading this contract with the final M5 logic, finishUpgrade() will be called to permanently seal the upgradeability of the contract.
 */
 contract MineableM5Token is GDPOraclizedToken { 
   
