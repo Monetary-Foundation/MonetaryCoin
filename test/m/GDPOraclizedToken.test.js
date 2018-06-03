@@ -1,7 +1,8 @@
 
 import assertRevert from '../helpers/assertRevert';
 import expectThrow from '../helpers/expectThrow';
-import { duration } from '../helpers/increaseTime';
+import { duration, increaseTimeTo } from '../helpers/increaseTime';
+import { windowTimeStamp } from '../helpers/windowTime';
 import latestTime from '../helpers/latestTime';
 // import advanceToBlock from '../helpers/advanceToBlock';
 const BigNumber = web3.BigNumber;
@@ -15,6 +16,7 @@ const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 const MCoinMock = artifacts.require('MCoinMock');
+
 const windowLength = duration.minutes(5);
 
 contract('GDPOraclizedToken', function (accounts) {
@@ -35,7 +37,6 @@ contract('GDPOraclizedToken', function (accounts) {
   const secondPeriodWindows = 7;
   const firstPeriodSupply = 100;
   const secondPeriodSupply = 150;
-  const initialBalance = 50;
 
   beforeEach(async function () {
     // New startTime for each test:
@@ -43,21 +44,12 @@ contract('GDPOraclizedToken', function (accounts) {
 
     token = await MCoinMock.new(initialBlockReward, GDPOracle, upgradeManager, { from: contractCreator });
 
-    // uint256 firstPeriodWindows,
-    // uint256 firstPeriodSupply,
-    // uint256 secondPeriodWindows,
-    // uint256 secondPeriodSupply,
-    // address initialAccount,
-    // uint256 initialBalance,
-    // uint256 startTime,
-    // uint256 windowLength
     distribution = await MCoinDistributionMock.new(
       firstPeriodWindows,
       firstPeriodSupply,
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       { from: contractCreator }
@@ -66,6 +58,12 @@ contract('GDPOraclizedToken', function (accounts) {
     await token.transferOwnership(distribution.address, { from: contractCreator });
 
     await distribution.init(token.address, { from: contractCreator });
+
+    const commitWindow = 0;
+    const withdrawWindow = 1;
+    await distribution.commit({ from: initialAccount, value: web3.toWei(new BigNumber(0.1), 'ether') });
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow, windowLength));
+    await distribution.withdraw(commitWindow, { from: initialAccount });
   });
 
   it('should return the correct oracle address after init', async function () {
@@ -246,7 +244,7 @@ contract('GDPOraclizedToken', function (accounts) {
 
   it('should withdraw() correctly after changing block reward', async function () {
     const commitValue = 4;
-
+    const initialBalance = await token.balanceOf(initialAccount);
     await token.commit(commitValue, { from: initialAccount });
     // next block:
     await token.setPositiveGrowth(11);
@@ -258,7 +256,7 @@ contract('GDPOraclizedToken', function (accounts) {
     let newBalance = await token.balanceOf(initialAccount);
 
     let expectedReward = new BigNumber(commitValue * 2 * 8).dividedToIntegerBy(commitValue);
-    let expectedBalance = expectedReward.plus(web3.toWei(new BigNumber(initialBalance), 'ether'));
+    let expectedBalance = expectedReward.plus(initialBalance);
 
     newBalance.should.be.bignumber.equal(expectedBalance);
   });

@@ -1,7 +1,8 @@
 
 import assertRevert from '../helpers/assertRevert';
-import { duration } from '../helpers/increaseTime';
 import latestTime from '../helpers/latestTime';
+import { duration, increaseTimeTo } from '../helpers/increaseTime';
+import { windowTimeStamp } from '../helpers/windowTime';
 
 const BigNumber = web3.BigNumber;
 const assert = require('chai').assert;
@@ -37,10 +38,9 @@ contract('MineableM5TokenIntegrationMock', function (accounts) {
 
   const firstPeriodWindows = 3;
   const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
-  const secondPeriodSupply = 150;
-  const initialBalance = 50;
-
+  const firstPeriodSupply = 300;
+  const secondPeriodSupply = 450;
+  
   beforeEach(async function () {
     // New startTime for each test:
     startTime = latestTime() + 60;
@@ -53,7 +53,6 @@ contract('MineableM5TokenIntegrationMock', function (accounts) {
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       { from: contractCreator }
@@ -62,6 +61,12 @@ contract('MineableM5TokenIntegrationMock', function (accounts) {
     await token.transferOwnership(distribution.address, { from: contractCreator });
 
     await distribution.init(token.address, { from: contractCreator });
+
+    const commitWindow = 0;
+    const withdrawWindow = 1;
+    await distribution.commit({ from: initialAccount, value: web3.toWei(new BigNumber(0.1), 'ether') });
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow, windowLength));
+    await distribution.withdraw(commitWindow, { from: initialAccount });
 
     M5Token = await M5TokenMock.new();
     M5Logic = await M5LogicMock3.new();

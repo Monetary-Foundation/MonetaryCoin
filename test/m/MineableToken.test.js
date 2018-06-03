@@ -2,8 +2,9 @@
 // import assertRevert from '../helpers/assertRevert';
 import expectThrow from '../helpers/expectThrow';
 import advanceToBlock from '../helpers/advanceToBlock';
-import { duration } from '../helpers/increaseTime';
 import latestTime from '../helpers/latestTime';
+import { duration, increaseTimeTo } from '../helpers/increaseTime';
+import { windowTimeStamp } from '../helpers/windowTime';
 
 const BigNumber = web3.BigNumber;
 const assert = require('chai').assert;
@@ -42,10 +43,10 @@ contract('MineableToken', function (accounts) {
 
   const firstPeriodWindows = 3;
   const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
+  const firstPeriodSupply = 300;
   const secondPeriodSupply = 150;
-  const initialBalance = 50;
-  const initialBalanceWei = web3.toWei(new BigNumber(initialBalance));
+ 
+  const initialBalanceWei = web3.toWei(new BigNumber(firstPeriodSupply / firstPeriodWindows));
 
   beforeEach(async function () {
     // New startTime for each test:
@@ -59,7 +60,6 @@ contract('MineableToken', function (accounts) {
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       { from: contractCreator }
@@ -68,6 +68,12 @@ contract('MineableToken', function (accounts) {
     await token.transferOwnership(distribution.address, { from: contractCreator });
 
     await distribution.init(token.address, { from: contractCreator });
+
+    const commitWindow = 0;
+    const withdrawWindow = 1;
+    await distribution.commit({ from: initialAccount, value: web3.toWei(new BigNumber(0.1), 'ether') });
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow, windowLength));
+    await distribution.withdraw(commitWindow, { from: initialAccount });
   });
 
   it('should return 0 for totalStake after construction', async function () {

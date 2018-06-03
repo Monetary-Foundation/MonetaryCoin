@@ -20,8 +20,7 @@ contract MCoinDistributionWrap is MCoinDistribution {
     uint256 firstPeriodSupply,
     uint256 secondPeriodWindows,
     uint256 secondPeriodSupply,
-    address initialAccount,
-    uint256 initialBalance,
+    address foundationWallet,
     uint256 startTime,
     uint256 windowLength
     )
@@ -30,8 +29,7 @@ contract MCoinDistributionWrap is MCoinDistribution {
       toDecimals(firstPeriodSupply),   // uint _firstPeriodSupply,
       secondPeriodWindows,             // uint _secondPeriodDays,
       toDecimals(secondPeriodSupply),  // uint _secondPeriodSupply,
-      initialAccount,                  // address _foundationMultiSig,
-      toDecimals(initialBalance),      // uint _foundationReserve,
+      foundationWallet,                // address _foundationMultiSig,
       startTime,                       // uint _startTime
       windowLength                     // uint _windowLength
     ) public 

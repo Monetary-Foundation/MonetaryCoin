@@ -1,14 +1,13 @@
-import { duration } from '../helpers/increaseTime';
 import latestTime from '../helpers/latestTime';
 import assertRevert from '../helpers/assertRevert';
+import { duration, increaseTimeTo } from '../helpers/increaseTime';
+import { windowTimeStamp } from '../helpers/windowTime';
 const BigNumber = web3.BigNumber;
 
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(BigNumber))
   .should();
-
-var StandardTokenMock = artifacts.require('MineableTokenMockERC20');
 
 const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 const MCoinMock = artifacts.require('MCoinMock');
@@ -33,11 +32,10 @@ contract('StandardToken', function ([_, owner, recipient, anotherAccount]) {
 
   const firstPeriodWindows = 3;
   const secondPeriodWindows = 7;
-  const firstPeriodSupply = 100;
+  const firstPeriodSupply = 300;
   const secondPeriodSupply = 150;
-  const initialBalance = 100;
-
-  const initialBalanceWei = web3.toWei(new BigNumber(initialBalance));
+  
+  const initialBalanceWei = web3.toWei(new BigNumber(firstPeriodSupply / firstPeriodWindows));
 
   beforeEach(async function () {
     // New startTime for each test:
@@ -51,7 +49,6 @@ contract('StandardToken', function ([_, owner, recipient, anotherAccount]) {
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       { from: contractCreator }
@@ -60,6 +57,12 @@ contract('StandardToken', function ([_, owner, recipient, anotherAccount]) {
     await token.transferOwnership(distribution.address, { from: contractCreator });
 
     await distribution.init(token.address, { from: contractCreator });
+    
+    const commitWindow = 0;
+    const withdrawWindow = 1;
+    await distribution.commit({ from: initialAccount, value: web3.toWei(new BigNumber(0.1), 'ether') });
+    await increaseTimeTo(windowTimeStamp(startTime, withdrawWindow, windowLength));
+    await distribution.withdraw(commitWindow, { from: initialAccount });
   });
 
   // beforeEach(async function () {
@@ -70,7 +73,7 @@ contract('StandardToken', function ([_, owner, recipient, anotherAccount]) {
     it('returns the total amount of tokens', async function () {
       const totalSupply = await token.totalSupply();
 
-      totalSupply.should.be.bignumber.equal(web3.toWei(new BigNumber(initialBalance + firstPeriodSupply + secondPeriodSupply), 'ether'));
+      totalSupply.should.be.bignumber.equal(web3.toWei(new BigNumber(firstPeriodSupply + secondPeriodSupply), 'ether'));
     });
   });
 

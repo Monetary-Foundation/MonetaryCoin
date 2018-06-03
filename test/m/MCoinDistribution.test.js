@@ -49,7 +49,6 @@ contract('MCoinDistributionMock', function (accounts) {
   const secondPeriodWindows = 7;
   const firstPeriodSupply = 100;
   const secondPeriodSupply = 150;
-  const initialBalance = 50;
 
   beforeEach(async function () {
     // New startTime for each test:
@@ -62,7 +61,6 @@ contract('MCoinDistributionMock', function (accounts) {
     // uint256 secondPeriodWindows,
     // uint256 secondPeriodSupply,
     // address initialAccount,
-    // uint256 initialBalance,
     // uint256 startTime,
     // uint256 windowLength
     distribution = await MCoinDistributionMock.new(
@@ -71,7 +69,6 @@ contract('MCoinDistributionMock', function (accounts) {
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       { from: contractCreator }
@@ -82,19 +79,14 @@ contract('MCoinDistributionMock', function (accounts) {
     await distribution.init(token.address, { from: contractCreator });
   });
 
-  it('should return the correct reward if nothing was commited', async function () {
-    let zeroReward = await token.getReward(accounts[0]);
-    assert.equal(zeroReward, 0);
-  });
-
   it('should return the correct balance for initial address', async function () {
     let balance = await token.balanceOf(accounts[0]);
-    web3.fromWei(balance, 'ether').should.be.bignumber.equal(initialBalance);
+    web3.fromWei(balance, 'ether').should.be.bignumber.equal(0);
   });
 
   it('should return the correct totalSupply', async function () {
     let supply = await token.totalSupply();
-    web3.fromWei(supply, 'ether').should.be.bignumber.equal(firstPeriodSupply + secondPeriodSupply + initialBalance);
+    web3.fromWei(supply, 'ether').should.be.bignumber.equal(firstPeriodSupply + secondPeriodSupply);
   });
 
   it('should return the correct allocation for firstPeriodWindows', async function () {
@@ -141,7 +133,7 @@ contract('MCoinDistributionMock', function (accounts) {
     }
   });
 
-  it('should return correct window details during the distrebution', async function () {
+  it('should return correct window details during the distribution', async function () {
     const totalWindows = firstPeriodWindows + secondPeriodWindows;
     let start, end, remainingTime, allocation, totalEth, window;
     for (let i = 0; i < totalWindows; i++) {

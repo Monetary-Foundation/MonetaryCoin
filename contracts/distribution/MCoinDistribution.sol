@@ -33,7 +33,6 @@ contract MCoinDistribution is Ownable {
   
   uint256 public totalWindows;  // firstPeriodWindows + secondPeriodSupply
 
-  uint256 public foundationReserve;
   address public foundationWallet;
 
   uint256 public startTimestamp;
@@ -48,7 +47,6 @@ contract MCoinDistribution is Ownable {
     uint256 _secondPeriodWindows,
     uint256 _secondPeriodSupply,
     address _foundationWallet,
-    uint256 _foundationReserve,
     uint256 _startTimestamp,
     uint256 _windowLength
   ) public 
@@ -57,7 +55,6 @@ contract MCoinDistribution is Ownable {
     require(0 < _firstPeriodSupply);
     require(0 < _secondPeriodWindows);
     require(0 < _secondPeriodSupply);
-    require(0 < _foundationReserve);
     require(0 < _startTimestamp);
     require(0 < _windowLength);
     require(_foundationWallet != address(0));
@@ -67,7 +64,6 @@ contract MCoinDistribution is Ownable {
     secondPeriodWindows = _secondPeriodWindows;
     secondPeriodSupply = _secondPeriodSupply;
     foundationWallet = _foundationWallet;
-    foundationReserve = _foundationReserve;
     startTimestamp = _startTimestamp;
     windowLength = _windowLength;
 
@@ -92,10 +88,8 @@ contract MCoinDistribution is Ownable {
     require(_MCoin.totalSupply() == 0);
 
     MCoin = _MCoin;
-    MCoin.mint(this, firstPeriodSupply.add(secondPeriodSupply).add(foundationReserve));
+    MCoin.mint(address(this), firstPeriodSupply.add(secondPeriodSupply));
     MCoin.finishMinting();
-
-    MCoin.transfer(foundationWallet, foundationReserve);
   }
 
   /**
@@ -308,7 +302,7 @@ contract MCoinDistribution is Ownable {
   * @return the amount to be moved.
   */
   function moveFunds() public onlyOwner returns (uint256 value) {
-    value = this.balance;
+    value = address(this).balance;
     require(0 < value);
 
     foundationWallet.transfer(value);

@@ -1,5 +1,5 @@
-import { duration } from '../helpers/increaseTime';
-import latestTime from '../helpers/latestTime';
+// import { duration } from '../helpers/increaseTime';
+// import latestTime from '../helpers/latestTime';
 const BigNumber = web3.BigNumber;
 
 require('chai')
@@ -95,7 +95,7 @@ contract('ComplianceStore', function (accounts) {
   it('should correctly emit event during touch', async function () {
     let txObj = await ComplianceStore.setHash(2, 3, '0x00000000000000000000000000000abcd1000000000000000000000000000002');
     const firstTimestamp = txObj.logs[0].args.timestamp;
-    setTimeout(async function (){
+    setTimeout(async function () {
       txObj = await ComplianceStore.touch();
       assert.equal(txObj.logs[0].event, 'SetHash');
       

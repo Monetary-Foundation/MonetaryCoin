@@ -1,13 +1,10 @@
 
 import expectThrow from '../helpers/expectThrow';
 
-// var MintableToken = artifacts.require('MineableToken');
-
-// const MCoinDistributionMock = artifacts.require('MCoinDistributionMock');
 const MCoinMock = artifacts.require('MCoinMock');
 
 // for tests run: ganache-cli -u0 -u1 -u2 -u3
-contract('MineableToken', function (accounts) {
+contract('MintableToken', function (accounts) {
   let token;
 
   const GDPOracle = accounts[1];
