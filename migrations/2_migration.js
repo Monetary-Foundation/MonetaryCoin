@@ -8,27 +8,29 @@ const deploy = false;
 // set MNEMONIC="HDkey"
 module.exports = async function (deployer, network, accounts) {
   if (deploy) {
-    const contractCreator = '0xb87A0317A4460973D683dEEe79A05A3F73a6277C';
+    const contractCreator = '0x357098ff39e5ce7139a5aee2b2b9987e56a106f4';
 
-    const initialAccount = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
-    const GDPOracle = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
-    const upgradeManager = '0xe78549c4bd8c5bbbc2a1d8454569934b4e9c2f3e';
+    // Foundation multi sig wallet
+    const initialAccount = '0x17c2cff681cd63b3fd0dc72b19e81d0c59fb7659';
+    const upgradeManager = initialAccount;
+    const GDPOracle = initialAccount;
 
     verifyContractCreator(accounts[0], contractCreator);
     logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
 
-    const firstPeriodWindows = 7;
-    const secondPeriodWindows = 173;
-    const startTime = await latestTime() + 240;
-    const windowLength = duration.hours(23);
+    const firstPeriodWindows = 70;
+    const secondPeriodWindows = 1730;
+    const startTime = '1528156801';
+    // const startTime = await latestTime() + 240;
+    // const windowLength = duration.hours(23);
+    const windowLength = duration.seconds(10032);
 
     // MUSA Params:
-    let MCoinName = 'MonetaryCoin USA';
-    let MCoinSymbol = 'MUSA';
-    let initialBlockReward = '26536';
-    let firstPeriodSupply = 6.9737 * (10 ** 9);
-    let secondPeriodSupply = firstPeriodSupply;
-    let initialBalance = 2 * firstPeriodSupply;
+    let MCoinName =   'MonetaryCoinERO';    // eslint-disable-line
+    let MCoinSymbol = 'MERO';
+    let initialBlockReward =       '25718'; // eslint-disable-line
+    let firstPeriodSupply  =   '844536898'; // eslint-disable-line
+    let secondPeriodSupply = '10436063102';
 
     await deployMCoin(
       MCoinName,
@@ -37,26 +39,23 @@ module.exports = async function (deployer, network, accounts) {
       initialBlockReward,
       GDPOracle,
       upgradeManager,
-
       MCoinDistribution,
       firstPeriodWindows,
       firstPeriodSupply,
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       deployer,
     );
 
     // MERO Params:
-    MCoinName = 'MonetaryCoin China';
-    MCoinSymbol = 'MCNY';
-    initialBlockReward = '21462';
-    firstPeriodSupply = 5.640 * (10 ** 9);
-    secondPeriodSupply = firstPeriodSupply;
-    initialBalance = 2 * firstPeriodSupply;
+    MCoinName =   'MonetaryCoinCHI';  // eslint-disable-line
+    MCoinSymbol = 'MCHI';
+    initialBlockReward =        '52242'; // eslint-disable-line
+    firstPeriodSupply  =  '13025686096'; // eslint-disable-line
+    secondPeriodSupply = '160960263904';
 
     await deployMCoin(
       MCoinName,
@@ -65,14 +64,12 @@ module.exports = async function (deployer, network, accounts) {
       initialBlockReward,
       GDPOracle,
       upgradeManager,
-
       MCoinDistribution,
       firstPeriodWindows,
       firstPeriodSupply,
       secondPeriodWindows,
       secondPeriodSupply,
       initialAccount,
-      initialBalance,
       startTime,
       windowLength,
       deployer,
@@ -95,7 +92,6 @@ async function deployMCoin (
   secondPeriodWindows,
   secondPeriodSupply,
   initialAccount,
-  initialBalance,
   startTime,
   windowLength,
   // Tools:
@@ -117,7 +113,6 @@ async function deployMCoin (
     secondPeriodWindows,
     secondPeriodSupply,
     initialAccount,
-    initialBalance,
     startTime,
     windowLength
   );
@@ -142,7 +137,7 @@ const getBlock = () => // eslint-disable-line no-inner-declarations
     });
   });
 
-async function latestTime () {
+async function latestTime () { // eslint-disable-line
   const latestBlock = await getBlock();
   return latestBlock.timestamp;
 }
