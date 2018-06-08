@@ -4,7 +4,7 @@ https://monetarycoin.org
 
 ## Description
 
-MonetaryCoin is an ERC20 token defined by the Monetary Protocol (see white paper for details).
+MonetaryCoin is an ERC20 token defined by the [Monetary Protocol](https://github.com/Monetary-Foundation/MonetaryCoin-White-Paper/blob/master/Monetary%20Protocol%20Whitepaper.pdf) (see [White Paper](https://github.com/Monetary-Foundation/MonetaryCoin-White-Paper/blob/master/Monetary%20Protocol%20Whitepaper.pdf) for details).
 
 Aside from standard ERC20 functionality, the token contract has these major features:
 
