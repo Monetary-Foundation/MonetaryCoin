@@ -1,5 +1,7 @@
 # MonetaryCoin smart contracts
 
+https://moetarycoin.org
+
 ## Description
 
 MonetaryCoin is an ERC20 token defined by the Monetary Protocol (see white paper for details).
@@ -22,7 +24,7 @@ Aside from standard ERC20 functionality, the token contract has these major feat
 
 The ERC20 standard token is based on the openzeppelin-solidity repository, the rest of the token’s functionality is custom developed and has been [audited](https://github.com/SagroVesk/MonetaryCoin-Audit/releases).
 
-Go to [API Documentation](#)
+Go to [API Documentation](https://monetary-foundation.github.io/MonetaryCoin/)
 
 ## Installation
 
