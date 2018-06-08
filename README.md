@@ -1,6 +1,6 @@
 # MonetaryCoin smart contracts
 
-https://moetarycoin.org
+https://monetarycoin.org
 
 ## Description
 
