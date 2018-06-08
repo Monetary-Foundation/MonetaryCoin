@@ -5,30 +5,37 @@ const MCoin = artifacts.require('MCoin');
 // see https://github.com/trufflesuite/truffle/issues/557
 const deploy = false;
 
-// set MNEMONIC="HDkey"
+// set MNEMONIC=HDkey
 module.exports = async function (deployer, network, accounts) {
   if (deploy) {
+    /*
+    Ropsten test Net:
     const contractCreator = '0x357098ff39e5ce7139a5aee2b2b9987e56a106f4';
-
-    // Foundation multi sig wallet
     const initialAccount = '0x17c2cff681cd63b3fd0dc72b19e81d0c59fb7659';
+    */
+
+    const contractCreator = '0x7e1F8194E7093e5d017EBBF3a4B2B3Ee97C883a1';
+    const initialAccount = '0x286d39aae5953fa2d6cac8fe6585cdce190d66ea';
     const upgradeManager = initialAccount;
     const GDPOracle = initialAccount;
 
     verifyContractCreator(accounts[0], contractCreator);
     logRoles(contractCreator, initialAccount, GDPOracle, upgradeManager);
 
-    const firstPeriodWindows = 70;
-    const secondPeriodWindows = 1730;
-    const startTime = '1528156801';
-    // const startTime = await latestTime() + 240;
-    // const windowLength = duration.hours(23);
-    const windowLength = duration.seconds(10032);
+    const firstPeriodWindows = 7;
+    const secondPeriodWindows = 173;
+    const startTime = '1531180801';
+    const windowLength = duration.hours(23);
 
-    // MUSA Params:
+    // const startTime = await latestTime() + 240;
+    // const startTime = '1528156801';
+    // const windowLength = duration.seconds(10032);
+    // const windowLength = duration.seconds(600);
+
+    // MERO Params:
     let MCoinName =   'MonetaryCoinERO';    // eslint-disable-line
     let MCoinSymbol = 'MERO';
-    let initialBlockReward =       '25718'; // eslint-disable-line
+    let initialBlockReward =       '24145'; // eslint-disable-line
     let firstPeriodSupply  =   '844536898'; // eslint-disable-line
     let secondPeriodSupply = '10436063102';
 
@@ -50,10 +57,10 @@ module.exports = async function (deployer, network, accounts) {
       deployer,
     );
 
-    // MERO Params:
+    // MCHI Params:
     MCoinName =   'MonetaryCoinCHI';  // eslint-disable-line
     MCoinSymbol = 'MCHI';
-    initialBlockReward =        '52242'; // eslint-disable-line
+    initialBlockReward =       '372401'; // eslint-disable-line
     firstPeriodSupply  =  '13025686096'; // eslint-disable-line
     secondPeriodSupply = '160960263904';
 
