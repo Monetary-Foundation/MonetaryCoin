@@ -16,6 +16,10 @@ const ropstenProvider = process.env.SOLIDITY_COVERAGE
   ? undefined
   : infuraProvider('ropsten');
 
+const mainnetProvider = process.env.SOLIDITY_COVERAGE
+  ? undefined
+  : infuraProvider('mainnet');
+
 module.exports = {
   networks: {
     development: {
@@ -28,6 +32,12 @@ module.exports = {
       network_id: 3, // eslint-disable-line camelcase
       gas: 4700000,
       gasPrice: 102 * 1000000000,
+    },
+    mainnet: {
+      provider: mainnetProvider,
+      network_id: 1, // eslint-disable-line camelcase
+      gas: 4700000,
+      gasPrice: 10 * 1000000000,
     },
     coverage: {
       host: '127.0.0.1',
