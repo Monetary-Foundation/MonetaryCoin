@@ -2,6 +2,15 @@
 
 https://monetarycoin.org
 
+## More info
+
+* [MonetaryCoin Distribution DApp](https://MonetaryCoin.io) (blocked for the US)
+* [MonetaryCoin Homepage](https://MonetaryCoin.org)
+* [MonetaryCoin smart contracts](https://github.com/Monetary-Foundation/MonetaryCoin)
+* [MonetaryCoin smart contracts Audit](https://github.com/SagroVesk/MonetaryCoin-Audit/releases)
+* [Monetary Foundation on Github](https://github.com/Monetary-Foundation)
+* [White Paper](https://github.com/Monetary-Foundation/MonetaryCoin-White-Paper/blob/master/Monetary%20Protocol%20Whitepaper.pdf)
+
 ## Description
 
 MonetaryCoin is an ERC20 token defined by the [Monetary Protocol](https://github.com/Monetary-Foundation/MonetaryCoin-White-Paper/blob/master/Monetary%20Protocol%20Whitepaper.pdf) (see [White Paper](https://github.com/Monetary-Foundation/MonetaryCoin-White-Paper/blob/master/Monetary%20Protocol%20Whitepaper.pdf) for details).
