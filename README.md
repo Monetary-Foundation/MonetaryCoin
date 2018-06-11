@@ -4,7 +4,7 @@ https://monetarycoin.org
 
 ## More info
 
-* [MonetaryCoin Distribution DApp](https://MonetaryCoin.io) (blocked for the US)
+* [MonetaryCoin Distribution DApp](https://MonetaryCoin.io)
 * [MonetaryCoin Homepage](https://MonetaryCoin.org)
 * [MonetaryCoin smart contracts](https://github.com/Monetary-Foundation/MonetaryCoin)
 * [MonetaryCoin smart contracts Audit](https://github.com/SagroVesk/MonetaryCoin-Audit/releases)
