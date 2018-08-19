@@ -4,6 +4,7 @@ https://monetarycoin.org
 
 ## More info
 
+* [MonetaryCoin Forging DApp](https://forging.MonetaryCoin.io)
 * [MonetaryCoin Distribution DApp](https://MonetaryCoin.io)
 * [MonetaryCoin Homepage](https://MonetaryCoin.org)
 * [MonetaryCoin smart contracts](https://github.com/Monetary-Foundation/MonetaryCoin)
